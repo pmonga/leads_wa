@@ -27,17 +27,25 @@ const crud = (collectionName, db) => {
         updateData.updatedAt = new Date(); // Set updatedAt timestamp
       }
       const collection = db.collection(collectionName);
-      const result = await collection.updateOne(filter, { $set: updateData });
-      return result > 0;
+      const result = await collection.updateOne(
+        filter,
+        { $set: updateData },
+        { upsert: false }
+      );
+      return result;
     },
 
     // Soft delete a document
     remove: async (filter) => {
       const collection = db.collection(collectionName);
-      const result = await collection.updateOne(filter, {
-        $set: { deletedAt: new Date() },
-      });
-      return result > 0;
+      const result = await collection.updateOne(
+        filter,
+        {
+          $set: { deletedAt: new Date() },
+        },
+        { upsert: false }
+      );
+      return result;
     },
   };
 };

@@ -5,7 +5,7 @@ import 'dotenv/config';
 import { connect } from './db.js';
 import crud from './crud.js'; // Import the CRUD module
 
-const { WEBHOOK_VERIFY_TOKEN, GRAPH_API_TOKEN, PORT, MONGO_URI } = process.env;
+const { WEBHOOK_VERIFY_TOKEN, GRAPH_API_TOKEN, PORT } = process.env;
 
 const app = express();
 
@@ -63,7 +63,7 @@ app.use(express.json());
 app.post('/webhook', async (req, res) => {
   // log incoming messages
   log.create(req.body);
-  console.log('Incoming webhook message:', JSON.stringify(req.body, null, 2));
+  //console.log('Incoming webhook message:', JSON.stringify(req.body, null, 2));
 
   // check if the webhook request contains a message
   // details on WhatsApp text message payload: https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/payload-examples#text-messages
@@ -74,6 +74,36 @@ app.post('/webhook', async (req, res) => {
     // extract the business number to send the reply from it
     const business_phone_number_id =
       req.body.entry?.[0].changes?.[0].value?.metadata?.phone_number_id;
+
+    // extract sender's number
+    const phone = message.from;
+
+    //extract campaign from the message
+    const regex = /\[([A-Za-z0-9]{6})\]/;
+    const match = message.text.body.match(regex);
+    let code = match && campaigns[match[1]] ? campaigns[match[1]] : false;
+    if (code) {
+      console.log('Campaign found:', code);
+    } else {
+      console.log('No campaign found in the message');
+    }
+
+    // Find contact if not found add to collection.
+    const contactArray = await contactsCollection.read({ phone: phone });
+    if (contactArray.length > 0) {
+      const contact = contactArray[0];
+    } else {
+      const contact = {
+        phone: phone,
+        name: '',
+        wa_name:
+          req.body.entry?.[0].changes?.[0].value?.contacts?.[0].profile.name ||
+          '',
+        wa_id: req.body.entry?.[0].changes?.[0].value?.contacts?.[0].wa_id,
+      };
+      let x = await contactsCollection.create(contact);
+      console.log('contact created', x);
+    }
 
     // send a reply message as per the docs here https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages
     await axios({
