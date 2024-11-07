@@ -81,28 +81,37 @@ app.post('/webhook', async (req, res) => {
     //extract campaign from the message
     const regex = /\[([A-Za-z0-9]{6})\]/;
     const match = message.text.body.match(regex);
-    let code = match && campaigns[match[1]] ? campaigns[match[1]] : false;
+    let tags = [];
+    let code = match && campaigns[match[1]] ? match[1] : false;
     if (code) {
       console.log('Campaign found:', code);
+      tags = [code, ...campaigns[code].tags];
     } else {
       console.log('No campaign found in the message');
     }
 
     // Find contact if not found add to collection.
-    const contactArray = await contactsCollection.read({ phone: phone });
+    const contactArray = await contactsCollection.findOneAndUpdate(
+      { phone: phone },
+      { $addToSet: { tags: { $each: tags } } }
+    );
     if (contactArray.length > 0) {
       const contact = contactArray[0];
     } else {
       const contact = {
+        _id: '',
         phone: phone,
         name: '',
         wa_name:
           req.body.entry?.[0].changes?.[0].value?.contacts?.[0].profile.name ||
           '',
         wa_id: req.body.entry?.[0].changes?.[0].value?.contacts?.[0].wa_id,
+        createdBy: code || 'self',
+        tags: tags,
       };
       let x = await contactsCollection.create(contact);
-      console.log('contact created', x);
+      contact.id = x.insertedId;
+      console.log('contact created', contact);
     }
 
     // send a reply message as per the docs here https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages

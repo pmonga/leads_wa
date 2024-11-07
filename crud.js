@@ -35,6 +35,21 @@ const crud = (collectionName, db) => {
       return result;
     },
 
+    // findOneAndUpdate a document
+    findOneAndUpdate: async (filter, updateData) => {
+      if (updateData.updatedAt) {
+        updateData.updatedAt = new Date(); // Set updatedAt timestamp
+      }
+      const collection = db.collection(collectionName);
+      return collection
+        .findOneAndUpdate(
+          filter,
+          { $set: updateData },
+          { upsert: false, returnNewDocument: true }
+        )
+        .toArray();
+    },
+
     // Soft delete a document
     remove: async (filter) => {
       const collection = db.collection(collectionName);
