@@ -41,13 +41,11 @@ const crud = (collectionName, db) => {
         updateData.updatedAt = new Date(); // Set updatedAt timestamp
       }
       const collection = db.collection(collectionName);
-      return collection
-        .findOneAndUpdate(
-          filter,
-          { $set: updateData },
-          { upsert: false, returnNewDocument: true }
-        )
-        .toArray();
+      return collection.findOneAndUpdate(
+        filter,
+        { $set: updateData },
+        { upsert: false, returnNewDocument: true }
+      );
     },
 
     // Soft delete a document
