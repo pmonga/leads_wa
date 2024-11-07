@@ -75,42 +75,75 @@ app.post('/webhook', async (req, res) => {
     const business_phone_number_id =
       req.body.entry?.[0].changes?.[0].value?.metadata?.phone_number_id;
 
-    // extract sender's number
+    // extract sender's number and validate its from India else return, no more processing
     const phone = message.from;
+    let mobile;
+    if (/^91/.test(phone)) {
+      mobile = phone.slice(2);
+    } else {
+      res.sendStatus(200);
+      return 'Not a valid Indian mobile';
+    }
 
     //extract campaign from the message
-    const regex = /\[([A-Za-z0-9]{6})\]/;
-    const match = message.text.body.match(regex);
-    let tags = [];
+    const campaignRegex = /\[([A-Za-z0-9]{6})\]/;
+    const match = message.text.body.match(campaignRegex);
+    let campaignTags = [];
+    let utm;
     let code = match && campaigns[match[1]] ? match[1] : false;
     if (code) {
       console.log('Campaign found:', code);
-      tags = [code, ...campaigns[code].tags];
+      campaignTags = [code, ...campaigns[code].tags];
+      utm = campaigns[code].utm || { utm_source: 'Self' };
     } else {
       console.log('No campaign found in the message');
     }
 
     // Find contact if not found add to collection.
-    let contact = await contactsCollection.findOneAndUpdate(
-      { phone: phone },
-      { $addToSet: { tags: { $each: tags } } }
-    );
-    if (!contact) {
+    let contact = (await contactsCollection.read({ phone: phone }))?.[0];
+    if (contact) {
+      contactsCollection.update(
+        { phone: phone },
+        { $addToSet: { tags: { $each: campaignTags } } }
+      );
+    } else {
       contact = {
-        _id: '',
         phone: phone,
+        mobile: mobile,
         name: '',
         wa_name:
           req.body.entry?.[0].changes?.[0].value?.contacts?.[0].profile.name ||
           '',
         wa_id: req.body.entry?.[0].changes?.[0].value?.contacts?.[0].wa_id,
         createdBy: code || 'self',
-        tags: tags,
+        tags: campaignTags,
       };
       let x = await contactsCollection.create(contact);
-      contact.id = x.insertedId;
-      console.log('contact created', contact);
+      contact._id = x.insertedId;
     }
+
+    // save the message in the wa_messages and create an entry in CRM
+    messagesCollection.create({
+      contact_id: contact._id,
+      message_object: { ...req.body },
+    });
+    let response = await axios({
+      method: 'POST',
+      url: `https://admin.schedule.alchemistindia.com/cp2/schedule/apis/contact`,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: {
+        source: 'whatsApp LP',
+        first_name: contact.name || contact.wa_name,
+        mobile: contact.mobile,
+        email: 'test@test.com',
+        wa_name: contact.wa_name,
+        message: message.text.body,
+        ...utm,
+      },
+    });
+    console.log(response.data);
 
     // send a reply message as per the docs here https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages
     await axios({
@@ -122,9 +155,10 @@ app.post('/webhook', async (req, res) => {
       data: {
         messaging_product: 'whatsapp',
         to: message.from,
-        text: { body: 'Echo: ' + message.text.body },
-        context: {
-          message_id: message.id, // shows the message as a reply to the original user message
+        text: {
+          body:
+            campaigns[code]?.reply ||
+            'Thank you for contacting Alchemist, we will get in touch with you soon',
         },
       },
     });

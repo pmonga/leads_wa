@@ -23,29 +23,24 @@ const crud = (collectionName, db) => {
 
     // Update a document
     update: async (filter, updateData) => {
-      if (updateData.updatedAt) {
-        updateData.updatedAt = new Date(); // Set updatedAt timestamp
-      }
+      if (!updateData['$set']) updateData['$set'] = {};
+      updateData['$set'].updatedAt = new Date(); // Set updatedAt timestamp
       const collection = db.collection(collectionName);
-      const result = await collection.updateOne(
-        filter,
-        { $set: updateData },
-        { upsert: false }
-      );
+      const result = await collection.updateOne(filter, updateData, {
+        upsert: false,
+      });
       return result;
     },
 
     // findOneAndUpdate a document
     findOneAndUpdate: async (filter, updateData) => {
-      if (updateData.updatedAt) {
-        updateData.updatedAt = new Date(); // Set updatedAt timestamp
-      }
+      if (!updateData['$set']) updateData['$set'] = {};
+      updateData['$set'].updatedAt = new Date(); // Set updatedAt timestamp
       const collection = db.collection(collectionName);
-      return collection.findOneAndUpdate(
-        filter,
-        { $set: updateData },
-        { upsert: false, returnNewDocument: true }
-      );
+      return collection.findOneAndUpdate(filter, updateData, {
+        upsert: false,
+        returnNewDocument: true,
+      });
     },
 
     // Soft delete a document
@@ -59,6 +54,10 @@ const crud = (collectionName, db) => {
         { upsert: false }
       );
       return result;
+    },
+    // expose the collection for native functions
+    collection: async () => {
+      return db.collection(collectionName);
     },
   };
 };
