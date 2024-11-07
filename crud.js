@@ -11,7 +11,7 @@ const crud = (collectionName, db) => {
       if (!data.updatedAt) data.updatedAt = new Date();
       const collection = db.collection(collectionName);
       const result = await collection.insertOne(data);
-      return result.ops[0];
+      return result;
     },
 
     // Read documents (excluding soft-deleted)
@@ -28,7 +28,7 @@ const crud = (collectionName, db) => {
       }
       const collection = db.collection(collectionName);
       const result = await collection.updateOne(filter, { $set: updateData });
-      return result.modifiedCount > 0;
+      return result > 0;
     },
 
     // Soft delete a document
@@ -37,7 +37,7 @@ const crud = (collectionName, db) => {
       const result = await collection.updateOne(filter, {
         $set: { deletedAt: new Date() },
       });
-      return result.modifiedCount > 0;
+      return result > 0;
     },
   };
 };
