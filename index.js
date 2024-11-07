@@ -62,7 +62,7 @@ app.use(express.json());
 
 app.post('/webhook', async (req, res) => {
   // log incoming messages
-  log.create(req.body);
+  log.create({ ...req.body });
   //console.log('Incoming webhook message:', JSON.stringify(req.body, null, 2));
 
   // check if the webhook request contains a message
@@ -88,13 +88,13 @@ app.post('/webhook', async (req, res) => {
     //extract campaign from the message
     const campaignRegex = /\[([A-Za-z0-9]{6})\]/;
     const match = message.text.body.match(campaignRegex);
-    let campaignTags = [];
-    let utm;
+    let campaignTags = ['self'];
+    let utm = { utm_source: 'self' };
     let code = match && campaigns[match[1]] ? match[1] : false;
     if (code) {
       console.log('Campaign found:', code);
       campaignTags = [code, ...campaigns[code].tags];
-      utm = campaigns[code].utm || { utm_source: 'Self' };
+      utm = { ...campaigns[code].utm };
     } else {
       console.log('No campaign found in the message');
     }
