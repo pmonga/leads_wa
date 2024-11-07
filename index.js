@@ -91,14 +91,12 @@ app.post('/webhook', async (req, res) => {
     }
 
     // Find contact if not found add to collection.
-    const contactArray = await contactsCollection.findOneAndUpdate(
+    let contact = await contactsCollection.findOneAndUpdate(
       { phone: phone },
       { $addToSet: { tags: { $each: tags } } }
     );
-    if (contactArray.length > 0) {
-      const contact = contactArray[0];
-    } else {
-      const contact = {
+    if (!contact) {
+      contact = {
         _id: '',
         phone: phone,
         name: '',
