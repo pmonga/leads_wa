@@ -24,6 +24,12 @@ function createWhatsAppClient(phoneNumberId) {
     throw new Error('phoneNumberId must be provided.');
   }
 
+  // Template for the base data object
+  const baseDataTemplate = {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+  };
+
   /**
    * Generates the headers required for WhatsApp API requests.
    * @returns {object} - Headers object.
@@ -46,19 +52,15 @@ function createWhatsAppClient(phoneNumberId) {
       const response = await axios.post(url, data, { headers: getHeaders() });
       return response.data;
     } catch (error) {
-      // Enhanced error handling
       if (error.response) {
-        // Server responded with a status other than 2xx
         throw new Error(
           `WhatsApp API Error: ${error.response.status} - ${JSON.stringify(
             error.response.data
           )}`
         );
       } else if (error.request) {
-        // No response received
         throw new Error('No response received from WhatsApp API.');
       } else {
-        // Other errors
         throw new Error(`Error in sending message: ${error.message}`);
       }
     }
@@ -67,15 +69,15 @@ function createWhatsAppClient(phoneNumberId) {
   /**
    * Sends a text message.
    * @param {string} to - Recipient's phone number in international format.
-   * @param {Object} messageObject - The text object with message in body. {body: message}. Modify object to as required.
+   * @param {object} message - Message object with `body` and other properties.
    * @returns {Promise} - Axios response promise.
    */
-  async function sendTextMessage(to, messageObject) {
+  async function sendTextMessage(to, message) {
     const data = {
-      messaging_product: 'whatsapp',
+      ...baseDataTemplate,
       to,
       type: 'text',
-      text: messageObject,
+      text: message, // message object expected to contain { body: 'your message' }
     };
     return sendMessage(data);
   }
@@ -83,19 +85,15 @@ function createWhatsAppClient(phoneNumberId) {
   /**
    * Sends an image message.
    * @param {string} to - Recipient's phone number in international format.
-   * @param {string} imageUrl - URL of the image to send.
-   * @param {string} [caption] - Optional caption for the image.
+   * @param {object} message - Message object with `link` and optional `caption`.
    * @returns {Promise} - Axios response promise.
    */
-  async function sendImageMessage(to, imageUrl, caption = '') {
+  async function sendImageMessage(to, message) {
     const data = {
-      messaging_product: 'whatsapp',
+      ...baseDataTemplate,
       to,
       type: 'image',
-      image: {
-        link: imageUrl,
-        caption,
-      },
+      image: message, // message object expected to contain { link: 'imageUrl', caption: 'optional caption' }
     };
     return sendMessage(data);
   }
@@ -103,19 +101,15 @@ function createWhatsAppClient(phoneNumberId) {
   /**
    * Sends a document message.
    * @param {string} to - Recipient's phone number in international format.
-   * @param {string} documentUrl - URL of the document to send.
-   * @param {string} [filename] - Optional filename for the document.
+   * @param {object} message - Message object with `link` and optional `filename`.
    * @returns {Promise} - Axios response promise.
    */
-  async function sendDocumentMessage(to, documentUrl, filename = '') {
+  async function sendDocumentMessage(to, message) {
     const data = {
-      messaging_product: 'whatsapp',
+      ...baseDataTemplate,
       to,
       type: 'document',
-      document: {
-        link: documentUrl,
-        filename,
-      },
+      document: message, // message object expected to contain { link: 'documentUrl', filename: 'optional filename' }
     };
     return sendMessage(data);
   }
@@ -123,34 +117,15 @@ function createWhatsAppClient(phoneNumberId) {
   /**
    * Sends a template message.
    * @param {string} to - Recipient's phone number in international format.
-   * @param {string} templateName - Name of the pre-approved template.
-   * @param {string} languageCode - Language code (e.g., 'en_US').
-   * @param {Array<string>} [variables] - Variables to replace in the template.
+   * @param {object} message - Message object with `name`, `language`, and optional `components`.
    * @returns {Promise} - Axios response promise.
    */
-  async function sendTemplateMessage(
-    to,
-    templateName,
-    languageCode,
-    variables = []
-  ) {
+  async function sendTemplateMessage(to, message) {
     const data = {
-      messaging_product: 'whatsapp',
+      ...baseDataTemplate,
       to,
       type: 'template',
-      template: {
-        name: templateName,
-        language: { code: languageCode },
-        components: [
-          {
-            type: 'body',
-            parameters: variables.map((variable) => ({
-              type: 'text',
-              text: variable,
-            })),
-          },
-        ],
-      },
+      template: message, // message object expected to contain { name: 'templateName', language: { code: 'languageCode' }, components: 'optional components' }
     };
     return sendMessage(data);
   }
