@@ -4,6 +4,7 @@ import MongoClient from 'mongodb';
 import 'dotenv/config';
 import { connect } from './db.js';
 import crud from './crud.js'; // Import the CRUD module
+import createWhatsAppClient from './whatsappCloudAPI.js';
 
 const { WEBHOOK_VERIFY_TOKEN, GRAPH_API_TOKEN, PORT } = process.env;
 
@@ -74,7 +75,7 @@ app.post('/webhook', async (req, res) => {
     // extract the business number to send the reply from it
     const business_phone_number_id =
       req.body.entry?.[0].changes?.[0].value?.metadata?.phone_number_id;
-
+    const waClient = createWhatsAppClient(business_phone_number_id);
     // extract sender's number and validate its from India else return, no more processing
     const phone = message.from;
     let mobile;
@@ -90,11 +91,14 @@ app.post('/webhook', async (req, res) => {
     const match = message.text.body.match(campaignRegex);
     let campaignTags = ['self'];
     let utm = { utm_source: 'self' };
+    let reply =
+      'Thank you for contacting Alchemist, we will get in touch with you soon';
     let code = match && campaigns[match[1]] ? match[1] : false;
     if (code) {
       console.log('Campaign found:', code);
       campaignTags = [code, ...campaigns[code].tags];
       utm = { ...campaigns[code].utm };
+      if (campaigns[code].reply) reply = campaigns[code].reply;
     } else {
       console.log('No campaign found in the message');
     }
@@ -146,22 +150,21 @@ app.post('/webhook', async (req, res) => {
     console.log(response.data);
 
     // send a reply message as per the docs here https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages
-    await axios({
-      method: 'POST',
-      url: `https://graph.facebook.com/v18.0/${business_phone_number_id}/messages`,
-      headers: {
-        Authorization: `Bearer ${GRAPH_API_TOKEN}`,
-      },
-      data: {
-        messaging_product: 'whatsapp',
-        to: message.from,
-        text: {
-          body:
-            campaigns[code]?.reply ||
-            'Thank you for contacting Alchemist, we will get in touch with you soon',
-        },
-      },
-    });
+    await waClient.sendTextMessage(message.from, { body: reply });
+    // await axios({
+    //   method: 'POST',
+    //   url: `https://graph.facebook.com/v18.0/${business_phone_number_id}/messages`,
+    //   headers: {
+    //     Authorization: `Bearer ${GRAPH_API_TOKEN}`,
+    //   },
+    //   data: {
+    //     messaging_product: 'whatsapp',
+    //     to: message.from,
+    //     text: {
+    //       body: reply,
+    //     },
+    //   },
+    // });
 
     // mark incoming message as read
     await axios({
