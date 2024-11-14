@@ -114,6 +114,7 @@ app.post('/webhook', async (req, res) => {
       contact = {
         phone: phone,
         mobile: mobile,
+        email: '',
         name: '',
         wa_name:
           req.body.entry?.[0].changes?.[0].value?.contacts?.[0].profile.name ||
@@ -141,7 +142,7 @@ app.post('/webhook', async (req, res) => {
         source: 'whatsApp LP',
         first_name: contact.name || contact.wa_name,
         mobile: contact.mobile,
-        email: 'test@test.com',
+        email: contact.email,
         wa_name: contact.wa_name,
         message: message.text.body,
         ...utm,
@@ -150,7 +151,9 @@ app.post('/webhook', async (req, res) => {
     console.log(response.data);
 
     // send a reply message as per the docs here https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages
-    await waClient.sendTextMessage(message.from, { body: reply });
+    await waClient.sendTextMessage(message.from, {
+      body: reply + '(sent by module)',
+    });
     // await axios({
     //   method: 'POST',
     //   url: `https://graph.facebook.com/v18.0/${business_phone_number_id}/messages`,
