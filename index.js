@@ -140,7 +140,7 @@ app.post('/webhook', async (req, res) => {
       },
       data: {
         source: 'whatsApp LP',
-        first_name: contact.name || contact.wa_name,
+        first_name: contact.name,
         mobile: contact.mobile,
         email: contact.email,
         wa_name: contact.wa_name,
