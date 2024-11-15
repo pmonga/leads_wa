@@ -119,21 +119,17 @@ app.use(async (req, res, next) => {
   next();
 });
 
-app.post(
-  '/webhook',
-  [logger(req, res, next), setCredentials(req, res, next)],
-  async (req, res) => {
-    switch (res.locals.type) {
-      case 'message':
-        handleMessage(req, res);
-        break;
-      case 'default':
-        console.log('unsupported webhook type: ', res.locals.type);
-        res.sendStatus(200);
-        break;
-    }
+app.post('/webhook', [logger, setCredentials], async (req, res) => {
+  switch (res.locals.type) {
+    case 'message':
+      handleMessage(req, res);
+      break;
+    case 'default':
+      console.log('unsupported webhook type: ', res.locals.type);
+      res.sendStatus(200);
+      break;
   }
-);
+});
 
 // accepts GET requests at the /webhook endpoint. You need this URL to setup webhook initially.
 // info on verification request payload: https://developers.facebook.com/docs/graph-api/webhooks/getting-started#verification-requests
