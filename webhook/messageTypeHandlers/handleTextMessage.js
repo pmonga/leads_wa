@@ -13,7 +13,7 @@ export default async (req, res, next) => {
   }
   // extract code from the campaign
   const match = message.text.body.match(campaignRegex);
-  const campaigns = res.local.campaigns;
+  const campaigns = res.locals.campaigns;
   const code = match && campaigns[match[1]] ? match[1] : false;
   if (code) {
     res.locals.code = code;
@@ -74,15 +74,17 @@ export default async (req, res, next) => {
   }
 
   // send message to contact
-  let reply = { type:'text',
-  body: 'Thank you for contacting Alchemist, we will get in touch with you soon'};
-  // get campaign specific reply 
-  if (code){
-    if(contact.isRegistered){
-      reply = res.locals.campaign.reply.registered
-    } else reply = res.locals.campaign.reply.unregistered
+  let reply = {
+    type: 'text',
+    body: 'Thank you for contacting Alchemist, we will get in touch with you soon',
+  };
+  // get campaign specific reply
+  if (code) {
+    if (contact.isRegistered) {
+      reply = res.locals.campaign.reply.registered;
+    } else reply = res.locals.campaign.reply.unregistered;
   }
-  if(reply.type ==='text')
+  if (reply.type === 'text')
     res.locals.waClient.sendTextMessage(contact.phone, reply);
   res.locals.waClient.sendStatusUpdate('read', message);
 
