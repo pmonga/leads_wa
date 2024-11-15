@@ -68,43 +68,6 @@ async function setCredentials(req, res, next) {
     res.locals.type = 'message';
     res.locals.message = message;
   }
-
-  // setting up the campaign
-  if (message?.type === 'text') {
-    const campaignRegex = /^\[([A-Za-z0-9]{6})\]/;
-    const match = message.text.body.match(campaignRegex);
-    res.local.campaign = campaigns[match?.[1]];
-  }
-
-  // setting the contact
-  if (message) {
-    if (!/^91/.test(message.from)) {
-      res.status(200).send('Not a valid Indian mobile');
-      return 'Not a valid Indian mobile';
-    }
-    const phone = message.from;
-    const contactsCollection = res.locals.collections.contactsCollection;
-    let contact = await contactsCollection.read({ phone })?.[0];
-    if (!contact) {
-      const mobile = phone.slice(2);
-      contact = {
-        phone,
-        mobile,
-        email: '',
-        name: '',
-        wa_name:
-          req.body.entry?.[0].changes?.[0].value?.contacts?.[0].profile.name ||
-          '',
-        wa_id: req.body.entry?.[0].changes?.[0].value?.contacts?.[0].wa_id,
-        createdBy: res.local.campaign?.code || 'self',
-        tags: res.local.campaign
-          ? [res.local.campaign.code, ...res.local.campaign.tags]
-          : ['self'],
-      };
-      contact._id = await contactsCollection.create(contact).insertedId;
-    }
-    res.locals.contact = contact;
-  }
   next();
 }
 
