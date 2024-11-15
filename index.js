@@ -79,6 +79,7 @@ app.use(async (req, res, next) => {
     messagesCollection,
   };
   res.locals.campaigns = campaigns;
+  console.log('setting up collections in res');
   next();
 });
 
