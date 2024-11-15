@@ -41,7 +41,7 @@ export default async (req, res, next) => {
         req.body.entry?.[0].changes?.[0].value?.contacts?.[0].profile.name ||
         '',
       wa_id: req.body.entry?.[0].changes?.[0].value?.contacts?.[0].wa_id,
-      createdBy: res.local.campaign?.code || 'self',
+      createdBy: res.locals.campaign?.code || 'self',
       tags: tagsToAdd,
     };
     contact._id = (await contactsCollection.create(contact)).insertedId;
