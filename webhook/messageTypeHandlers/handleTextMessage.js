@@ -25,7 +25,6 @@ export default async (req, res, next) => {
   const phone = message.from;
   const contactsCollection = res.locals.collections.contactsCollection;
   let contact = (await contactsCollection.read({ phone: phone }))?.[0];
-  console.log('contact: ', JSON.stringify(contact));
   if (contact) {
     await contactsCollection.update(
       { phone: phone },
