@@ -129,6 +129,14 @@ function createWhatsAppClient(phoneNumberId) {
     };
     return sendMessage(data);
   }
+  async function sendStatusUpdate(status, message) {
+    const data = {
+      messaging_product: 'whatsapp',
+      status,
+      message_id: message.id,
+    };
+    return sendMessage(data);
+  }
 
   // Return the methods as an object
   return {
@@ -136,6 +144,7 @@ function createWhatsAppClient(phoneNumberId) {
     sendImageMessage,
     sendDocumentMessage,
     sendTemplateMessage,
+    sendStatusUpdate,
   };
 }
 
