@@ -86,7 +86,7 @@ export default async (req, res, next) => {
     } else reply = res.locals.campaign.reply.unregistered;
   }
   if (reply.type === 'text')
-    res.locals.waClient.sendTextMessage(contact.phone, reply);
+    res.locals.waClient.sendTextMessage(contact.phone, { body: reply.body });
   res.locals.waClient.sendStatusUpdate('read', message);
 
   res.sendStatus(200);
