@@ -126,7 +126,6 @@ export default async (req, res, next) => {
       flow_action: 'navigate',
       flow_action_payload: {
         screen: 'JOIN_NOW',
-        data: {},
       },
     };
     let result = await res.locals.waClient.sendFlowMessage(
