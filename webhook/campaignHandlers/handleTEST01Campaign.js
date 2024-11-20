@@ -16,7 +16,7 @@ export default async (req, res, next) => {
         case 'text':
           await handleTEST01CampaignTextMessage(req, res);
           break;
-        case 'default':
+        default:
           console.log(
             'unsupported message type for TEST01 campaign: ',
             res.locals.message.type
@@ -25,7 +25,7 @@ export default async (req, res, next) => {
           break;
       }
       break;
-    case 'default':
+    default:
       console.log('unsupported type for TEST01 campaign: ', res.locals.type);
       res.sendStatus(200);
       break;

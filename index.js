@@ -94,7 +94,7 @@ app.post('/webhook', [logger, setCredentials], async (req, res) => {
       console.log(`inside switch`);
       await handleMessage(req, res);
       break;
-    case 'default':
+    default:
       console.log('unsupported webhook type: ', res.locals.type);
       res.sendStatus(200);
       break;

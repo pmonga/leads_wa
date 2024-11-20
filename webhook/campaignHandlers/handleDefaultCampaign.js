@@ -16,7 +16,7 @@ export default async (req, res, next) => {
         case 'text':
           await handleDefaultCampaignTextMessage(req, res);
           break;
-        case 'default':
+        default:
           console.log(
             'unsupported message type for default campaign type: ',
             res.locals.message.type
@@ -26,7 +26,7 @@ export default async (req, res, next) => {
           break;
       }
       break;
-    case 'default':
+    default:
       console.log('unsupported type for default campaign: ', res.locals.type);
       await res.locals.waClient.sendStatusUpdate('read', message);
       res.sendStatus(200);

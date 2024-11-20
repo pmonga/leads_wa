@@ -7,7 +7,7 @@ const handleMessage = async function (req, res) {
     case 'text':
       await handleTextMessage(req, res);
       break;
-    case 'default':
+    default:
       console.log('Not supported message type: ', type);
       res.sendStatus(200);
       break;

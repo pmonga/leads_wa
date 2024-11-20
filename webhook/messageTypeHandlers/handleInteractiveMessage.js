@@ -6,7 +6,7 @@ const handleInteractiveMessage = async function (req, res) {
     case 'nfm_reply':
       handleFlowMessage(req, res);
       break;
-    case 'default':
+    default:
       console.log('Not supported Interactive message type: ', type);
       res.sendStatus(200);
       break;
