@@ -21,14 +21,14 @@ export default async (req, res, next) => {
             'unsupported message type for default campaign type: ',
             res.locals.message.type
           );
-          res.locals.waClient.sendStatusUpdate('read', message);
+          await res.locals.waClient.sendStatusUpdate('read', message);
           res.sendStatus(200);
           break;
       }
       break;
     case 'default':
       console.log('unsupported type for default campaign: ', res.locals.type);
-      res.locals.waClient.sendStatusUpdate('read', message);
+      await res.locals.waClient.sendStatusUpdate('read', message);
       res.sendStatus(200);
       break;
   }

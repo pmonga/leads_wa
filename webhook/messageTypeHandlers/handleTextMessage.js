@@ -23,10 +23,10 @@ export default async (req, res, next) => {
   }
   switch (code) {
     case 'TEST01':
-      handleTEST01Campaign(req, res);
+      await handleTEST01Campaign(req, res);
       break;
     case 'default':
-      handleDefaultCampaign(req, res);
+      await handleDefaultCampaign(req, res);
       break;
   }
 };
