@@ -14,7 +14,7 @@ export default async (req, res, next) => {
     case 'message':
       switch (res.locals.message.type) {
         case 'text':
-          handleTEST01CampaignTextMessage(req, res);
+          await handleTEST01CampaignTextMessage(req, res);
           break;
         case 'default':
           console.log(
