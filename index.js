@@ -28,7 +28,10 @@ async function initdb() {
 }
 
 async function refreshCampaign() {
-  let data = await campaignsCollection.read();
+  let data = await campaignsCollection.read(
+    {},
+    { projections: { _id: 1, code: 1, utm: 1, tags: 1, name: 1, reply: 1 } }
+  );
   campaigns = data.reduce((acc, curr) => {
     // Assuming each object has a 'code' key
     if (curr.code) {
@@ -77,6 +80,7 @@ app.use(async (req, res, next) => {
   res.locals.collections = {
     contactsCollection,
     messagesCollection,
+    campaignsCollection,
   };
   res.locals.campaigns = campaigns;
   console.log('setting up collections in res');

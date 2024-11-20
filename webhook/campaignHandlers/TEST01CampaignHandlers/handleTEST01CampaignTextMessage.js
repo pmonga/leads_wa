@@ -1,5 +1,6 @@
 import dotnenv from 'dotenv';
 import createCommInCRM from '../../../helpers/crm.js';
+import generateToken from '../../../helpers/tokenizer.js';
 
 dotnenv.config();
 export default async (req, res, next) => {
@@ -9,8 +10,9 @@ export default async (req, res, next) => {
 
   //Add tags for the campaign to be added to the contact
   const tagsToAdd = campaign.tags;
-  const phone = message.from;
+  const phone = '+' + message.from;
   const contactsCollection = res.locals.collections.contactsCollection;
+  const campaignsCollection = res.locals.collections.campaignsCollection;
 
   // search for existing Contact and if exists update the tags
   let contact = (await contactsCollection.read({ phone: phone }))?.[0];
@@ -21,7 +23,7 @@ export default async (req, res, next) => {
     );
   } // eslse create a new contact
   else {
-    const mobile = phone.slice(2);
+    const mobile = phone.slice(3);
     contact = {
       phone,
       mobile,
@@ -44,7 +46,7 @@ export default async (req, res, next) => {
     message_object: { ...req.body },
   });
 
-  // Update CRM with the UTM fot no campaign
+  // Update CRM with the UTM for TEST01 campaign
   let utm = { ...campaign.utm };
   let crmData = {
     source: 'whatsApp LP',
@@ -56,24 +58,81 @@ export default async (req, res, next) => {
     ...utm,
   };
   if (process.env.ENV === 'PROD') {
-    await createCommInCRM(crmData);
+    createCommInCRM(crmData);
   } else {
     console.log('CRM Entry :', JSON.stringify(crmData));
   }
 
   // send message to contact
-  let reply = contact.isRegistered
-    ? campaign.reply.registered
-    : campaign.reply.unregistered;
-  // get campaign specific reply use for existing campaign codes
-  //   if (code) {
-  //     if (contact.isRegistered) {
-  //       reply = res.locals.campaign.reply.registered;
-  //     } else reply = res.locals.campaign.reply.unregistered;
-  //   }
-  //   if (reply.type === 'text')
-  //     res.locals.waClient.sendTextMessage(contact.phone, { body: reply.body });
-  res.locals.waClient.sendTextMessage(contact.phone, { body: reply.body });
-  res.locals.waClient.sendStatusUpdate('read', message);
-  res.sendStatus(200);
+  if (contact.name) {
+    const registrations = [
+      ...(
+        await campaignsCollection.read(
+          { _id: campaign._id },
+          { projection: { registrations: 1 } }
+        )
+      ).registrations,
+    ];
+    let registered = registrations.find((e) => e._id === contact._id);
+
+    if (!registered) {
+      registered = {
+        _id,
+        name,
+        mobile,
+        phone,
+        email,
+        regnum: registrations.length,
+      } = contact;
+      registrations.push(registered);
+      await campaignsCollection.update(
+        { _id: campaign._id },
+        { $set: { registrations: registrations } }
+      );
+    }
+    let reply = {
+      body: `Thank you, ${
+        registered.name
+      }, you are registered for ${campaign.name.toUpperCase()} with mobile number ${
+        registered.mobile
+      } and your registartion id is ${registered.regnum}`,
+    };
+    res.locals.waClient.sendTextMessage(contact.phone, reply);
+    res.locals.waClient.sendStatusUpdate('read', message);
+    res.sendStatus(200);
+  } else {
+    // send flow message here
+    // to get the contacts name
+    const token = generateToken(
+      JSON.stringify({ code, mobile, phone, date: new Date() })
+    );
+    const layout = {
+      header: {
+        type: 'text',
+        text: 'Flow message header',
+      },
+      body: {
+        text: 'Flow message body',
+      },
+      footer: {
+        text: 'Flow message footer',
+      },
+    };
+    const params = {
+      flow_token: token,
+      mode: 'draft',
+      flow_id: '1760272798116365', //Lead Sign Up
+      flow_cta: 'Register',
+      flow_action: 'navigate',
+      flow_action_payload: {
+        screen: 'JOIN_NOW',
+        data: {},
+      },
+    };
+    let result = await res.locals.waClient.sendFlowMessage(
+      contact.phone,
+      layout,
+      params
+    );
+  }
 };

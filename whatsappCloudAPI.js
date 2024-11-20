@@ -129,6 +129,39 @@ function createWhatsAppClient(phoneNumberId) {
     };
     return sendMessage(data);
   }
+  async function sendFlowMessage(to, layout, params) {
+    const data = {
+      recipient_type: 'individual',
+      messaging_product: 'whatsapp',
+      to: to,
+      type: 'interactive',
+      interactive: {
+        type: 'flow',
+        ...layout,
+        action: {
+          name: 'flow',
+          parameters: {
+            flow_message_version: '3',
+            // flow_token: 'AQAAAAACS5FpgQ_cAAAAAD0QI3s.',
+            // flow_id: '1760272798116365', //Lead Sign Up
+
+            // flow_cta: 'Book!',
+            // flow_action: 'navigate',
+            // flow_action_payload: {
+            //   screen: '<SCREEN_NAME>',
+            //   data: {
+            //     product_name: 'name',
+            //     product_description: 'description',
+            //     product_price: 100,
+            //   },
+            // },
+            ...params,
+          },
+        },
+      },
+    };
+    return sendMessage(data);
+  }
   async function sendStatusUpdate(status, message) {
     const data = {
       messaging_product: 'whatsapp',
@@ -144,6 +177,7 @@ function createWhatsAppClient(phoneNumberId) {
     sendImageMessage,
     sendDocumentMessage,
     sendTemplateMessage,
+    sendFlowMessage,
     sendStatusUpdate,
   };
 }

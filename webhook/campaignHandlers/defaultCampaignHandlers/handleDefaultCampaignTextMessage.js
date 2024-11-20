@@ -7,7 +7,7 @@ export default async (req, res, next) => {
 
   //No campaign hence self contact
   const tagsToAdd = ['self'];
-  const phone = message.from;
+  const phone = '+' + message.from;
   const contactsCollection = res.locals.collections.contactsCollection;
 
   // search for existing Contact and if exists update the tags
@@ -19,7 +19,7 @@ export default async (req, res, next) => {
     );
   } // eslse create a new contact
   else {
-    const mobile = phone.slice(2);
+    const mobile = phone.slice(3);
     contact = {
       phone,
       mobile,
