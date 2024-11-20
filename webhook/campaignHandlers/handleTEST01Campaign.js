@@ -5,6 +5,7 @@ This is when code= TEST01.
 *********************************************************************************/
 import dotnenv from 'dotenv';
 import createCommInCRM from '../../helpers/crm.js';
+import handleTEST01CampaignTextMessage from './TEST01CampaignHandlers/handleTEST01CampaignTextMessage.js';
 
 dotnenv.config();
 
