@@ -160,7 +160,8 @@ function createWhatsAppClient(phoneNumberId) {
         },
       },
     };
-    return sendMessage(data);
+    console.log('action: ', JSON.stringify(data.action));
+    //return sendMessage(data);
   }
   async function sendStatusUpdate(status, message) {
     const data = {

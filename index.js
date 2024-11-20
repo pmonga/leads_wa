@@ -88,9 +88,10 @@ app.use(async (req, res, next) => {
 });
 
 app.post('/webhook', [logger, setCredentials], async (req, res) => {
+  console.log('hook type: ', res.locals.type);
   switch (res.locals.type) {
     case 'message':
-      handleMessage(req, res);
+      await handleMessage(req, res);
       break;
     case 'default':
       console.log('unsupported webhook type: ', res.locals.type);
