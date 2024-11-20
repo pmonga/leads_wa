@@ -91,6 +91,7 @@ app.post('/webhook', [logger, setCredentials], async (req, res) => {
   console.log('hook type: ', res.locals.type);
   switch (res.locals.type) {
     case 'message':
+      console.log(`inside switch`);
       await handleMessage(req, res);
       break;
     case 'default':

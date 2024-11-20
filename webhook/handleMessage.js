@@ -2,6 +2,7 @@ import handleTextMessage from './messageTypeHandlers/handleTextMessage.js';
 
 const handleMessage = async function (req, res) {
   const type = res.locals.message.type;
+  console.log('handleMessage switch type:', type);
   switch (type) {
     case 'text':
       await handleTextMessage(req, res);
