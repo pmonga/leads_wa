@@ -60,7 +60,7 @@ export default async (req, res, next) => {
   if (process.env.ENV === 'PROD') {
     createCommInCRM(crmData);
   } else {
-    console.log('CRM Entry :', JSON.stringify(crmData));
+    //console.log('CRM Entry :', JSON.stringify(crmData));
   }
 
   // send message to contact
@@ -104,7 +104,7 @@ export default async (req, res, next) => {
     // send flow message here
     // to get the contacts name
     const token = generateToken(
-      JSON.stringify({ code, mobile, phone, date: new Date() })
+      JSON.stringify({ code, ...contact, date: new Date() })
     );
     const layout = {
       header: {

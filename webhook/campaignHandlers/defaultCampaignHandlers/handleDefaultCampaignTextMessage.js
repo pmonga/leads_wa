@@ -56,7 +56,7 @@ export default async (req, res, next) => {
   if (process.env.ENV === 'PROD') {
     await createCommInCRM(crmData);
   } else {
-    console.log('CRM Entry :', JSON.stringify(crmData));
+    //console.log('CRM Entry :', JSON.stringify(crmData));
   }
 
   // send message to contact
@@ -72,8 +72,11 @@ export default async (req, res, next) => {
   //   }
   //   if (reply.type === 'text')
   //     res.locals.waClient.sendTextMessage(contact.phone, { body: reply.body });
-  res.locals.waClient.sendTextMessage(contact.phone, { body: reply.body });
-  res.locals.waClient.sendStatusUpdate('read', message);
-
+  console.log('check phone:', contact.phone);
+  let result = await res.locals.waClient.sendTextMessage(contact.phone, {
+    body: reply.body,
+  });
+  await res.locals.waClient.sendStatusUpdate('read', message);
+  console.log('after sending message: ', result);
   res.sendStatus(200);
 };
