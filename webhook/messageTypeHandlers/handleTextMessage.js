@@ -8,6 +8,7 @@ dotnenv.config();
 export default async (req, res, next) => {
   const campaignRegex = /^\[([A-Za-z0-9]{6})\]/;
   const message = res.locals.message;
+  console.log('from: ', message.from);
   // check if message is from a valid Indian number
   if (!/^91/.test(message.from)) {
     res.status(200).send('Not a valid Indian mobile');
