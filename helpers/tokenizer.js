@@ -3,7 +3,7 @@ import dotnenv from 'dotenv';
 dotnenv.config();
 
 // Function to generate HMAC signatures
-export function generateToken(payload) {
+export default function generateToken(payload) {
   // Ensure the secret is provided in the environment variables
   const secret = process.env.SECRET_KEY;
   if (!secret) {
