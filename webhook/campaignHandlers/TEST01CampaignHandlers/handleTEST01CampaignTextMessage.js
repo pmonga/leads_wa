@@ -1,6 +1,7 @@
 import dotnenv from 'dotenv';
 import createCommInCRM from '../../../helpers/crm.js';
 import generateToken from '../../../helpers/tokenizer.js';
+import { set, get } from '../../../helpers/storage.js';
 
 dotnenv.config();
 export default async (req, res, next) => {
@@ -104,7 +105,7 @@ export default async (req, res, next) => {
     // send flow message here
     // to get the contacts name
     const token = generateToken(
-      JSON.stringify({ code, ...contact, date: new Date() })
+      JSON.stringify({ phone, code, flow_id: '1760272798116365' })
     );
     const layout = {
       header: {
@@ -128,10 +129,12 @@ export default async (req, res, next) => {
         screen: 'JOIN_NOW',
       },
     };
-    let result = await res.locals.waClient.sendFlowMessage(
-      contact.phone,
-      layout,
-      params
-    );
+    await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);
+    set('token', {
+      phone,
+      code,
+      flow_id: '1760272798116365',
+      created: new Date(),
+    });
   }
 };

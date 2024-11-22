@@ -1,11 +1,23 @@
 // Inbound Flow message handler
-//import handleFlowMessage from './interactiveTypeHandlers/handleFlowMessage';
+import handleTEST01Campaign from '../../campaignHandlers/handleTEST01Campaign.js';
+import { get } from '../../../helpers/storage.js';
 
 const handleFlowMessage = async function (req, res) {
-  const flow = 'test'; // write code to find flow.id or flow.name from flow_token
-  switch (flow) {
+  const flow_data = JSON.parse(
+    res.locals.message.interactive.nfm_reply?.response_json
+  );
+  const flow_token = flow_data?.flow_token;
+  const code = flow_token ? (await get(flow_token))?.code : undefined;
+  res.locals.code = code;
+  res.locals.campaign = res.locals.campaigns[code];
+  res.locals.flow_token = flow_token;
+  res.locals.flow_data = flow_data;
+  switch (code) {
+    case 'TEST01':
+      await handleTEST01Campaign(req, res);
+      break;
     default:
-      console.log('Not supported flow: ', flow);
+      console.log('Flow: Invalid campaign code:  ', code);
       res.sendStatus(200);
       break;
   }

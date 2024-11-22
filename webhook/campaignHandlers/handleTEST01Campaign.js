@@ -1,11 +1,12 @@
 /*******************************************************
 This file is created for each campaign type;
-Handlers based on type oh hook invoked are invoked within the switch staments.
+Handlers based on type of hook invoked are invoked within the switch staments.
 This is when code= TEST01.
 *********************************************************************************/
 import dotnenv from 'dotenv';
 import createCommInCRM from '../../helpers/crm.js';
 import handleTEST01CampaignTextMessage from './TEST01CampaignHandlers/handleTEST01CampaignTextMessage.js';
+import handleTEST01CampaignInteractiveMessage from './TEST01CampaignHandlers/handleTEST01CampaignInteractiveMessage.js';
 
 dotnenv.config();
 
@@ -15,6 +16,9 @@ export default async (req, res, next) => {
       switch (res.locals.message.type) {
         case 'text':
           await handleTEST01CampaignTextMessage(req, res);
+          break;
+        case 'interactive':
+          await handleTEST01CampaignInteractiveMessage(req, res);
           break;
         default:
           console.log(
