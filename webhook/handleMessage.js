@@ -1,6 +1,5 @@
 import handleInteractiveMessage from './messageTypeHandlers/handleInteractiveMessage.js';
 import handleTextMessage from './messageTypeHandlers/handleTextMessage.js';
-import handleFlowMessage from './messageTypeHandlers/interactiveTypeHandlers/handleFlowMessage.js';
 
 const handleMessage = async function (req, res) {
   const type = res.locals.message.type;

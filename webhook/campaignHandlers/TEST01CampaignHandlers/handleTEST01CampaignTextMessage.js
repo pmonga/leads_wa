@@ -130,11 +130,13 @@ export default async (req, res, next) => {
       },
     };
     await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);
-    set('token', {
+    await set(token, {
       phone,
       code,
       flow_id: '1760272798116365',
       created: new Date(),
     });
+
+    console.log('storage 1: ', await get(token));
   }
 };

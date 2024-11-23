@@ -53,11 +53,11 @@ async function logger(req, res, next) {
     // log incoming messages
     log.create({ ...req.body });
   else if (ENV === 'DEV')
-    console.log(
-      'Logger: Incoming webhook message:',
-      JSON.stringify(req.body, null, 2)
-    );
-  next();
+    // console.log(
+    //   'Logger: Incoming webhook message:',
+    //   JSON.stringify(req.body, null, 2)
+    // );
+    next();
 }
 async function setCredentials(req, res, next) {
   // setup whatsapp api client
@@ -91,7 +91,7 @@ app.post('/webhook', [logger, setCredentials], async (req, res) => {
   console.log('hook type: ', res.locals.type);
   switch (res.locals.type) {
     case 'message':
-      console.log(`inside switch`);
+      //console.log(`inside switch`);
       await handleMessage(req, res);
       break;
     default:
