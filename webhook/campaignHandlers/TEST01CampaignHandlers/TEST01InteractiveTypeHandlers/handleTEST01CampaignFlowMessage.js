@@ -62,14 +62,12 @@ export default async (req, res) => {
   del(res.locals.flow_token);
 
   //register for the campaign event
-  const registrations = [
-    ...(
-      await campaignsCollection.read(
-        { _id: campaign._id },
-        { projection: { registrations: 1 } }
-      )
-    ).registrations,
-  ];
+  const registrations = (
+    await campaignsCollection.read(
+      { _id: campaign._id },
+      { projection: { registrations: 1 } }
+    )
+  ).registrations;
   let registered = registrations.find((e) => e._id === contact._id);
 
   if (!registered) {
