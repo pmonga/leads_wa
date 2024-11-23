@@ -66,14 +66,12 @@ export default async (req, res, next) => {
 
   // send message to contact
   if (contact.name) {
-    const registrations = [
-      ...(
-        await campaignsCollection.read(
-          { _id: campaign._id },
-          { projection: { registrations: 1 } }
-        )
-      ).registrations,
-    ];
+    const registrations = (
+      await campaignsCollection.read(
+        { _id: campaign._id },
+        { projection: { registrations: 1 } }
+      )
+    ).registrations;
     let registered = registrations.find((e) => e._id === contact._id);
 
     if (!registered) {
