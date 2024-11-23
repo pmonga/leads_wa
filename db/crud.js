@@ -15,10 +15,10 @@ const crud = (collectionName, db) => {
     },
 
     // Read documents (excluding soft-deleted)
-    read: async (filter = {}, proj = {}) => {
+    read: async (filter = {}, options = {}) => {
       const collection = db.collection(collectionName);
       filter.deletedAt = { $exists: false }; // Exclude soft-deleted docs
-      return collection.find(filter, proj).toArray();
+      return collection.find(filter, options).toArray();
     },
 
     // Update a document

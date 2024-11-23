@@ -72,6 +72,8 @@ export default async (req, res, next) => {
         { projection: { registrations: 1 } }
       )
     ).registrations;
+    console.log('campaign: ', campaign.code);
+    console.log('redistrations: ', registrations);
     let registered = registrations.find((e) => e._id === contact._id);
 
     if (!registered) {
