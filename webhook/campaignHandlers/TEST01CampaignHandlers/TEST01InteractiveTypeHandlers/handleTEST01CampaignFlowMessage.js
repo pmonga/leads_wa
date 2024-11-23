@@ -67,18 +67,19 @@ export default async (req, res) => {
       { _id: campaign._id },
       { projection: { registrations: 1 } }
     )
-  ).registrations;
+  )?.[0].registrations;
   let registered = registrations.find((e) => e._id === contact._id);
 
   if (!registered) {
+    const { _id, name, mobile, phone, email } = contact;
     registered = {
       _id,
       name,
       mobile,
       phone,
       email,
-      regnum: registrations.length,
-    } = contact;
+      regnum: registrations.length + 1,
+    };
     registrations.push(registered);
     await campaignsCollection.update(
       { _id: campaign._id },
