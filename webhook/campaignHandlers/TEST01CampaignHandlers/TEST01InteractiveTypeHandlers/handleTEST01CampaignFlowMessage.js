@@ -49,7 +49,7 @@ export default async (req, res) => {
     mobile: contact.mobile,
     email: contact.email,
     wa_name: contact.wa_name,
-    message: message.text.body,
+    message: JSON.stringify({ ...flowData, ...flowObject }),
     ...utm,
   };
   if (process.env.ENV === 'PROD') {
