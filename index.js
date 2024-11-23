@@ -30,7 +30,7 @@ async function initdb() {
 async function refreshCampaign() {
   let data = await campaignsCollection.read(
     {},
-    { projections: { _id: 1, code: 1, utm: 1, tags: 1, name: 1, reply: 1 } }
+    { projection: { _id: 1, code: 1, utm: 1, tags: 1, name: 1, reply: 1 } }
   );
   campaigns = data.reduce((acc, curr) => {
     // Assuming each object has a 'code' key
