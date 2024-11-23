@@ -10,7 +10,7 @@ export default async (req, res, next) => {
   const campaign = res.locals.campaigns[code];
 
   //Add tags for the campaign to be added to the contact
-  const tagsToAdd = campaign.tags;
+  const tagsToAdd = [code, ...campaign.tags];
   const phone = '+' + message.from;
   const contactsCollection = res.locals.collections.contactsCollection;
   const campaignsCollection = res.locals.collections.campaignsCollection;
@@ -136,7 +136,5 @@ export default async (req, res, next) => {
       flow_id: '1760272798116365',
       created: new Date(),
     });
-
-    console.log('storage 1: ', await get(token));
   }
 };
