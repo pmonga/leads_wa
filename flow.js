@@ -22,6 +22,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   }
   const { flow_id } = await get(flow_token);
   switch (flow_id) {
-    case '1760272798116365':
+    // Flow KBM_test id 1214667192982073
+    case '1214667192982073':
   }
 };

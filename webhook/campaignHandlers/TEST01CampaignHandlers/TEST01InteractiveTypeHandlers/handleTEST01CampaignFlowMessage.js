@@ -14,7 +14,7 @@ export default async (req, res) => {
 
   const flowObject = await get(res.locals.flow_token);
   const flowData = res.locals.flow_data;
-  // flow_object will exist else this handler wouldnt have been invoked
+  // flow_object will exist else this handler wouldn't have been invoked
   const tagsToAdd = [code, ...flowData.courses];
   let contact = (
     await contactsCollection.read({ phone: flowObject.phone })

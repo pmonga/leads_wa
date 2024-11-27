@@ -26,6 +26,9 @@ export default async (req, res, next) => {
     case 'TEST01':
       await handleTEST01Campaign(req, res);
       break;
+    case 'XCD09G':
+      await handleTEST01Campaign(req, res);
+      break;
     default:
       await handleDefaultCampaign(req, res);
       break;

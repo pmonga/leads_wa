@@ -8,9 +8,9 @@ import {
 // handle initial request when opening the flow
 export const getNextScreen = async (req, res, decryptedBody) => {
   const { screen, data, version, action, flow_token } = decryptedBody;
-  const flowId = 1760272798116365;
+  const flow_id = 1214667192982073;
 
-  if (action === 'INIT') {
+  if (action === 'data_exchange') {
     return {
       screen: 'MY_SCREEN',
       data: {
@@ -23,7 +23,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   if (action === 'data_exchange') {
     // handle the request based on the current screen
     switch (screen) {
-      case 'MY_SCREEN':
+      case 'WELCOME':
         // TODO: process flow input data
         console.info('Input name:', data?.name);
 

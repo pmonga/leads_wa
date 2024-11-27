@@ -17,6 +17,9 @@ const handleFlowMessage = async function (req, res) {
     case 'TEST01':
       await handleTEST01Campaign(req, res);
       break;
+    case 'XCD09G':
+      await handleTEST01Campaign(req, res);
+      break;
     default:
       console.log('Flow: Invalid campaign code:  ', code);
       res.locals.waClient.sendTextMessage(message.from, {
