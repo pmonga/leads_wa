@@ -10,12 +10,11 @@ export default async (req, res, next) => {
   const contact = res.locals.contact;
   const code = res.locals.code; // should be 'XCD09G';
   const campaign = res.locals.campaign;
-  console.log('res collections', res.local.collections);
   const phone = contact.phone;
   const contactsCollection = res.locals.collections.contactsCollection;
   const campaignsCollection = res.locals.collections.campaignsCollection;
   const campaignContactsCollection =
-    res.local.collections.campaignContactsCollection;
+    res.locals.collections.campaignContactsCollection;
 
   // check if contact has already provided name && registered for the game;
   if (contact.name) {
