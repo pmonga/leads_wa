@@ -78,7 +78,7 @@ async function addToCRM(res) {
     mobile: contact.mobile,
     email: contact.email,
     wa_name: contact.wa_name,
-    message: message.text.body,
+    message: message,
     ...utm,
   };
   if (process.env.ENV === 'PROD') {
