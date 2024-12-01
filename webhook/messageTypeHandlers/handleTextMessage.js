@@ -1,5 +1,6 @@
 import dotnenv from 'dotenv';
 import handleTEST01Campaign from '../campaignHandlers/handleTEST01Campaign.js';
+import handleXCD09GCampaign from '../campaignHandlers/handleXCD09GCampaign.js';
 import handleDefaultCampaign from '../campaignHandlers/handleDefaultCampaign.js';
 
 dotnenv.config();
