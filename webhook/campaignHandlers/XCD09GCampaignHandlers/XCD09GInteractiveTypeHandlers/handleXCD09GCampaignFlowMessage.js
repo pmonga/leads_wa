@@ -95,7 +95,10 @@ async function signupFlow() {
   }
   // send the KBM flow message for KBM flow_id = 1214667192982073
   // check if has already played the game today
-  if (isSameDate(registered.last_attemptedAt)) {
+  if (
+    registered.last_attemptedAt &&
+    isSameDate(new Date(registered.last_attemptedAt))
+  ) {
     res.locals.waClient.sendTextMessage(contact.phone, {
       body: `You have already played the game today. Please try again tomorrow `,
     });
