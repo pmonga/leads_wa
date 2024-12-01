@@ -76,7 +76,7 @@ export default async (req, res) => {
       registered.name
     }, you are registered for ${campaign.name.toUpperCase()} with mobile number ${
       registered.mobile
-    } and your registartion id is ${registered.regnum}`,
+    } and your registration id is ${registered.regnum}`,
   };
   res.locals.waClient.sendTextMessage(contact.phone, reply);
 };
