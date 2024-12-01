@@ -1,5 +1,6 @@
 // Inbound Flow message handler
 import handleTEST01Campaign from '../../campaignHandlers/handleTEST01Campaign.js';
+import handleXCD09GCampaign from '../../campaignHandlers/handleXCD09GCampaign.js';
 import { get } from '../../../helpers/storage.js';
 
 const handleFlowMessage = async function (req, res) {
@@ -28,7 +29,7 @@ const handleFlowMessage = async function (req, res) {
       await handleTEST01Campaign(req, res);
       break;
     case 'XCD09G':
-      await handleTEST01Campaign(req, res);
+      await handleXCD09GCampaign(req, res);
       break;
     default:
       console.log('Flow: Invalid campaign code:  ', code);

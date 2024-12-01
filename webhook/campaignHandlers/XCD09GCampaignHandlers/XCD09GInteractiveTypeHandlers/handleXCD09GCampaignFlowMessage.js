@@ -1,5 +1,4 @@
 import dotnenv from 'dotenv';
-import createCommInCRM from '../../../../helpers/crm.js';
 import generateToken from '../../../../helpers/tokenizer.js';
 import { set, get, del } from '../../../../helpers/storage.js';
 
@@ -152,4 +151,53 @@ async function signupFlow() {
       { $set: { active_flow_token: token } }
     );
   }
+}
+function isSameDate(givenDate) {
+  // Get the current date in IST
+  const currentDate = new Date();
+  const istOffset = 330; // IST is UTC+5:30
+  const istCurrentDate = new Date(
+    currentDate.getTime() +
+      currentDate.getTimezoneOffset() * 60000 +
+      istOffset * 60000
+  );
+
+  // Adjust the given date to IST
+  const istGivenDate = new Date(
+    givenDate.getTime() +
+      givenDate.getTimezoneOffset() * 60000 +
+      istOffset * 60000
+  );
+
+  // Compare year, month, and day
+  return (
+    istCurrentDate.getFullYear() === istGivenDate.getFullYear() &&
+    istCurrentDate.getMonth() === istGivenDate.getMonth() &&
+    istCurrentDate.getDate() === istGivenDate.getDate()
+  );
+}
+
+/**
+ * Checks if the current time is within the allowed period from the start time.
+ * @param {Date|string} startTime - The starting time as a Date object or a valid date string.
+ * @param {number} allowedPeriod - The allowed period in milliseconds.
+ * @returns {boolean} - True if the current time is within the allowed period, false otherwise.
+ */
+function isWithinAllowedPeriod(startTime, allowedPeriod) {
+  // Ensure startTime is a Date object
+  const start = new Date(startTime);
+
+  // Check for invalid start time
+  if (isNaN(start)) {
+    throw new Error('Invalid start time provided');
+  }
+
+  // Get the current time
+  const currentTime = new Date();
+
+  // Calculate the difference in time
+  const timeDifference = currentTime - start;
+
+  // Check if the difference is within the allowed period
+  return timeDifference <= allowedPeriod;
 }
