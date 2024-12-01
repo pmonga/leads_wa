@@ -1,5 +1,4 @@
 import dotnenv from 'dotenv';
-import createCommInCRM from '../../../helpers/crm.js';
 import generateToken from '../../../helpers/tokenizer.js';
 import { set, get } from '../../../helpers/storage.js';
 
@@ -11,6 +10,7 @@ export default async (req, res, next) => {
   const contact = res.locals.contact;
   const code = res.locals.code; // should be 'XCD09G';
   const campaign = res.locals.campaign;
+  console.log('I am here');
 
   const phone = contact.phone;
   const contactsCollection = res.locals.collections.contactsCollection;
