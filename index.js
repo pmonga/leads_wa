@@ -108,6 +108,7 @@ app.use(async (req, res, next) => {
     contactsCollection,
     messagesCollection,
     campaignsCollection,
+    campaignContactsCollection,
   };
   res.locals.campaigns = campaigns;
   console.log('setting up collections in res');
