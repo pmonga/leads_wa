@@ -11,7 +11,6 @@ const handleTEST01CampaignInteractiveMessage = async function (req, res) {
         'Not supported TEST01 Campaign Interactive message type: ',
         type
       );
-      res.sendStatus(200);
       break;
   }
 };

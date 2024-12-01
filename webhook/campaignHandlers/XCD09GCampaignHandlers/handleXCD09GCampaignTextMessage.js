@@ -5,108 +5,120 @@ import { set, get } from '../../../helpers/storage.js';
 
 dotnenv.config();
 export default async (req, res, next) => {
-  const message = res.locals.message;
-  const code = 'XCD09G';
-  const campaign = res.locals.campaigns[code];
+  const GAME_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
 
-  //Add tags for the campaign to be added to the contact
-  const tagsToAdd = [code, ...campaign.tags];
-  const phone = '+' + message.from;
+  const message = res.locals.message;
+  const contact = res.locals.contact;
+  const code = res.locals.code; // should be 'XCD09G';
+  const campaign = res.locals.campaign;
+
+  const phone = contact.phone;
   const contactsCollection = res.locals.collections.contactsCollection;
   const campaignsCollection = res.locals.collections.campaignsCollection;
   const campaignContactsCollection =
     res.local.collections.campaignContactsCollection;
 
-  // search for existing Contact and if exists update the tags
-  let contact = (await contactsCollection.read({ phone: phone }))?.[0];
-  if (contact) {
-    await contactsCollection.update(
-      { phone: phone },
-      { $addToSet: { tags: { $each: tagsToAdd } } }
-    );
-  } // eslse create a new contact
-  else {
-    const mobile = phone.slice(3);
-    contact = {
-      phone,
-      mobile,
-      email: '',
-      name: '',
-      wa_name:
-        req.body.entry?.[0].changes?.[0].value?.contacts?.[0].profile.name ||
-        '',
-      wa_id: req.body.entry?.[0].changes?.[0].value?.contacts?.[0].wa_id,
-      createdBy: code,
-      tags: tagsToAdd,
-    };
-    contact._id = (await contactsCollection.create(contact)).insertedId;
-  }
-  res.locals.contact = contact;
-
-  // Save the message in messages collection
-  res.locals.collections.messagesCollection.create({
-    contact_id: contact._id,
-    message_object: { ...req.body },
-  });
-
-  // Update CRM with the UTM for TEST01 campaign
-  let utm = { ...campaign.utm };
-  let crmData = {
-    source: 'whatsApp LP',
-    first_name: contact.name,
-    mobile: contact.mobile,
-    email: contact.email,
-    wa_name: contact.wa_name,
-    message: message.text.body,
-    ...utm,
-  };
-  if (process.env.ENV === 'PROD') {
-    createCommInCRM(crmData);
-  } else {
-    //console.log('CRM Entry :', JSON.stringify(crmData));
-  }
-
-  // send message to contact
+  // check if contact has already provided name && registered for the game;
   if (contact.name) {
-    const registrations = (
-      await campaignsCollection.read(
-        { _id: campaign._id },
-        { projection: { registrations: 1 } }
+    let registered = (
+      await campaignContactsCollection.read(
+        { code, phone },
+        {
+          projection: {
+            _id: 1,
+            name: 1,
+            code: 1,
+            phone: 1,
+            last_attemptedAt: 1,
+            last_attempt_level: 1,
+            active_flow_token: 1,
+          },
+        }
       )
-    )?.[0].registrations;
-    let registered = registrations.find((e) => e.phone === contact.phone);
+    )?.[0];
+    // if not registered then register now
     if (!registered) {
-      const { _id, name, mobile, phone, email } = contact;
       registered = {
-        _id,
-        name,
-        mobile,
+        campaign_id: campaign._id,
+        code,
+        contact_id: contact._id,
+        name: contact.name,
         phone,
-        email,
-        regnum: registrations.length + 1,
+        mobile: contact.mobile,
       };
-      registrations.push(registered);
-      await campaignsCollection.update(
-        { _id: campaign._id },
-        { $set: { registrations: registrations } }
-      );
+      registered._id = (
+        await campaignContactsCollection.create(registered)
+      ).insertedId;
       let reply = {
         body: `Thank you, ${
           registered.name
         }, you are registered for ${campaign.name.toUpperCase()} with mobile number ${
-          registered.mobile
+          registered.phone
         }`,
       };
       res.locals.waClient.sendTextMessage(contact.phone, reply);
     }
-    // send the flow message for KBM id = 1214667192982073:
-
-    //send response to the server
-    res.locals.waClient.sendStatusUpdate('read', message);
-    res.sendStatus(200);
+    // send the KBM flow message for KBM flow_id = 1214667192982073
+    // check if has already played the game today
+    if (isSameDate(registered.last_attemptedAt)) {
+      res.locals.waClient.sendTextMessage(contact.phone, {
+        body: `You have already played the game today. Please try again tomorrow `,
+      });
+    } else {
+      //check if there is a previously active flow token
+      if (registered?.active_flow_token) {
+        const flow_obj = await get(registered.active_flow_token);
+        // that previous has a valid started game not yet expired or ended.
+        if (
+          flow_obj?.startedAt &&
+          isWithinAllowedPeriod(flow_obj.startedAt, GAME_TIME)
+        ) {
+          res.locals.waClient.sendTextMessage(contact.phone, {
+            body: `You already have a game in progress, please finish it or wait for it to expire.`,
+          });
+          res.locals.waClient.sendStatusUpdate('read', message);
+          res.sendStatus(200);
+          return;
+        }
+        // delete the existing flow_token
+        await del(registered.active_flow_token);
+      }
+      // setup a new flow_token and make ready to send flow
+      const flow_id = '1214667192982073';
+      const flow_obj = { phone, code, flow_id, createdAt: new Date() };
+      const token = generateToken(JSON.stringify(flow_obj));
+      const layout = {
+        header: {
+          type: 'text',
+          text: 'Flow message header',
+        },
+        body: {
+          text: 'Flow message body',
+        },
+        footer: {
+          text: 'Flow message footer',
+        },
+      };
+      const params = {
+        flow_token: token,
+        mode: 'draft',
+        flow_id, //KBM
+        flow_cta: 'Play Now',
+        flow_action: 'navigate',
+        flow_action_payload: {
+          screen: 'WELCOME',
+        },
+      };
+      await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);
+      await set(token, flow_obj);
+      await campaignContactsCollection.update(
+        { _id: registered._id },
+        { $set: { active_flow_token: token } }
+      );
+    }
   } else {
-    // send flow message here
-    // to get the contacts name
+    // send Sign Up flow message here
+    // to get the contact's name
     const token = generateToken(
       JSON.stringify({ phone, code, flow_id: '1760272798116365' })
     );
@@ -134,6 +146,7 @@ export default async (req, res, next) => {
     };
     await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);
     await set(token, {
+      flow_token: token,
       phone,
       code,
       flow_id: '1760272798116365',
@@ -141,3 +154,53 @@ export default async (req, res, next) => {
     });
   }
 };
+
+function isSameDate(givenDate) {
+  // Get the current date in IST
+  const currentDate = new Date();
+  const istOffset = 330; // IST is UTC+5:30
+  const istCurrentDate = new Date(
+    currentDate.getTime() +
+      currentDate.getTimezoneOffset() * 60000 +
+      istOffset * 60000
+  );
+
+  // Adjust the given date to IST
+  const istGivenDate = new Date(
+    givenDate.getTime() +
+      givenDate.getTimezoneOffset() * 60000 +
+      istOffset * 60000
+  );
+
+  // Compare year, month, and day
+  return (
+    istCurrentDate.getFullYear() === istGivenDate.getFullYear() &&
+    istCurrentDate.getMonth() === istGivenDate.getMonth() &&
+    istCurrentDate.getDate() === istGivenDate.getDate()
+  );
+}
+
+/**
+ * Checks if the current time is within the allowed period from the start time.
+ * @param {Date|string} startTime - The starting time as a Date object or a valid date string.
+ * @param {number} allowedPeriod - The allowed period in milliseconds.
+ * @returns {boolean} - True if the current time is within the allowed period, false otherwise.
+ */
+function isWithinAllowedPeriod(startTime, allowedPeriod) {
+  // Ensure startTime is a Date object
+  const start = new Date(startTime);
+
+  // Check for invalid start time
+  if (isNaN(start)) {
+    throw new Error('Invalid start time provided');
+  }
+
+  // Get the current time
+  const currentTime = new Date();
+
+  // Calculate the difference in time
+  const timeDifference = currentTime - start;
+
+  // Check if the difference is within the allowed period
+  return timeDifference <= allowedPeriod;
+}

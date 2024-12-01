@@ -1,68 +1,18 @@
 import dotnenv from 'dotenv';
-import createCommInCRM from '../../../helpers/crm.js';
+//import createCommInCRM from '../../../helpers/crm.js';
 import generateToken from '../../../helpers/tokenizer.js';
 import { set, get } from '../../../helpers/storage.js';
 
 dotnenv.config();
 export default async (req, res, next) => {
-  const message = res.locals.message;
-  const code = 'TEST01';
-  const campaign = res.locals.campaigns[code];
+  //const message = res.locals.message;
+  const contact = res.locals.contact;
+  const phone = contact.phone;
+  const code = res.locals.code;
+  const campaign = res.locals.campaign;
 
-  //Add tags for the campaign to be added to the contact
-  const tagsToAdd = [code, ...campaign.tags];
-  const phone = '+' + message.from;
-  const contactsCollection = res.locals.collections.contactsCollection;
+  //const contactsCollection = res.locals.collections.contactsCollection;
   const campaignsCollection = res.locals.collections.campaignsCollection;
-
-  // search for existing Contact and if exists update the tags
-  let contact = (await contactsCollection.read({ phone: phone }))?.[0];
-  if (contact) {
-    await contactsCollection.update(
-      { phone: phone },
-      { $addToSet: { tags: { $each: tagsToAdd } } }
-    );
-  } // eslse create a new contact
-  else {
-    const mobile = phone.slice(3);
-    contact = {
-      phone,
-      mobile,
-      email: '',
-      name: '',
-      wa_name:
-        req.body.entry?.[0].changes?.[0].value?.contacts?.[0].profile.name ||
-        '',
-      wa_id: req.body.entry?.[0].changes?.[0].value?.contacts?.[0].wa_id,
-      createdBy: code,
-      tags: tagsToAdd,
-    };
-    contact._id = (await contactsCollection.create(contact)).insertedId;
-  }
-  res.locals.contact = contact;
-
-  // Save the message in messages collection
-  res.locals.collections.messagesCollection.create({
-    contact_id: contact._id,
-    message_object: { ...req.body },
-  });
-
-  // Update CRM with the UTM for TEST01 campaign
-  let utm = { ...campaign.utm };
-  let crmData = {
-    source: 'whatsApp LP',
-    first_name: contact.name,
-    mobile: contact.mobile,
-    email: contact.email,
-    wa_name: contact.wa_name,
-    message: message.text.body,
-    ...utm,
-  };
-  if (process.env.ENV === 'PROD') {
-    createCommInCRM(crmData);
-  } else {
-    //console.log('CRM Entry :', JSON.stringify(crmData));
-  }
 
   // send message to contact
   if (contact.name) {
@@ -97,14 +47,10 @@ export default async (req, res, next) => {
       } and your registartion id is ${registered.regnum}`,
     };
     res.locals.waClient.sendTextMessage(contact.phone, reply);
-    res.locals.waClient.sendStatusUpdate('read', message);
-    res.sendStatus(200);
   } else {
-    // send flow message here
-    // to get the contacts name
-    const token = generateToken(
-      JSON.stringify({ phone, code, flow_id: '1760272798116365' })
-    );
+    // send SIGN UP flow message here flow_id: '1760272798116365'
+    const flow_id = '1760272798116365';
+    const token = generateToken(JSON.stringify({ phone, code, flow_id }));
     const layout = {
       header: {
         type: 'text',
@@ -120,7 +66,7 @@ export default async (req, res, next) => {
     const params = {
       flow_token: token,
       mode: 'draft',
-      flow_id: '1760272798116365', //Lead Sign Up
+      flow_id, //Lead Sign Up
       flow_cta: 'Register',
       flow_action: 'navigate',
       flow_action_payload: {
@@ -131,7 +77,7 @@ export default async (req, res, next) => {
     await set(token, {
       phone,
       code,
-      flow_id: '1760272798116365',
+      flow_id,
       created: new Date(),
     });
   }

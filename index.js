@@ -88,6 +88,7 @@ async function setCredentials(req, res, next) {
   if (message) {
     res.locals.type = 'message';
     res.locals.message = message;
+    res.locals.crm = { message: '', utm: {} };
   }
   next();
 }
@@ -114,16 +115,21 @@ app.use(async (req, res, next) => {
 });
 
 app.post('/webhook', [logger, setCredentials], async (req, res) => {
-  console.log('hook type: ', res.locals.type);
-  switch (res.locals.type) {
-    case 'message':
-      //console.log(`inside switch`);
-      await handleMessage(req, res);
-      break;
-    default:
-      console.log('unsupported webhook type: ', res.locals.type);
-      res.sendStatus(200);
-      break;
+  try {
+    console.log('hook type: ', res.locals.type);
+    switch (res.locals.type) {
+      case 'message':
+        //console.log(`inside switch`);
+        await handleMessage(req, res);
+        break;
+      default:
+        console.log('unsupported webhook type: ', res.locals.type);
+        break;
+    }
+  } catch (e) {
+    console.log('error caught at webhook: ', e);
+  } finally {
+    res.sendStatus(200);
   }
 });
 
