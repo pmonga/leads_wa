@@ -104,7 +104,7 @@ async function signupFlow(res) {
         registered.phone
       }.`,
     };
-    res.locals.waClient.sendTextMessage(contact.phone, reply);
+    await res.locals.waClient.sendTextMessage(contact.phone, reply);
   }
   // send the KBM flow message for KBM flow_id = 1214667192982073
   // check if has already played the game today
@@ -112,7 +112,7 @@ async function signupFlow(res) {
     registered.last_attemptedAt &&
     isSameDate(new Date(registered.last_attemptedAt))
   ) {
-    res.locals.waClient.sendTextMessage(contact.phone, {
+    await res.locals.waClient.sendTextMessage(contact.phone, {
       body: `You have already played the game today. Please try again tomorrow `,
     });
   } else {
