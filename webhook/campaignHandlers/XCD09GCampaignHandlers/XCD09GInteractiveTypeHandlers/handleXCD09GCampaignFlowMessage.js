@@ -26,7 +26,7 @@ export default async (req, res) => {
   }
   switch (flowObject.flow_id) {
     case '1760272798116365': {
-      signupFlow();
+      await signupFlow();
       break;
     }
   }
