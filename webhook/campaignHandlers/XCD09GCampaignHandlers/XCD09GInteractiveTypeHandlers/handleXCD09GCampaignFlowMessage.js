@@ -35,6 +35,15 @@ export default async (req, res) => {
 };
 
 async function signupFlow() {
+  const {
+    contact,
+    flowData,
+    campaign,
+    contactsCollection,
+    campaignContactsCollection,
+    flowObject,
+    res,
+  } = this;
   contact.tagsToAdd = [
     ...contact.tagsToAdd,
     code,
