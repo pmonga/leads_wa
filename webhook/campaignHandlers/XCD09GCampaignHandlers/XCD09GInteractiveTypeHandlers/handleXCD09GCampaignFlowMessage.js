@@ -26,7 +26,7 @@ export default async (req, res) => {
   }
   switch (flowObject.flow_id) {
     case '1760272798116365': {
-      await signupFlow();
+      await signupFlow(res);
       break;
     }
   }
@@ -34,22 +34,25 @@ export default async (req, res) => {
   //register for the campaign event
 };
 
-async function signupFlow() {
-  const {
-    contact,
-    flowData,
-    campaign,
-    contactsCollection,
+async function signupFlow(res) {
+  const contact = res.locals.contact;
+  const campaign = res.locals.campaign;
+  const contactsCollection = res.locals.collections.contactsCollection;
+  const campaignContactsCollection =
+    res.locals.collections.campaignContactsCollection;
+
+  const flowData = res.locals.flow_data;
+  const flow_token = res.locals.flow_token;
+  const flowObject = await get(flow_token);
+  contactsCollection,
     campaignContactsCollection,
     flowObject,
-    res,
-  } = this;
-  contact.tagsToAdd = [
-    ...contact.tagsToAdd,
-    code,
-    ...flowData.courses,
-    ...campaign.tags,
-  ];
+    (contact.tagsToAdd = [
+      ...contact.tagsToAdd,
+      code,
+      ...flowData.courses,
+      ...campaign.tags,
+    ]);
   if (!contact.name) {
     // update contact info
     contact.name = flowData.name;
