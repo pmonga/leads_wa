@@ -11,7 +11,7 @@ export default async (req, res) => {
   const contactsCollection = res.locals.collections.contactsCollection;
   const campaignsCollection = res.locals.collections.campaignsCollection;
   const campaignContactsCollection =
-    res.s.collections.campaignContactsCollection;
+    res.locals.collections.campaignContactsCollection;
 
   const flowData = res.locals.flow_data;
   const flow_token = res.locals.flow_token;
