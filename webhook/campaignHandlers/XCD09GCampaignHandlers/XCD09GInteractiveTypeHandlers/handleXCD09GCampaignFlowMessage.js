@@ -67,7 +67,7 @@ async function signupFlow(res) {
   }
   // clean up, remove the token
   del(res.locals.flow_token);
-
+  const phone = contact.phone;
   let registered = (
     await campaignContactsCollection.read(
       { code, phone },
