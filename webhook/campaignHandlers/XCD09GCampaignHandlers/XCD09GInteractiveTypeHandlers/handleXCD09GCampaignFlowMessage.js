@@ -35,6 +35,7 @@ export default async (req, res) => {
 };
 
 async function signupFlow(res) {
+  const code = res.locals.code;
   const contact = res.locals.contact;
   const campaign = res.locals.campaign;
   const contactsCollection = res.locals.collections.contactsCollection;
