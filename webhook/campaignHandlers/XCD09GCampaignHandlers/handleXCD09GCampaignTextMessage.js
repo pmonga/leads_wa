@@ -1,6 +1,6 @@
 import dotnenv from 'dotenv';
 import generateToken from '../../../helpers/tokenizer.js';
-import { set, get } from '../../../helpers/storage.js';
+import { set, get, del } from '../../../helpers/storage.js';
 
 dotnenv.config();
 export default async (req, res, next) => {
