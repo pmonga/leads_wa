@@ -17,7 +17,7 @@ const handleMessage = async function (req, res) {
 
   const contact =
     (await contactsCollection.read({ phone: phone }))?.[0] ||
-    (await createContact(res));
+    (await createContact(req, res));
   contact.tagsToAdd = [];
   res.locals.contact = contact;
 
@@ -50,7 +50,7 @@ const handleMessage = async function (req, res) {
   res.locals.waClient.sendStatusUpdate('read', message);
 };
 
-async function createContact(res) {
+async function createContact(req, res) {
   const message = res.locals.message;
   const phone = '+' + message.from;
   const contactsCollection = res.locals.collections.contactsCollection;

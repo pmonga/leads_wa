@@ -122,7 +122,10 @@ async function signupFlow(res) {
       // that previous has a valid started game not yet expired or ended.
       if (
         flow_obj?.startedAt &&
-        isWithinAllowedPeriod(flow_obj.startedAt, GAME_TIME)
+        isWithinAllowedPeriod(
+          flow_obj.startedAt,
+          flow_obj.time_allowed || 10 * 60 * 1000
+        )
       ) {
         res.locals.waClient.sendTextMessage(contact.phone, {
           body: `You already have a game in progress, please finish it or wait for it to expire.`,
@@ -199,7 +202,7 @@ function isSameDate(givenDate) {
  * @param {number} allowedPeriod - The allowed period in milliseconds.
  * @returns {boolean} - True if the current time is within the allowed period, false otherwise.
  */
-function isWithinAllowedPeriod(startTime, allowedPeriod) {
+function isWithinAllowedPeriod(startTime, allowedPeriod = 10 * 60 * 1000) {
   // Ensure startTime is a Date object
   const start = new Date(startTime);
 

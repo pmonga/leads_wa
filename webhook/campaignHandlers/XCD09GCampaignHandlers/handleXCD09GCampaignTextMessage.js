@@ -1,11 +1,10 @@
 import dotnenv from 'dotenv';
 import generateToken from '../../../helpers/tokenizer.js';
 import { set, get, del } from '../../../helpers/storage.js';
+import { convertKeysToDate } from '../../../helpers/utils.js';
 
 dotnenv.config();
 export default async (req, res, next) => {
-  const GAME_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
-
   const message = res.locals.message;
   const contact = res.locals.contact;
   const code = res.locals.code; // should be 'XCD09G';
@@ -68,12 +67,14 @@ export default async (req, res, next) => {
     } else {
       //check if there is a previously active flow token
       if (registered?.active_flow_token) {
-        const flow_obj = await get(registered.active_flow_token);
+        const flow_obj = convertKeysToDate(
+          await get(registered.active_flow_token),
+          'startedAt',
+          'end_time',
+          'finishedAt'
+        );
         // that previous has a valid started game not yet expired or ended.
-        if (
-          flow_obj?.startedAt &&
-          isWithinAllowedPeriod(flow_obj.startedAt, GAME_TIME)
-        ) {
+        if (flow_obj?.end_time >= new Date()) {
           res.locals.waClient.sendTextMessage(contact.phone, {
             body: `You already have a game in progress, please finish it or wait for it to expire.`,
           });
@@ -187,7 +188,7 @@ function isSameDate(givenDate) {
  * @param {number} allowedPeriod - The allowed period in milliseconds.
  * @returns {boolean} - True if the current time is within the allowed period, false otherwise.
  */
-function isWithinAllowedPeriod(startTime, allowedPeriod) {
+function isWithinAllowedPeriod(startTime, allowedPeriod = 10 * 60 * 1000) {
   // Ensure startTime is a Date object
   const start = new Date(startTime);
 
