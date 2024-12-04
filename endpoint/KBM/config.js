@@ -10,9 +10,4 @@ const GAME_PRIZE = [
 ];
 
 // Export individually
-module.exports = {
-  APP_NAME,
-  VERSION,
-  GAME_TIME,
-  GAME_PRIZE,
-};
+export { APP_NAME, VERSION, GAME_TIME, GAME_PRIZE };

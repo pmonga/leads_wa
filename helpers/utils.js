@@ -73,8 +73,4 @@ function convertKeysToDate(obj, ...keys) {
   return updatedObj;
 }
 
-module.exports = {
-  getTimeWithOffset,
-  formatTohhmmDateIST,
-  convertKeysToDate,
-};
+export { getTimeWithOffset, formatTohhmmDateIST, convertKeysToDate };
