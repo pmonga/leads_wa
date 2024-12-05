@@ -83,9 +83,11 @@ async function logger(req, res, next) {
 }
 async function setCredentials(req, res, next) {
   // setup whatsapp api client
-  res.locals.waClient = createWhatsAppClient(
-    req.body.entry?.[0].changes?.[0].value?.metadata?.phone_number_id
-  );
+  if (req.body.entry?.[0].changes?.[0].value?.metadata?.phone_number_id) {
+    res.locals.waClient = createWhatsAppClient(
+      req.body.entry?.[0].changes?.[0].value?.metadata?.phone_number_id
+    );
+  }
 
   // type of payload
   const message = req.body.entry?.[0]?.changes[0]?.value?.messages?.[0];
