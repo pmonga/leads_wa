@@ -101,6 +101,32 @@ export const getNextScreen = async (req, res, decryptedBody) => {
         }
         break;
       case "QS":
+        if (
+          flow_obj.questions?.[flow_obj.cur - 1]?.ans.toUppercase() ===
+          data.ans.toUppercase()
+        ) {
+          flow_obj.cur++;
+          const win_statement = `You win ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
+          const response = {
+            screen: "POST",
+            data: {
+              win_statement,
+              img: flow_obj.questions[flow_obj.cur - 1].img,
+              qs_subheading: `Answer next for ${
+                flow_obj.prize?.[flow_obj.cur - 1] || 0
+              }`,
+              quit_label: `I want to quit now and claim ${
+                flow_obj.prize?.[flow_obj.cur - 2] || 0
+              }`,
+              instruction: `Instructions:\n1. Please finish the attempt by ${formatTohhmmDateIST(
+                flow_obj.end_time
+              )} to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game on this screen before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
+            }
+          };
+          await set(flow_token, flow_obj);
+          return response;
+        }
+
         break;
       // send success response to complete and close the flow
       // return {
