@@ -192,9 +192,8 @@ app.post("/endpoint", async (req, res) => {
   const { aesKeyBuffer, initialVectorBuffer, decryptedBody } = decryptedRequest;
   console.log("💬 Decrypted Request:", decryptedBody);
   // added for testing the end point remove  in production
-  if (!decryptedBody?.flow_token && ENV === "DEV") {
-    const flow_token = "TEST";
-    decryptedBody.flow_token = flow_token;
+  if (decryptedBody?.flow_token === "TEST" && ENV === "DEV") {
+    const flow_token = decryptedBody.flow_token;
     const flow_obj = await get(flow_token);
     if (!flow_obj) {
       await set(flow_token, { flow_d: FLOW_KBM });
