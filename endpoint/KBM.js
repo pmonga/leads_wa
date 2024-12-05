@@ -76,8 +76,8 @@ export const getNextScreen = async (req, res, decryptedBody) => {
           return {
             screen: "PRE",
             data: {
-              img: flow_obj.questions[flow_obj.cur - 1].img,
-              qs_subheading: `Answer next for ${
+              qs_img: flow_obj.questions[flow_obj.cur - 1].qs_img,
+              pre_subheading: `Answer next for ${
                 flow_obj.prize?.[flow_obj.cur - 1] || 0
               }`,
               quit_label: `I want to quit now and claim ${
@@ -106,13 +106,15 @@ export const getNextScreen = async (req, res, decryptedBody) => {
           data.ans.toUpperCase()
         ) {
           flow_obj.cur++;
-          const win_statement = `You win ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
+          const post_title = "Sahi Jawaab!";
+          const post_msg = `You win ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
           const response = {
             screen: "POST",
             data: {
-              win_statement,
-              img: flow_obj.questions[flow_obj.cur - 1].img,
-              qs_subheading: `Answer next for ${
+              post_title,
+              post_msg,
+              qs_img: flow_obj.questions[flow_obj.cur - 1].qs_img,
+              pre_subheading: `Answer next for ${
                 flow_obj.prize?.[flow_obj.cur - 1] || 0
               }`,
               quit_label: `I want to quit now and claim ${
