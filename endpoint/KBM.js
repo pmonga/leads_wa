@@ -102,8 +102,8 @@ export const getNextScreen = async (req, res, decryptedBody) => {
         break;
       case "QS":
         if (
-          flow_obj.questions?.[flow_obj.cur - 1]?.ans.toUppercase() ===
-          data.ans.toUppercase()
+          flow_obj.questions?.[flow_obj.cur - 1]?.ans.toUpperCase() ===
+          data.ans.toUpperCase()
         ) {
           flow_obj.cur++;
           const win_statement = `You win ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
