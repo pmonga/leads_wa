@@ -196,7 +196,7 @@ app.post("/endpoint", async (req, res) => {
     const flow_token = decryptedBody.flow_token;
     const flow_obj = await get(flow_token);
     if (!flow_obj) {
-      await set(flow_token, { flow_d: FLOW_KBM });
+      await set(flow_token, { flow_id: FLOW_KBM });
     }
   }
 
