@@ -24,10 +24,11 @@ export const getNextScreen = async (req, res, decryptedBody) => {
     };
   }
   const { flow_id } = await get(flow_token);
+  let response;
   switch (flow_id) {
     // Flow KBM_test id 1214667192982073
     case FLOW_KBM:
-      KBMgetNextSCreen(req, res, decryptedBody);
+      response = await KBMgetNextSCreen(req, res, decryptedBody);
       break;
     default:
       throw new Error(
@@ -35,4 +36,5 @@ export const getNextScreen = async (req, res, decryptedBody) => {
       );
     //break;
   }
+  return response;
 };
