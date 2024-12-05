@@ -8,7 +8,7 @@ export const SAMPLE_GAME = [
   },
   {
     ans: "A",
-    img: " "
+    img: "ABC"
   },
   {
     ans: "A",
