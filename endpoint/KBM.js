@@ -165,7 +165,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             } else {
               flow_obj.cur++;
               const post_title = "Sahi Jawaab!";
-              const post_msg = `You win ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
+              const post_msg = `That's correct. You win ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
               response = {
                 screen: "POST",
                 data: {
