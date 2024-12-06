@@ -13,7 +13,7 @@ import {
   formatTohhmmDateIST,
   convertKeysToDate
 } from "../helpers/utils.js";
-import { TIME_UP, WINNER, WRONG } from "../assets/kbm_assets.js";
+import { BACK, TIME_UP, WINNER, WRONG } from "../assets/kbm_assets.js";
 
 // handle initial request when opening the flow
 export const getNextScreen = async (req, res, decryptedBody) => {
@@ -30,18 +30,13 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   }
 
   if (action === "BACK") {
-    let final_img = TIME_UP.img;
-    let final_img_height = TIME_UP.height;
-    let final_img_width = TIME_UP.width;
-    let final_msg = "Sorry time over. Better luck next time.";
+    let back_img = BACK.img;
+    let back_img_height = BACK.height;
+    let back_img_width = BACK.width;
+    let back_msg = "Sorry BACK not allowed.";
     return {
-      screen: "FINAL",
-      data: {
-        final_img,
-        final_img_height,
-        final_img_width,
-        final_msg
-      }
+      screen: "BACK",
+      data: { back_img, back_img_height, back_img_width, back_msg }
     };
   }
 
@@ -220,6 +215,12 @@ export const getNextScreen = async (req, res, decryptedBody) => {
       //     },
       //   },
       // };
+      case "BACK":
+        return {
+          screen: data.screen,
+          data: {}
+        };
+      //break;
       default:
         break;
     }
