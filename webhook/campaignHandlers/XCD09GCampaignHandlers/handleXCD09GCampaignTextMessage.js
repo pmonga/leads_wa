@@ -2,6 +2,7 @@ import dotnenv from "dotenv";
 import generateToken from "../../../helpers/tokenizer.js";
 import { set, get, del } from "../../../helpers/storage.js";
 import { convertKeysToDate } from "../../../helpers/utils.js";
+import { FLOW_KBM, FLOW_SIGNUP } from "../../../helpers/config.js";
 
 dotnenv.config();
 export default async (req, res, next) => {
@@ -68,26 +69,28 @@ export default async (req, res, next) => {
       //check if there is a previously active flow token
       if (registered?.active_flow_token) {
         let flow_obj = await get(registered.active_flow_token);
-        flow_obj = convertKeysToDate(
-          flow_obj,
-          "startedAt",
-          "end_time",
-          "finishedAt"
-        );
-        // that previous has a valid started game not yet expired or ended.
-        if (flow_obj?.end_time >= new Date()) {
-          res.locals.waClient.sendTextMessage(contact.phone, {
-            body: `You already have a game in progress, please finish it or wait for it to expire.`
-          });
-          res.locals.waClient.sendStatusUpdate("read", message);
-          res.sendStatus(200);
-          return;
+        if (flow_obj) {
+          flow_obj = convertKeysToDate(
+            flow_obj,
+            "startedAt",
+            "end_time",
+            "finishedAt"
+          );
+          // that previous has a valid started game not yet expired or ended.
+          if (flow_obj?.end_time >= new Date()) {
+            res.locals.waClient.sendTextMessage(contact.phone, {
+              body: `You already have a game in progress, please finish it or wait for it to expire.`
+            });
+            res.locals.waClient.sendStatusUpdate("read", message);
+            res.sendStatus(200);
+            return;
+          }
+          // delete the existing flow_token
+          await del(registered.active_flow_token);
         }
-        // delete the existing flow_token
-        await del(registered.active_flow_token);
       }
       // setup a new flow_token and make ready to send flow
-      const flow_id = "1214667192982073";
+      const flow_id = FLOW_KBM;
       const flow_obj = { phone, code, flow_id, createdAt: new Date() };
       const token = generateToken(JSON.stringify(flow_obj));
       const layout = {
@@ -123,7 +126,7 @@ export default async (req, res, next) => {
     // send Sign Up flow message here
     // to get the contact's name
     const token = generateToken(
-      JSON.stringify({ phone, code, flow_id: "1760272798116365" })
+      JSON.stringify({ phone, code, flow_id: FLOW_SIGNUP })
     );
     const layout = {
       header: {
@@ -140,7 +143,7 @@ export default async (req, res, next) => {
     const params = {
       flow_token: token,
       mode: "draft",
-      flow_id: "1760272798116365", //Lead Sign Up
+      flow_id: FLOW_SIGNUP, //Lead Sign Up
       flow_cta: "Register",
       flow_action: "navigate",
       flow_action_payload: {
@@ -152,7 +155,7 @@ export default async (req, res, next) => {
       flow_token: token,
       phone,
       code,
-      flow_id: "1760272798116365",
+      flow_id: FLOW_SIGNUP,
       created: new Date()
     });
   }
