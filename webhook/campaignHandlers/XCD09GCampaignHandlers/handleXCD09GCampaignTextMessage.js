@@ -1,7 +1,7 @@
-import dotnenv from 'dotenv';
-import generateToken from '../../../helpers/tokenizer.js';
-import { set, get, del } from '../../../helpers/storage.js';
-import { convertKeysToDate } from '../../../helpers/utils.js';
+import dotnenv from "dotenv";
+import generateToken from "../../../helpers/tokenizer.js";
+import { set, get, del } from "../../../helpers/storage.js";
+import { convertKeysToDate } from "../../../helpers/utils.js";
 
 dotnenv.config();
 export default async (req, res, next) => {
@@ -28,8 +28,8 @@ export default async (req, res, next) => {
             phone: 1,
             last_attemptedAt: 1,
             last_attempt_level: 1,
-            active_flow_token: 1,
-          },
+            active_flow_token: 1
+          }
         }
       )
     )?.[0];
@@ -41,7 +41,7 @@ export default async (req, res, next) => {
         contact_id: contact._id,
         name: contact.name,
         phone,
-        mobile: contact.mobile,
+        mobile: contact.mobile
       };
       registered._id = (
         await campaignContactsCollection.create(registered)
@@ -51,7 +51,7 @@ export default async (req, res, next) => {
           registered.name
         }, you are registered for ${campaign.name.toUpperCase()} with mobile number ${
           registered.phone
-        }`,
+        }`
       };
       res.locals.waClient.sendTextMessage(contact.phone, reply);
     }
@@ -62,23 +62,24 @@ export default async (req, res, next) => {
       isSameDate(new Date(registered.last_attemptedAt))
     ) {
       res.locals.waClient.sendTextMessage(contact.phone, {
-        body: `You have already played the game today. Please try again tomorrow `,
+        body: `You have already played the game today. Please try again tomorrow `
       });
     } else {
       //check if there is a previously active flow token
       if (registered?.active_flow_token) {
-        const flow_obj = convertKeysToDate(
-          await get(registered.active_flow_token),
-          'startedAt',
-          'end_time',
-          'finishedAt'
+        let flow_obj = await get(registered.active_flow_token);
+        flow_obj = convertKeysToDate(
+          flow_obj,
+          "startedAt",
+          "end_time",
+          "finishedAt"
         );
         // that previous has a valid started game not yet expired or ended.
         if (flow_obj?.end_time >= new Date()) {
           res.locals.waClient.sendTextMessage(contact.phone, {
-            body: `You already have a game in progress, please finish it or wait for it to expire.`,
+            body: `You already have a game in progress, please finish it or wait for it to expire.`
           });
-          res.locals.waClient.sendStatusUpdate('read', message);
+          res.locals.waClient.sendStatusUpdate("read", message);
           res.sendStatus(200);
           return;
         }
@@ -86,30 +87,30 @@ export default async (req, res, next) => {
         await del(registered.active_flow_token);
       }
       // setup a new flow_token and make ready to send flow
-      const flow_id = '1214667192982073';
+      const flow_id = "1214667192982073";
       const flow_obj = { phone, code, flow_id, createdAt: new Date() };
       const token = generateToken(JSON.stringify(flow_obj));
       const layout = {
         header: {
-          type: 'text',
-          text: 'Flow message header',
+          type: "text",
+          text: "Flow message header"
         },
         body: {
-          text: 'Flow message body',
+          text: "Flow message body"
         },
         footer: {
-          text: 'Flow message footer',
-        },
+          text: "Flow message footer"
+        }
       };
       const params = {
         flow_token: token,
-        mode: 'draft',
+        mode: "draft",
         flow_id, //KBM
-        flow_cta: 'Play Now',
-        flow_action: 'navigate',
+        flow_cta: "Play Now",
+        flow_action: "navigate",
         flow_action_payload: {
-          screen: 'WELCOME',
-        },
+          screen: "WELCOME"
+        }
       };
       await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);
       await set(token, flow_obj);
@@ -122,37 +123,37 @@ export default async (req, res, next) => {
     // send Sign Up flow message here
     // to get the contact's name
     const token = generateToken(
-      JSON.stringify({ phone, code, flow_id: '1760272798116365' })
+      JSON.stringify({ phone, code, flow_id: "1760272798116365" })
     );
     const layout = {
       header: {
-        type: 'text',
-        text: 'Flow message header',
+        type: "text",
+        text: "Flow message header"
       },
       body: {
-        text: 'Flow message body',
+        text: "Flow message body"
       },
       footer: {
-        text: 'Flow message footer',
-      },
+        text: "Flow message footer"
+      }
     };
     const params = {
       flow_token: token,
-      mode: 'draft',
-      flow_id: '1760272798116365', //Lead Sign Up
-      flow_cta: 'Register',
-      flow_action: 'navigate',
+      mode: "draft",
+      flow_id: "1760272798116365", //Lead Sign Up
+      flow_cta: "Register",
+      flow_action: "navigate",
       flow_action_payload: {
-        screen: 'JOIN_NOW',
-      },
+        screen: "JOIN_NOW"
+      }
     };
     await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);
     await set(token, {
       flow_token: token,
       phone,
       code,
-      flow_id: '1760272798116365',
-      created: new Date(),
+      flow_id: "1760272798116365",
+      created: new Date()
     });
   }
 };
@@ -194,7 +195,7 @@ function isWithinAllowedPeriod(startTime, allowedPeriod = 10 * 60 * 1000) {
 
   // Check for invalid start time
   if (isNaN(start)) {
-    throw new Error('Invalid start time provided');
+    throw new Error("Invalid start time provided");
   }
 
   // Get the current time
