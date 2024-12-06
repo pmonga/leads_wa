@@ -13,6 +13,7 @@ import {
   formatTohhmmDateIST,
   convertKeysToDate
 } from "../helpers/utils.js";
+import { TIME_UP, WINNER, WRONG } from "../assets/kbm_assets.js";
 
 // handle initial request when opening the flow
 export const getNextScreen = async (req, res, decryptedBody) => {
@@ -40,6 +41,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
 
   if (action === "data_exchange") {
     // handle the request based on the current screen
+    let response;
     switch (screen) {
       case "WELCOME":
         if (flow_obj?.is_back) {
@@ -72,18 +74,18 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             // the last_attemptedAT, last_attempt_level needs to be set here in the campaignContacts.
             // update contactQuestions too, so it avoids repetition.
           }
-          await set(flow_token, flow_obj);
-          return {
+
+          response = {
             screen: "PRE",
             data: {
               qs_img: flow_obj.questions[flow_obj.cur - 1].qs_img,
               pre_subheading: `Answer next for ${
                 flow_obj.prize?.[flow_obj.cur - 1] || 0
               }`,
-              quit_label: `I want to quit now and claim ${
+              pre_quit_label: `I want to quit now and claim ${
                 flow_obj.prize?.[flow_obj.cur - 2] || 0
               }`,
-              instruction: `Instructions:\n1. Please finish the attempt by ${formatTohhmmDateIST(
+              pre_instruction: `Instructions:\n1. Please finish the attempt by ${formatTohhmmDateIST(
                 flow_obj.end_time
               )} to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game on this screen before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
             }
@@ -95,40 +97,82 @@ export const getNextScreen = async (req, res, decryptedBody) => {
           // implement continue from back logic
         } else {
           if (data.has_quit || flow_obj.end_time < new Date()) {
-            flow_obj.is_finished = true;
             flow_obj.finishedAt = new Date();
           }
         }
         break;
       case "QS":
-        if (
-          flow_obj.questions?.[flow_obj.cur - 1]?.ans.toUpperCase() ===
-          data.ans.toUpperCase()
-        ) {
-          flow_obj.cur++;
-          const post_title = "Sahi Jawaab!";
-          const post_msg = `You win ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
-          const response = {
-            screen: "POST",
-            data: {
-              post_title,
-              post_msg,
-              qs_img: flow_obj.questions[flow_obj.cur - 1].qs_img,
-              pre_subheading: `Answer next for ${
-                flow_obj.prize?.[flow_obj.cur - 1] || 0
-              }`,
-              quit_label: `I want to quit now and claim ${
-                flow_obj.prize?.[flow_obj.cur - 2] || 0
-              }`,
-              instruction: `Instructions:\n1. Please finish the attempt by ${formatTohhmmDateIST(
-                flow_obj.end_time
-              )} to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game on this screen before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
+        {
+          if (flow_obj.end_time < new Date()) {
+            flow_obj.finishedAt = new Date();
+            let final_img = TIME_UP.img;
+            let final_img_height = TIME_UP.height;
+            let final_img_width = TIME_UP.width;
+            let final_msg = "Sorry time over. Better luck next time.";
+            response = {
+              screen: "FINAL",
+              data: { final_img, final_img_height, final_img_width, final_msg }
+            };
+          } else if (
+            flow_obj.questions?.[flow_obj.cur - 1]?.ans.toUpperCase() ===
+            data.ans.toUpperCase()
+          ) {
+            if (flow_obj.cur >= flow_obj.questions.length) {
+              flow_obj.finishedAt = new Date();
+              let final_img = WINNER.img;
+              let final_img_height = WINNER.height;
+              let final_img_width = WINNER.width;
+              let final_msg = `Congratulations, You have won ${flow_obj.prize?.[flow_obj.prize.length - 1]}.`;
+              response = {
+                screen: "FINAL",
+                data: {
+                  final_img,
+                  final_img_height,
+                  final_img_width,
+                  final_msg
+                }
+              };
+            } else {
+              flow_obj.cur++;
+              const post_title = "Sahi Jawaab!";
+              const post_msg = `You win ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
+              response = {
+                screen: "POST",
+                data: {
+                  post_title,
+                  post_msg,
+                  qs_img: flow_obj.questions[flow_obj.cur - 1].qs_img,
+                  pre_subheading: `Answer next for ${
+                    flow_obj.prize?.[flow_obj.cur - 1] || 0
+                  }`,
+                  pre_quit_label: `I want to quit now and claim ${
+                    flow_obj.prize?.[flow_obj.cur - 2] || 0
+                  }`,
+                  pre_instruction: `Instructions:\n1. Please finish the attempt by ${formatTohhmmDateIST(
+                    flow_obj.end_time
+                  )} to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game on this screen before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
+                }
+              };
             }
-          };
-          await set(flow_token, flow_obj);
-          return response;
+          } else {
+            {
+              flow_obj.finishedAt = new Date();
+              let final_img = WRONG.img;
+              let final_img_height = WRONG.height;
+              let final_img_width = WRONG.width;
+              let final_msg = `Sorry, that's incorrect. Better luck next time.`;
+              response = {
+                screen: "FINAL",
+                data: {
+                  final_img,
+                  final_img_height,
+                  final_img_width,
+                  final_msg
+                }
+              };
+            }
+          }
         }
-
         break;
       // send success response to complete and close the flow
       // return {
@@ -144,6 +188,8 @@ export const getNextScreen = async (req, res, decryptedBody) => {
       default:
         break;
     }
+    await set(flow_token, flow_obj);
+    return response;
   }
 
   console.error("Unhandled request body:", decryptedBody);
