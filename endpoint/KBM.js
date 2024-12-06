@@ -96,8 +96,37 @@ export const getNextScreen = async (req, res, decryptedBody) => {
         if (flow_obj.is_back) {
           // implement continue from back logic
         } else {
-          if (data.has_quit || flow_obj.end_time < new Date()) {
+          if (data.has_quit) {
             flow_obj.finishedAt = new Date();
+            if (flow_obj.end_time < new Date()) {
+              let final_img = TIME_UP.img;
+              let final_img_height = TIME_UP.height;
+              let final_img_width = TIME_UP.width;
+              let final_msg = "Sorry time over. Better luck next time.";
+              response = {
+                screen: "FINAL",
+                data: {
+                  final_img,
+                  final_img_height,
+                  final_img_width,
+                  final_msg
+                }
+              };
+            } else {
+              let final_img = WINNER.img;
+              let final_img_height = WINNER.height;
+              let final_img_width = WINNER.width;
+              let final_msg = `Congratulations, You have won ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
+              response = {
+                screen: "FINAL",
+                data: {
+                  final_img,
+                  final_img_height,
+                  final_img_width,
+                  final_msg
+                }
+              };
+            }
           }
         }
         break;
