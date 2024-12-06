@@ -13,7 +13,7 @@ import {
   formatTohhmmDateIST,
   convertKeysToDate
 } from "../helpers/utils.js";
-import { BACK, TIME_UP, WINNER, WRONG } from "../assets/kbm_assets.js";
+import { BACK, CORRECT, TIME_UP, WINNER, WRONG } from "../assets/kbm_assets.js";
 
 // handle initial request when opening the flow
 export const getNextScreen = async (req, res, decryptedBody) => {
@@ -147,7 +147,8 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             flow_obj.questions?.[flow_obj.cur - 1]?.ans.toUpperCase() ===
             data.ans.toUpperCase()
           ) {
-            if (flow_obj.cur >= flow_obj.questions.length) {
+            flow_obj.cur++;
+            if (flow_obj.cur > flow_obj.questions.length) {
               flow_obj.finishedAt = new Date();
               let final_img = WINNER.img;
               let final_img_height = WINNER.height;
@@ -163,13 +164,16 @@ export const getNextScreen = async (req, res, decryptedBody) => {
                 }
               };
             } else {
-              flow_obj.cur++;
               const post_title = "Sahi Jawaab!";
+              const post_img = CORRECT.img;
+              const post_img_height = CORRECT.height;
               const post_msg = `That's correct. You win ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
               response = {
                 screen: "POST",
                 data: {
                   post_title,
+                  post_img,
+                  post_img_height,
                   post_msg,
                   qs_img: flow_obj.questions[flow_obj.cur - 1].qs_img,
                   pre_subheading: `Answer next for ${
