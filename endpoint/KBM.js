@@ -30,13 +30,19 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   }
 
   if (action === "BACK") {
-    // return {
-    //   screen: 'MY_SCREEN',
-    //   data: {
-    //     // custom data for the screen
-    //     greeting: 'Hey there! 👋',
-    //   },
-    // };
+    let final_img = TIME_UP.img;
+    let final_img_height = TIME_UP.height;
+    let final_img_width = TIME_UP.width;
+    let final_msg = "Sorry time over. Better luck next time.";
+    return {
+      screen: "FINAL",
+      data: {
+        final_img,
+        final_img_height,
+        final_img_width,
+        final_msg
+      }
+    };
   }
 
   if (action === "data_exchange") {
