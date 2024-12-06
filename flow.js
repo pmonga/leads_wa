@@ -2,9 +2,20 @@
 import { get } from "./helpers/storage.js";
 import { FLOW_KBM } from "./helpers/config.js";
 import { getNextScreen as KBMgetNextSCreen } from "./endpoint/KBM.js";
+import { set } from "./helpers/storage.js";
 
 export const getNextScreen = async (req, res, decryptedBody) => {
   const { data, action, flow_token } = decryptedBody;
+  // added for testing the end point remove  in production
+  if (decryptedBody?.flow_token === "TEST") {
+    const flow_token = decryptedBody.flow_token;
+    const flow_obj = await get(flow_token);
+    if (!flow_obj) {
+      await set(flow_token, { flow_id: FLOW_KBM });
+    }
+  }
+
+  // tesing code ends
   // handle health check request
   if (action === "ping") {
     return {

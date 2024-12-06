@@ -193,16 +193,6 @@ app.post("/endpoint", async (req, res) => {
 
   const { aesKeyBuffer, initialVectorBuffer, decryptedBody } = decryptedRequest;
   console.log("💬 Decrypted Request:", decryptedBody);
-  // added for testing the end point remove  in production
-  if (decryptedBody?.flow_token === "TEST" && ENV === "DEV") {
-    const flow_token = decryptedBody.flow_token;
-    const flow_obj = await get(flow_token);
-    if (!flow_obj) {
-      await set(flow_token, { flow_id: FLOW_KBM });
-    }
-  }
-
-  // tesing code ends
 
   // TODO: Uncomment this block and add your flow token validation logic.
   // If the flow token becomes invalid, return HTTP code 427 to disable the flow and show the message in `error_msg` to the user
