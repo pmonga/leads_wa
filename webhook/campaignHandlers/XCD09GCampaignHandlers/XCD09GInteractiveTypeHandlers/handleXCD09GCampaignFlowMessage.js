@@ -82,13 +82,15 @@ export default async (req, res) => {
           for (const k in changes) {
             wallet[type][k] += changes[k];
           }
-          await campaignContactsCollection.update(
-            { _id },
-            {
-              $set: { wallet },
-              $push: { ledger: { ...flow_obj.entry, createdAt: new Date() } }
-            }
-          );
+          console.log("wallet: ", wallet);
+          console.log("entry: ", { ...flow_obj.entry, createdAt: new Date() });
+          // await campaignContactsCollection.update(
+          //   { _id },
+          //   {
+          //     $set: { wallet },
+          //     $push: { ledger: { ...flow_obj.entry, createdAt: new Date() } }
+          //   }
+          // );
           await res.locals.waClient.sendTextMessage(contact.phone, {
             body: `You won ${flow_obj.won}. Your balance is ${wallet.redeemable.total - wallet.redeemable.used - wallet.redeemable.redeemed}.`
           });
@@ -209,3 +211,4 @@ async function sendKBMFlow(registered, res) {
     );
   }
 }
+/*global console*/
