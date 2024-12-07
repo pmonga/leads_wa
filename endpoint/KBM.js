@@ -86,6 +86,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
           response = {
             screen: "PRE",
             data: {
+              cur: `Q${flow_obj.cur}`,
               qs_img: flow_obj.questions[flow_obj.cur - 1].qs_img,
               pre_subheading: `Answer next for ${
                 flow_obj.prize?.[flow_obj.cur - 1] || 0
@@ -175,6 +176,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
               response = {
                 screen: "POST",
                 data: {
+                  cur: `Q${flow_obj.cur}`,
                   post_title,
                   post_img,
                   post_img_height,
