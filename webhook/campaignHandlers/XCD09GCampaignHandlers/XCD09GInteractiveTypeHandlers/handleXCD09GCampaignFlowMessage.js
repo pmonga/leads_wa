@@ -77,6 +77,7 @@ export default async (req, res) => {
       if (registered) {
         const flow_obj = res.locals.flow_obj;
         const { _id, wallet } = registered;
+        console.log("flow object:", flow_obj);
         if (flow_obj?.entry) {
           const { type, changes } = flow_obj.entry;
           for (const k in changes) {
