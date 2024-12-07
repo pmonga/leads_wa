@@ -77,7 +77,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             flow_obj.questions = [...SAMPLE_GAME];
           } else {
             // implement real game progress logic here;
-            flow_obj.is_sample = true;
+            //flow_obj.is_sample = true;
             flow_obj.questions = [...SAMPLE_GAME];
             // the last_attemptedAT, last_attempt_level needs to be set here in the campaignContacts.
             // update contactQuestions too, so it avoids repetition.
@@ -224,11 +224,12 @@ export const getNextScreen = async (req, res, decryptedBody) => {
         break;
     }
     if (!flow_obj.is_sample && flow_obj.finishedAt) {
+      const { questions, ...details } = flow_obj;
       const entry = {
         type: "redeemable",
         changes: { total: flow_obj.won },
         description: "game winnings",
-        details: { ...flow_obj }
+        details
       };
       flow_obj.entry = entry;
     }
