@@ -1,6 +1,8 @@
-import dotnenv from 'dotenv';
-import generateToken from '../../../../helpers/tokenizer.js';
-import { set, get, del } from '../../../../helpers/storage.js';
+import dotnenv from "dotenv";
+import generateToken from "../../../../helpers/tokenizer.js";
+import { set, get, del } from "../../../../helpers/storage.js";
+import { FLOW_KBM, FLOW_SIGNUP } from "../../../../helpers/config.js";
+import { isSameDate } from "../../../../helpers/utils.js";
 
 dotnenv.config();
 export default async (req, res) => {
@@ -13,210 +15,197 @@ export default async (req, res) => {
   const campaignContactsCollection =
     res.locals.collections.campaignContactsCollection;
 
-  const flowData = res.locals.flow_data;
+  const flow_data = res.locals.flow_data;
   const flow_token = res.locals.flow_token;
-  const flowObject = await get(flow_token);
-  if (flowObject.phone != contact.phone) {
+  const flow_obj = res.locals.flow_obj;
+  if (flow_obj.phone != contact.phone) {
     let reply = {
-      body: 'Sorry, Incorrect parameters. Please try again later.',
+      body: "Sorry, Incorrect parameters. Please try again later."
     };
-    del(res.locals.flow_token);
+    await del(res.locals.flow_token);
     await res.locals.waClient.sendTextMessage(contact.phone, reply);
     return;
   }
-  switch (flowObject.flow_id) {
-    case '1760272798116365': {
-      await signupFlow(res);
+  switch (flow_obj.flow_id) {
+    case FLOW_SIGNUP: {
+      //sign up -- enter contact name and email if not already done earlier
+      if (!contact.name) {
+        contact.name = flow_data.name;
+        contact.email = flow_data.email;
+        await signUp(contact, contactsCollection);
+      }
+      // get registration details
+      let registered = await getRegistration(
+        campaign,
+        contact,
+        campaignContactsCollection
+      );
+      // if not registered; register for the Campaign
+      if (!registered) {
+        registered = await register(
+          campaign,
+          contact,
+          campaignContactsCollection
+        );
+      }
+      //send wa reply to contact
+      if (registered) {
+        let reply = {
+          body: `Thank you, ${
+            registered.name
+          }, you are registered for ${campaign.name.toUpperCase()} with mobile number ${
+            registered.phone
+          }.`
+        };
+        await res.locals.waClient.sendTextMessage(contact.phone, reply);
+        // send KBM flow
+        await sendKBMFlow(registered, res);
+      } else {
+        await res.locals.waClient.sendTextMessage(contact.phone, {
+          body: `Sorry something went wrong, please try again later`
+        });
+      }
+      break;
+    }
+    case FLOW_KBM: {
+      // get registration details
+      const registered = await getRegistration(
+        campaign,
+        contact,
+        campaignContactsCollection
+      );
+      if (registered) {
+        const flow_obj = res.locals.flow_obj;
+        const { _id, wallet } = registered;
+        if (flow_obj?.entry) {
+          const { type, changes } = flow_obj.entry;
+          for (const k in changes) {
+            wallet[type][k] += changes[k];
+          }
+          await campaignContactsCollection.update(
+            { _id },
+            {
+              $set: { wallet },
+              $push: { ledger: { ...flow_obj.entry, createdAt: new Date() } }
+            }
+          );
+          await res.locals.waClient.sendTextMessage(contact.phone, {
+            body: `You won ${flow_obj.won}. Your balance is ${wallet.redeemable.total - wallet.redeemable.used - wallet.redeemable.redeemed}.`
+          });
+        }
+        await res.locals.waClient.sendTextMessage(contact.phone, {
+          body: `Thanks for playing. Your balance is ${wallet.redeemable.total - wallet.redeemable.used - wallet.redeemable.redeemed}.`
+        });
+      }
       break;
     }
   }
-
-  //register for the campaign event
+  // clean up, remove the token
+  del(res.locals.flow_token);
 };
 
-async function signupFlow(res) {
+async function signUp(contact, collection) {
+  const { phone, name, email } = contact;
+  await collection.update({ phone }, { $set: { name, email } });
+  return;
+}
+
+async function getRegistration(campaign, contact, coll) {
+  const fields = {
+    _id: 1,
+    name: 1,
+    code: 1,
+    phone: 1,
+    last_attemptedAt: 1,
+    last_attempt_level: 1,
+    active_flow_token: 1,
+    wallet: 1
+  };
+  const registered = (
+    await coll.read(
+      { code: campaign.code, phone: contact.phone },
+      { projection: fields }
+    )
+  )?.[0];
+  return registered;
+}
+
+async function register(campaign, contact, coll) {
+  const registered = {
+    campaign_id: campaign._id,
+    code: campaign.code,
+    contact_id: contact._id,
+    name: contact.name,
+    phone: contact.phone,
+    mobile: contact.mobile,
+    wallet: { redeemable: { total: 0, used: 0, redeemed: 0 } },
+    ledger: []
+  };
+  registered._id = (await coll.create(registered)).insertedId;
+  return registered;
+}
+
+async function sendKBMFlow(registered, res) {
   const code = res.locals.code;
   const contact = res.locals.contact;
-  const campaign = res.locals.campaign;
-  const contactsCollection = res.locals.collections.contactsCollection;
+  const phone = contact.phone;
   const campaignContactsCollection =
     res.locals.collections.campaignContactsCollection;
 
-  const flowData = res.locals.flow_data;
-  const flow_token = res.locals.flow_token;
-  const flowObject = await get(flow_token);
-  contactsCollection,
-    campaignContactsCollection,
-    flowObject,
-    (contact.tagsToAdd = [
-      ...contact.tagsToAdd,
-      code,
-      ...flowData.courses,
-      ...campaign.tags,
-    ]);
-  if (!contact.name) {
-    // update contact info
-    contact.name = flowData.name;
-    contact.email = flowData.email;
-    await contactsCollection.update(
-      { phone: flowObject.phone },
-      {
-        $set: { name: flowData.name, email: flowData.email },
-      }
-    );
-  }
-  // clean up, remove the token
-  del(res.locals.flow_token);
-  const phone = contact.phone;
-  let registered = (
-    await campaignContactsCollection.read(
-      { code, phone },
-      {
-        projection: {
-          _id: 1,
-          name: 1,
-          code: 1,
-          phone: 1,
-          last_attemptedAt: 1,
-          last_attempt_level: 1,
-          active_flow_token: 1,
-        },
-      }
-    )
-  )?.[0];
-  // if not registered then register now
-  if (!registered) {
-    registered = {
-      campaign_id: campaign._id,
-      code,
-      contact_id: contact._id,
-      name: contact.name,
-      phone,
-      mobile: contact.mobile,
-    };
-    registered._id = (
-      await campaignContactsCollection.create(registered)
-    ).insertedId;
-    let reply = {
-      body: `Thank you, ${
-        registered.name
-      }, you are registered for ${campaign.name.toUpperCase()} with mobile number ${
-        registered.phone
-      }.`,
-    };
-    await res.locals.waClient.sendTextMessage(contact.phone, reply);
-  }
-  // send the KBM flow message for KBM flow_id = 1214667192982073
+  // send the KBM flow message for KBM flow_id = FLOW_KBM
   // check if has already played the game today
   if (
     registered.last_attemptedAt &&
     isSameDate(new Date(registered.last_attemptedAt))
   ) {
     await res.locals.waClient.sendTextMessage(contact.phone, {
-      body: `You have already played the game today. Please try again tomorrow `,
+      body: `You have already played the game today. Please try again tomorrow `
     });
   } else {
     //check if there is a previously active flow token
     if (registered?.active_flow_token) {
-      const flow_obj = await get(registered.active_flow_token);
+      let kbm_flow_obj = await get(registered.active_flow_token);
       // that previous has a valid started game not yet expired or ended.
-      if (
-        flow_obj?.startedAt &&
-        isWithinAllowedPeriod(
-          flow_obj.startedAt,
-          flow_obj.time_allowed || 10 * 60 * 1000
-        )
-      ) {
+      if (new Date(kbm_flow_obj?.end_time) > new Date()) {
         res.locals.waClient.sendTextMessage(contact.phone, {
-          body: `You already have a game in progress, please finish it or wait for it to expire.`,
+          body: `You already have a game in progress, please finish it or wait for it to expire.`
         });
-        res.locals.waClient.sendStatusUpdate('read', message);
-        res.sendStatus(200);
         return;
       }
       // delete the existing flow_token
       await del(registered.active_flow_token);
     }
     // setup a new flow_token and make ready to send flow
-    const flow_id = '1214667192982073';
-    const flow_obj = { phone, code, flow_id, createdAt: new Date() };
-    const token = generateToken(JSON.stringify(flow_obj));
+    const flow_id = FLOW_KBM;
+    const kbm_flow_obj = { phone, code, flow_id, createdAt: new Date() };
+    const token = generateToken(JSON.stringify(kbm_flow_obj));
     const layout = {
       header: {
-        type: 'text',
-        text: 'Flow message header',
+        type: "text",
+        text: "Flow message header"
       },
       body: {
-        text: 'Flow message body',
+        text: "Flow message body"
       },
       footer: {
-        text: 'Flow message footer',
-      },
+        text: "Flow message footer"
+      }
     };
     const params = {
       flow_token: token,
-      mode: 'draft',
+      mode: "draft",
       flow_id, //KBM
-      flow_cta: 'Play Now',
-      flow_action: 'navigate',
+      flow_cta: "Play Now",
+      flow_action: "navigate",
       flow_action_payload: {
-        screen: 'WELCOME',
-      },
+        screen: "WELCOME"
+      }
     };
     await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);
-    await set(token, flow_obj);
+    await set(token, kbm_flow_obj);
     await campaignContactsCollection.update(
       { _id: registered._id },
       { $set: { active_flow_token: token } }
     );
   }
-}
-function isSameDate(givenDate) {
-  // Get the current date in IST
-  const currentDate = new Date();
-  const istOffset = 330; // IST is UTC+5:30
-  const istCurrentDate = new Date(
-    currentDate.getTime() +
-      currentDate.getTimezoneOffset() * 60000 +
-      istOffset * 60000
-  );
-
-  // Adjust the given date to IST
-  const istGivenDate = new Date(
-    givenDate.getTime() +
-      givenDate.getTimezoneOffset() * 60000 +
-      istOffset * 60000
-  );
-
-  // Compare year, month, and day
-  return (
-    istCurrentDate.getFullYear() === istGivenDate.getFullYear() &&
-    istCurrentDate.getMonth() === istGivenDate.getMonth() &&
-    istCurrentDate.getDate() === istGivenDate.getDate()
-  );
-}
-
-/**
- * Checks if the current time is within the allowed period from the start time.
- * @param {Date|string} startTime - The starting time as a Date object or a valid date string.
- * @param {number} allowedPeriod - The allowed period in milliseconds.
- * @returns {boolean} - True if the current time is within the allowed period, false otherwise.
- */
-function isWithinAllowedPeriod(startTime, allowedPeriod = 10 * 60 * 1000) {
-  // Ensure startTime is a Date object
-  const start = new Date(startTime);
-
-  // Check for invalid start time
-  if (isNaN(start)) {
-    throw new Error('Invalid start time provided');
-  }
-
-  // Get the current time
-  const currentTime = new Date();
-
-  // Calculate the difference in time
-  const timeDifference = currentTime - start;
-
-  // Check if the difference is within the allowed period
-  return timeDifference <= allowedPeriod;
 }

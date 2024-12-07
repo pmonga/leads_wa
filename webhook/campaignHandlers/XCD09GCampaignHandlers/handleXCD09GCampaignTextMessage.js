@@ -1,8 +1,9 @@
 import dotnenv from "dotenv";
 import generateToken from "../../../helpers/tokenizer.js";
 import { set, get, del } from "../../../helpers/storage.js";
-import { convertKeysToDate } from "../../../helpers/utils.js";
+import { convertKeysToDate, isSameDate } from "../../../helpers/utils.js";
 import { FLOW_KBM, FLOW_SIGNUP } from "../../../helpers/config.js";
+import { WELCOME } from "../../../assets/kbm_assets.js";
 
 dotnenv.config();
 export default async (req, res, next) => {
@@ -29,7 +30,8 @@ export default async (req, res, next) => {
             phone: 1,
             last_attemptedAt: 1,
             last_attempt_level: 1,
-            active_flow_token: 1
+            active_flow_token: 1,
+            wallet: 1
           }
         }
       )
@@ -42,7 +44,9 @@ export default async (req, res, next) => {
         contact_id: contact._id,
         name: contact.name,
         phone,
-        mobile: contact.mobile
+        mobile: contact.mobile,
+        wallet: { redeemable: { total: 0, used: 0, redeemed: 0 } },
+        ledger: []
       };
       registered._id = (
         await campaignContactsCollection.create(registered)
@@ -68,21 +72,19 @@ export default async (req, res, next) => {
     } else {
       //check if there is a previously active flow token
       if (registered?.active_flow_token) {
-        let flow_obj = await get(registered.active_flow_token);
-        if (flow_obj) {
-          flow_obj = convertKeysToDate(
-            flow_obj,
+        let kbm_flow_obj = await get(registered.active_flow_token);
+        if (kbm_flow_obj) {
+          kbm_flow_obj = convertKeysToDate(
+            kbm_flow_obj,
             "startedAt",
             "end_time",
             "finishedAt"
           );
           // that previous has a valid started game not yet expired or ended.
-          if (flow_obj?.end_time >= new Date()) {
+          if (kbm_flow_obj?.end_time >= new Date()) {
             res.locals.waClient.sendTextMessage(contact.phone, {
               body: `You already have a game in progress, please finish it or wait for it to expire.`
             });
-            res.locals.waClient.sendStatusUpdate("read", message);
-            res.sendStatus(200);
             return;
           }
           // delete the existing flow_token
@@ -112,7 +114,8 @@ export default async (req, res, next) => {
         flow_cta: "Play Now",
         flow_action: "navigate",
         flow_action_payload: {
-          screen: "WELCOME"
+          screen: "WELCOME",
+          data: { welcome_img: WELCOME.img }
         }
       };
       await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);
@@ -160,53 +163,3 @@ export default async (req, res, next) => {
     });
   }
 };
-
-function isSameDate(givenDate) {
-  // Get the current date in IST
-  const currentDate = new Date();
-  const istOffset = 330; // IST is UTC+5:30
-  const istCurrentDate = new Date(
-    currentDate.getTime() +
-      currentDate.getTimezoneOffset() * 60000 +
-      istOffset * 60000
-  );
-
-  // Adjust the given date to IST
-  const istGivenDate = new Date(
-    givenDate.getTime() +
-      givenDate.getTimezoneOffset() * 60000 +
-      istOffset * 60000
-  );
-
-  // Compare year, month, and day
-  return (
-    istCurrentDate.getFullYear() === istGivenDate.getFullYear() &&
-    istCurrentDate.getMonth() === istGivenDate.getMonth() &&
-    istCurrentDate.getDate() === istGivenDate.getDate()
-  );
-}
-
-/**
- * Checks if the current time is within the allowed period from the start time.
- * @param {Date|string} startTime - The starting time as a Date object or a valid date string.
- * @param {number} allowedPeriod - The allowed period in milliseconds.
- * @returns {boolean} - True if the current time is within the allowed period, false otherwise.
- */
-function isWithinAllowedPeriod(startTime, allowedPeriod = 10 * 60 * 1000) {
-  // Ensure startTime is a Date object
-  const start = new Date(startTime);
-
-  // Check for invalid start time
-  if (isNaN(start)) {
-    throw new Error("Invalid start time provided");
-  }
-
-  // Get the current time
-  const currentTime = new Date();
-
-  // Calculate the difference in time
-  const timeDifference = currentTime - start;
-
-  // Check if the difference is within the allowed period
-  return timeDifference <= allowedPeriod;
-}

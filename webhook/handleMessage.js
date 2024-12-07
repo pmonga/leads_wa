@@ -1,18 +1,23 @@
-import handleInteractiveMessage from './messageTypeHandlers/handleInteractiveMessage.js';
-import handleTextMessage from './messageTypeHandlers/handleTextMessage.js';
-import createCommInCRM from '../helpers/crm.js';
+/*global console*/
+/*global process*/
 
+import dotnenv from "dotenv";
+import handleInteractiveMessage from "./messageTypeHandlers/handleInteractiveMessage.js";
+import handleTextMessage from "./messageTypeHandlers/handleTextMessage.js";
+import createCommInCRM from "../helpers/crm.js";
+
+dotnenv.config();
 const handleMessage = async function (req, res) {
   const message = res.locals.message;
 
   // check if message is from a valid Indian number if not then return without doing anything
   if (!/^91/.test(message.from)) {
-    res.locals.waClient.sendStatusUpdate('read', message);
+    res.locals.waClient.sendStatusUpdate("read", message);
     return;
   }
 
   const type = res.locals.message.type;
-  const phone = '+' + message.from;
+  const phone = "+" + message.from;
   const contactsCollection = res.locals.collections.contactsCollection;
 
   const contact =
@@ -24,19 +29,19 @@ const handleMessage = async function (req, res) {
   // Save the message in messages collection
   res.locals.collections.messagesCollection.create({
     contact_id: contact._id,
-    message_object: { ...req.body },
+    message_object: { ...req.body }
   });
 
-  console.log('handleMessage switch type:', type);
+  console.log("handleMessage switch type:", type);
   switch (type) {
-    case 'text':
+    case "text":
       await handleTextMessage(req, res);
       break;
-    case 'interactive':
+    case "interactive":
       await handleInteractiveMessage(req, res);
       break;
     default:
-      console.log('Not supported message type: ', type);
+      console.log("Not supported message type: ", type);
       break;
   }
   // add to CRM without await.. no need to wait for it
@@ -47,22 +52,22 @@ const handleMessage = async function (req, res) {
     { phone: contact.phone },
     { $addToSet: { tags: { $each: tagsToAdd } }, $set: { createdBy } }
   );
-  res.locals.waClient.sendStatusUpdate('read', message);
+  res.locals.waClient.sendStatusUpdate("read", message);
 };
 
 async function createContact(req, res) {
   const message = res.locals.message;
-  const phone = '+' + message.from;
+  const phone = "+" + message.from;
   const contactsCollection = res.locals.collections.contactsCollection;
   const mobile = phone.slice(3);
   const contact = {
     phone,
     mobile,
-    email: '',
-    name: '',
+    email: "",
+    name: "",
     wa_name:
-      req.body.entry?.[0].changes?.[0].value?.contacts?.[0].profile.name || '',
-    wa_id: req.body.entry?.[0].changes?.[0].value?.contacts?.[0].wa_id,
+      req.body.entry?.[0].changes?.[0].value?.contacts?.[0].profile.name || "",
+    wa_id: req.body.entry?.[0].changes?.[0].value?.contacts?.[0].wa_id
   };
   contact._id = (await contactsCollection.create(contact)).insertedId;
   return contact;
@@ -73,15 +78,15 @@ async function addToCRM(res) {
   const { message, utm } = res.locals.crm;
   const contact = res.locals.contact;
   const crmData = {
-    source: 'whatsApp LP',
+    source: "whatsApp LP",
     first_name: contact.name,
     mobile: contact.mobile,
     email: contact.email,
     wa_name: contact.wa_name,
     message: message,
-    ...utm,
+    ...utm
   };
-  if (process.env.ENV === 'PROD') {
+  if (process.env.ENV === "PROD") {
     await createCommInCRM(crmData);
   } else {
     //console.log('CRM Entry :', JSON.stringify(crmData));

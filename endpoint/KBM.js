@@ -18,12 +18,20 @@ import { BACK, CORRECT, TIME_UP, WINNER, WRONG } from "../assets/kbm_assets.js";
 // handle initial request when opening the flow
 export const getNextScreen = async (req, res, decryptedBody) => {
   const { screen, data, version, action, flow_token } = decryptedBody;
-  const flow_obj = convertKeysToDate(
-    await get(flow_token),
-    "startedAt",
-    "end_time",
-    "finishedAt"
-  );
+  let flow_obj = await get(flow_token);
+  if (!flow_obj) {
+    return {
+      screen: "SUCCESS",
+      data: {
+        extension_message_response: {
+          params: {
+            flow_token
+          }
+        }
+      }
+    };
+  }
+  flow_obj = convertKeysToDate(flow_obj, "startedAt", "end_time", "finishedAt");
   const flow_id = { flow_obj };
   if (flow_id != FLOW_KBM) {
     //return with error
@@ -55,7 +63,6 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             flow_obj.level = level;
             flow_obj.cur = cur;
             flow_obj.prize = [...prize];
-            flow_obj.won = 0;
             flow_obj.time_allowed =
               GAME_TIME?.[level] || GAME_TIME?.[GAME_TIME.length - 1];
             flow_obj.startedAt = new Date();
@@ -94,40 +101,37 @@ export const getNextScreen = async (req, res, decryptedBody) => {
         }
         break;
       case "PRE":
-        if (flow_obj.is_back) {
-          // implement continue from back logic
-        } else {
-          if (data.has_quit) {
-            flow_obj.finishedAt = new Date();
-            if (flow_obj.end_time < new Date()) {
-              let final_img = TIME_UP.img;
-              let final_img_height = TIME_UP.height;
-              let final_img_width = TIME_UP.width;
-              let final_msg = "Sorry time over. Better luck next time.";
-              response = {
-                screen: "FINAL",
-                data: {
-                  final_img,
-                  final_img_height,
-                  final_img_width,
-                  final_msg
-                }
-              };
-            } else {
-              let final_img = WINNER.img;
-              let final_img_height = WINNER.height;
-              let final_img_width = WINNER.width;
-              let final_msg = `Congratulations, You have won ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
-              response = {
-                screen: "FINAL",
-                data: {
-                  final_img,
-                  final_img_height,
-                  final_img_width,
-                  final_msg
-                }
-              };
-            }
+        if (data.has_quit) {
+          flow_obj.finishedAt = new Date();
+          if (flow_obj.end_time < new Date()) {
+            let final_img = TIME_UP.img;
+            let final_img_height = TIME_UP.height;
+            let final_img_width = TIME_UP.width;
+            let final_msg = "Sorry time over. Better luck next time.";
+            response = {
+              screen: "FINAL",
+              data: {
+                final_img,
+                final_img_height,
+                final_img_width,
+                final_msg
+              }
+            };
+          } else {
+            let final_img = WINNER.img;
+            let final_img_height = WINNER.height;
+            let final_img_width = WINNER.width;
+            let final_msg = `Congratulations, You have won ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
+            flow_obj.won = flow_obj.prize?.[flow_obj.cur - 2];
+            response = {
+              screen: "FINAL",
+              data: {
+                final_img,
+                final_img_height,
+                final_img_width,
+                final_msg
+              }
+            };
           }
         }
         break;
@@ -147,13 +151,13 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             flow_obj.questions?.[flow_obj.cur - 1]?.ans.toUpperCase() ===
             data.ans.toUpperCase()
           ) {
-            flow_obj.cur++;
-            if (flow_obj.cur > flow_obj.questions.length) {
+            if (++flow_obj.cur > flow_obj.questions.length) {
               flow_obj.finishedAt = new Date();
               let final_img = WINNER.img;
               let final_img_height = WINNER.height;
               let final_img_width = WINNER.width;
-              let final_msg = `Congratulations, You have won ${flow_obj.prize?.[flow_obj.prize.length - 1]}.`;
+              let final_msg = `Congratulations, You have won ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
+              flow_obj.won = flow_obj.prize?.[flow_obj.cur - 2];
               response = {
                 screen: "FINAL",
                 data: {
@@ -208,17 +212,6 @@ export const getNextScreen = async (req, res, decryptedBody) => {
           }
         }
         break;
-      // send success response to complete and close the flow
-      // return {
-      //   screen: 'SUCCESS',
-      //   data: {
-      //     extension_message_response: {
-      //       params: {
-      //         flow_token,
-      //       },
-      //     },
-      //   },
-      // };
       case "BACK":
         return {
           screen: data.screen,
@@ -227,6 +220,15 @@ export const getNextScreen = async (req, res, decryptedBody) => {
       //break;
       default:
         break;
+    }
+    if (!flow_obj.is_sample && flow_obj.finishedAt) {
+      const entry = {
+        type: "redeemable",
+        changes: { total: flow_obj.won },
+        description: "game winnings",
+        details: { ...flow_obj }
+      };
+      flow_obj.entry = entry;
     }
     await set(flow_token, flow_obj);
     return response;
