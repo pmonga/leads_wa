@@ -34,7 +34,8 @@ export const getNextScreen = async (req, res, decryptedBody) => {
       }
     };
   }
-  const { flow_id } = await get(flow_token);
+  const flow_obj = await get(flow_token);
+  const flow_id = flow_obj?.flow_token;
   let response;
   switch (flow_id) {
     // Flow KBM_test id 1214667192982073
