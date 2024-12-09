@@ -38,6 +38,12 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   const flow_id = flow_obj?.flow_token;
   let response;
   console.log("flow_object: ", flow_obj);
+  console.log(
+    "compare FLOW_KBM to flow_id: ",
+    FLOW_KBM,
+    flow_id == FLOW_KBM,
+    flow_id
+  );
   switch (flow_id) {
     // Flow KBM_test id 1214667192982073
     case FLOW_KBM:
