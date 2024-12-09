@@ -37,12 +37,15 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   const flow_obj = await get(flow_token);
   const flow_id = flow_obj?.flow_token;
   let response;
+  console.log("flow_object: ", flow_obj);
   switch (flow_id) {
     // Flow KBM_test id 1214667192982073
     case FLOW_KBM:
+      console.log("Inside KBM");
       response = await KBMgetNextSCreen(req, res, decryptedBody);
       break;
     default:
+      console.log("Inside default");
       // close the flow;
       response = {
         screen: "SUCCESS",
