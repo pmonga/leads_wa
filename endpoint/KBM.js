@@ -124,7 +124,9 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             let final_img_height = WINNER.height;
             let final_img_width = WINNER.width;
             let final_msg = `Congratulations, You have won ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
-            flow_obj.won = flow_obj.prize?.[flow_obj.cur - 2];
+            flow_obj.won = flow_obj.is_sample
+              ? 0
+              : flow_obj.prize?.[flow_obj.cur - 2];
             response = {
               screen: "FINAL",
               data: {
@@ -159,7 +161,9 @@ export const getNextScreen = async (req, res, decryptedBody) => {
               let final_img_height = WINNER.height;
               let final_img_width = WINNER.width;
               let final_msg = `Congratulations, You have won ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
-              flow_obj.won = flow_obj.prize?.[flow_obj.cur - 2];
+              flow_obj.won = flow_obj.is_sample
+                ? 0
+                : flow_obj.prize?.[flow_obj.cur - 2];
               response = {
                 screen: "FINAL",
                 data: {
@@ -224,12 +228,12 @@ export const getNextScreen = async (req, res, decryptedBody) => {
       default:
         break;
     }
-    if (!flow_obj.is_sample && flow_obj.finishedAt) {
+    if (flow_obj.finishedAt) {
       const { questions, ...details } = flow_obj;
       const entry = {
         type: "redeemable",
         changes: { total: flow_obj.won },
-        description: "game winnings",
+        description: "KBM game winning",
         details
       };
       flow_obj.entry = entry;

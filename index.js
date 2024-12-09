@@ -32,6 +32,7 @@ let contactsCollection,
   messagesCollection,
   campaignsCollection,
   campaignContactsCollection,
+  ledgerCollection,
   log;
 let campaigns;
 
@@ -42,6 +43,7 @@ async function initdb() {
     messagesCollection = crud("wa_messages", db);
     campaignsCollection = crud("wa_campaigns", db);
     campaignContactsCollection = crud("wa_campaign_contacts", db);
+    ledgerCollection = crud("wa_ledger", db);
     log = crud("wa_logs", db);
   } catch (error) {
     console.error("Failed to connect to the database", error);
@@ -114,7 +116,8 @@ app.use(async (req, res, next) => {
     contactsCollection,
     messagesCollection,
     campaignsCollection,
-    campaignContactsCollection
+    campaignContactsCollection,
+    ledgerCollection
   };
   res.locals.campaigns = campaigns;
   console.log("setting up collections in res");

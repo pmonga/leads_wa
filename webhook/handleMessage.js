@@ -47,10 +47,10 @@ const handleMessage = async function (req, res) {
   // add to CRM without await.. no need to wait for it
   addToCRM(res);
   // update contact
-  const { tagsToAdd, createdBy } = contact;
+  const { tagsToAdd, createdBy, wallet } = contact; // in future versions introduce a field called, fields_to_update and use that
   await contactsCollection.update(
     { phone: contact.phone },
-    { $addToSet: { tags: { $each: tagsToAdd } }, $set: { createdBy } }
+    { $addToSet: { tags: { $each: tagsToAdd } }, $set: { createdBy, wallet } }
   );
   res.locals.waClient.sendStatusUpdate("read", message);
 };
@@ -61,10 +61,11 @@ async function createContact(req, res) {
   const contactsCollection = res.locals.collections.contactsCollection;
   const mobile = phone.slice(3);
   const contact = {
+    name: "",
     phone,
     mobile,
     email: "",
-    name: "",
+    wallet: { redeemable: { total: 0, used: 0, redeemed: 0 } },
     wa_name:
       req.body.entry?.[0].changes?.[0].value?.contacts?.[0].profile.name || "",
     wa_id: req.body.entry?.[0].changes?.[0].value?.contacts?.[0].wa_id

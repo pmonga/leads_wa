@@ -76,28 +76,27 @@ export default async (req, res) => {
       );
       if (registered) {
         const flow_obj = res.locals.flow_obj;
-        const { _id, wallet } = registered;
+        const { ledgerCollection } = res.locals.collections;
+        const wallet = res.locals.contact.wallet;
         if (flow_obj?.entry) {
           const { type, changes } = flow_obj.entry;
           for (const k in changes) {
             wallet[type][k] += changes[k];
           }
-          console.log("wallet: ", wallet);
-          console.log("entry: ", { ...flow_obj.entry, createdAt: new Date() });
-          // await campaignContactsCollection.update(
-          //   { _id },
-          //   {
-          //     $set: { wallet },
-          //     $push: { ledger: { ...flow_obj.entry, createdAt: new Date() } }
-          //   }
-          // );
+          await ledgerCollection.create({
+            contact_id: contact._id,
+            phone: contact.phone,
+            name: contact.name,
+            entry: flow_obj?.entry
+          });
           await res.locals.waClient.sendTextMessage(contact.phone, {
-            body: `You won ${flow_obj.won}. Your balance is ${wallet.redeemable.total - wallet.redeemable.used - wallet.redeemable.redeemed}.`
+            body: `Thanks for playing. You won ${flow_obj.won}. Your balance is ${wallet.redeemable.total - wallet.redeemable.used - wallet.redeemable.redeemed}.`
+          });
+        } else {
+          await res.locals.waClient.sendTextMessage(contact.phone, {
+            body: `Thanks for playing. Your balance is ${wallet.redeemable.total - wallet.redeemable.used - wallet.redeemable.redeemed}.`
           });
         }
-        await res.locals.waClient.sendTextMessage(contact.phone, {
-          body: `Thanks for playing. Your balance is ${wallet.redeemable.total - wallet.redeemable.used - wallet.redeemable.redeemed}.`
-        });
       }
       break;
     }
@@ -139,9 +138,7 @@ async function register(campaign, contact, coll) {
     contact_id: contact._id,
     name: contact.name,
     phone: contact.phone,
-    mobile: contact.mobile,
-    wallet: { redeemable: { total: 0, used: 0, redeemed: 0 } },
-    ledger: []
+    mobile: contact.mobile
   };
   registered._id = (await coll.create(registered)).insertedId;
   return registered;

@@ -30,8 +30,7 @@ export default async (req, res, next) => {
             phone: 1,
             last_attemptedAt: 1,
             last_attempt_level: 1,
-            active_flow_token: 1,
-            wallet: 1
+            active_flow_token: 1
           }
         }
       )
@@ -44,9 +43,7 @@ export default async (req, res, next) => {
         contact_id: contact._id,
         name: contact.name,
         phone,
-        mobile: contact.mobile,
-        wallet: { redeemable: { total: 0, used: 0, redeemed: 0 } },
-        ledger: []
+        mobile: contact.mobile
       };
       registered._id = (
         await campaignContactsCollection.create(registered)
