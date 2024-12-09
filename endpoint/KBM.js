@@ -62,6 +62,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
           {
             flow_obj.level = level;
             flow_obj.cur = cur;
+            flow_obj.won = 0;
             flow_obj.prize = [...prize];
             flow_obj.time_allowed =
               GAME_TIME?.[level] || GAME_TIME?.[GAME_TIME.length - 1];

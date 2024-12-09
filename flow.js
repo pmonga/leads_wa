@@ -42,10 +42,21 @@ export const getNextScreen = async (req, res, decryptedBody) => {
       response = await KBMgetNextSCreen(req, res, decryptedBody);
       break;
     default:
-      throw new Error(
-        `Unhadled flow_id in the endpoint. Please check your endpoint for flow_id : ${flow_id}".`
-      );
-    //break;
+      // close the flow;
+      response = {
+        screen: "SUCCESS",
+        data: {
+          extension_message_response: {
+            params: {
+              flow_token
+            }
+          }
+        }
+      };
+      // throw new Error(
+      //   `Unhadled flow_id in the endpoint. Please check your endpoint for flow_id : ${flow_id}".`
+      // );
+      break;
   }
   return response;
 };
