@@ -47,7 +47,12 @@ const handleMessage = async function (req, res) {
   // add to CRM without await.. no need to wait for it
   addToCRM(res);
   // update contact
-  const { tagsToAdd, createdBy, wallet } = contact; // in future versions introduce a field called, fields_to_update and use that
+  const { createdBy, wallet } = contact; // in future versions introduce a field called, fields_to_update and use that
+  const tagsToAdd = contact.tagsToAdd;
+  // All tags in uppercase to avoid search defeciency
+  // const tagsToAdd = contact.tagsToAdd.map(function (x) {
+  //   return x.toUpperCase();
+  // });
   await contactsCollection.update(
     { phone: contact.phone },
     { $addToSet: { tags: { $each: tagsToAdd } }, $set: { createdBy, wallet } }

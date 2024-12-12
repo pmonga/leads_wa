@@ -4,6 +4,7 @@ import { set, get, del } from "../../../helpers/storage.js";
 import { convertKeysToDate, isSameDate } from "../../../helpers/utils.js";
 import { FLOW_KBM, FLOW_SIGNUP } from "../../../helpers/config.js";
 import { WELCOME } from "../../../assets/kbm_assets.js";
+import { COURSES, JOIN_NOW } from "../../../assets/signup_assets.js";
 
 dotnenv.config();
 export default async (req, res, next) => {
@@ -147,7 +148,27 @@ export default async (req, res, next) => {
       flow_cta: "Register",
       flow_action: "navigate",
       flow_action_payload: {
-        screen: "JOIN_NOW"
+        screen: "JOIN_NOW",
+        data: {
+          join_now_img: JOIN_NOW.img,
+          join_now_img_height: JOIN_NOW.height,
+          courses_img: COURSES.img,
+          courses_img_height: COURSES.height,
+          courses: [
+            {
+              id: "cat",
+              title: "CAT"
+            },
+            {
+              id: "omet",
+              title: "OMETs (XAT, NMAT etc)"
+            },
+            {
+              id: "gmat",
+              title: "GMAT"
+            }
+          ]
+        }
       }
     };
     await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);
