@@ -122,11 +122,16 @@ function isWithinAllowedPeriod(startTime, allowedPeriod = 10 * 60 * 1000) {
   return timeDifference <= allowedPeriod;
 }
 
+function isObject(x) {
+  return typeof x === "object" && !Array.isArray(x) && x !== null;
+}
+
 export {
   getTimeWithOffset,
   formatTohhmmDateIST,
   convertKeysToDate,
   isSameDate,
-  isWithinAllowedPeriod
+  isWithinAllowedPeriod,
+  isObject
 };
 /* global console, Intl */

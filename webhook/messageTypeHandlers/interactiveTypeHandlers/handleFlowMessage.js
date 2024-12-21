@@ -14,18 +14,16 @@ const handleFlowMessage = async function (req, res) {
   const flow_token = flow_data?.flow_token;
   const flow_obj = await get(flow_token);
   const code = campaigns[flow_obj?.code] ? flow_obj.code : false;
-  let base_code;
   if (code) {
     res.locals.code = code;
     res.locals.campaign = campaigns[code];
-    base_code = campaigns[code]?.base_code || code;
   }
   res.locals.flow_token = flow_token;
   res.locals.flow_obj = flow_obj;
   res.locals.flow_data = flow_data;
   const utm = res.locals.campaign?.utm ? { ...res.locals.campaign.utm } : {};
   res.locals.crm.utm = { ...utm };
-  switch (base_code) {
+  switch (code) {
     case "TEST01": {
       res.locals.crm.message +=
         " Data from Flow: " +

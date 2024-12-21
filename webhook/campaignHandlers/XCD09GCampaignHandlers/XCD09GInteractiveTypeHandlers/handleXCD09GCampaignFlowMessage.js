@@ -77,12 +77,13 @@ export default async (req, res) => {
       if (registered) {
         const flow_obj = res.locals.flow_obj;
         const { ledgerCollection } = res.locals.collections;
-        const wallet = res.locals.contact.wallet;
+        const wallet = { ...res.locals.contact.wallet };
         if (flow_obj?.entry) {
           const { type, changes } = flow_obj.entry;
           for (const k in changes) {
             wallet[type][k] += changes[k];
           }
+          res.locals.contact.fieldsToUpdate.wallet = wallet;
           await ledgerCollection.create({
             contact_id: contact._id,
             phone: contact.phone,
