@@ -38,7 +38,7 @@ export default async (req, res, next) => {
     tagsToAdd = Array.isArray(campaigns[code]?.tags)
       ? [code, ...campaigns[code].tags]
       : [code];
-    if (Array.isArray(payload.tags)) {
+    if (Array.isArray(payload?.tags)) {
       tagsToAdd = [...tagsToAdd, ...payload.tags];
     }
   } else {
