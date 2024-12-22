@@ -122,7 +122,9 @@ export function signMessage(payload) {
  */
 export function verifyMessage(signedMessage) {
   const secretKey = process.env.SECRET_KEY;
-
+  if (!(typeof signedMessage === "string" || signedMessage instanceof String)) {
+    return null;
+  }
   // Split the signed message into payload and signature
   const [payloadBase64, signature] = signedMessage.split(".");
 

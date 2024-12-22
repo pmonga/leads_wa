@@ -24,6 +24,7 @@ export default async (req, res, next) => {
   let tagsToAdd = [];
   if (code) {
     res.locals.code = code;
+    res.locals.payload = payload;
     res.locals.campaign = campaigns[code];
     const utm =
       res.locals.campaign?.utm || payload?.utm
