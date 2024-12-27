@@ -92,9 +92,9 @@ export const getNextScreen = async (req, res, decryptedBody) => {
               pre_subheading: `Answer next for ${
                 flow_obj.prize?.[flow_obj.cur - 1] || 0
               }`,
-              pre_instruction: `Instructions:\n1. Please finish the attempt by ${formatTohhmmDateIST(
+              pre_instruction: `Instructions:\n1. Please finish the attempt by **${formatTohhmmDateIST(
                 flow_obj.end_time
-              )} to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game on this screen before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
+              )}** to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game on this screen before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
             }
           };
         }
@@ -190,9 +190,9 @@ export const getNextScreen = async (req, res, decryptedBody) => {
                   post_quit_label: `I want to quit now and claim ${
                     flow_obj.prize?.[flow_obj.cur - 2] || 0
                   }`,
-                  pre_instruction: `Instructions:\n1. Please finish the attempt by ${formatTohhmmDateIST(
+                  pre_instruction: `Instructions:\n1. Please finish the attempt by **${formatTohhmmDateIST(
                     flow_obj.end_time
-                  )} to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game on this screen before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
+                  )}** to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game on this screen before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
                 }
               };
             }

@@ -16,7 +16,7 @@ function getTimeWithOffset(baseTime, offsetMs, roundUp = false) {
   return newTime; // Return the Date object
 }
 
-function formatTohhmmDateIST(date) {
+function formatTohhmmDateIST(date, withDate = false) {
   const options = {
     timeZone: "Asia/Kolkata",
     hour: "2-digit",
@@ -39,8 +39,8 @@ function formatTohhmmDateIST(date) {
   const day = parts.find((part) => part.type === "day").value;
   const month = parts.find((part) => part.type === "month").value;
   const year = parts.find((part) => part.type === "year").value;
-
-  return `${hours}:${minutes} ${ampm}, ${day}-${month}-${year}`;
+  if (withDate) return `${hours}:${minutes} ${ampm}, ${day}-${month}-${year}`;
+  else return `${hours}:${minutes} ${ampm}`;
 }
 
 /**
