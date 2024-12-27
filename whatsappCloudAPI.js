@@ -1,6 +1,6 @@
 // whatsappCloudAPI.js
-import axios from 'axios';
-import dotenv from 'dotenv';
+import axios from "axios";
+import dotenv from "dotenv";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -11,23 +11,23 @@ dotenv.config();
  * @returns {object} - An object with methods to send different types of WhatsApp messages.
  */
 function createWhatsAppClient(phoneNumberId) {
-  const baseURL = 'https://graph.facebook.com/v16.0/';
+  const baseURL = "https://graph.facebook.com/v16.0/";
   const accessToken = process.env.GRAPH_API_TOKEN;
 
   if (!accessToken) {
     throw new Error(
-      'GRAPH_API_TOKEN is not defined in the environment variables.'
+      "GRAPH_API_TOKEN is not defined in the environment variables."
     );
   }
 
   if (!phoneNumberId) {
-    throw new Error('phoneNumberId must be provided.');
+    throw new Error("phoneNumberId must be provided.");
   }
 
   // Template for the base data object
   const baseDataTemplate = {
-    messaging_product: 'whatsapp',
-    recipient_type: 'individual',
+    messaging_product: "whatsapp",
+    recipient_type: "individual"
   };
 
   /**
@@ -37,7 +37,7 @@ function createWhatsAppClient(phoneNumberId) {
   function getHeaders() {
     return {
       Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json"
     };
   }
 
@@ -59,7 +59,7 @@ function createWhatsAppClient(phoneNumberId) {
           )}`
         );
       } else if (error.request) {
-        throw new Error('No response received from WhatsApp API.');
+        throw new Error("No response received from WhatsApp API.");
       } else {
         throw new Error(`Error in sending message: ${error.message}`);
       }
@@ -76,8 +76,8 @@ function createWhatsAppClient(phoneNumberId) {
     const data = {
       ...baseDataTemplate,
       to,
-      type: 'text',
-      text: message, // message object expected to contain { body: 'your message' }
+      type: "text",
+      text: message // message object expected to contain { body: 'your message' }
     };
     return sendMessage(data);
   }
@@ -92,8 +92,8 @@ function createWhatsAppClient(phoneNumberId) {
     const data = {
       ...baseDataTemplate,
       to,
-      type: 'image',
-      image: message, // message object expected to contain { link: 'imageUrl', caption: 'optional caption' }
+      type: "image",
+      image: message // message object expected to contain { link: 'imageUrl', caption: 'optional caption' }
     };
     return sendMessage(data);
   }
@@ -108,8 +108,8 @@ function createWhatsAppClient(phoneNumberId) {
     const data = {
       ...baseDataTemplate,
       to,
-      type: 'document',
-      document: message, // message object expected to contain { link: 'documentUrl', filename: 'optional filename' }
+      type: "document",
+      document: message // message object expected to contain { link: 'documentUrl', filename: 'optional filename' }
     };
     return sendMessage(data);
   }
@@ -124,53 +124,40 @@ function createWhatsAppClient(phoneNumberId) {
     const data = {
       ...baseDataTemplate,
       to,
-      type: 'template',
-      template: message, // message object expected to contain { name: 'templateName', language: { code: 'languageCode' }, components: 'optional components' }
+      type: "template",
+      template: message // message object expected to contain { name: 'templateName', language: { code: 'languageCode' }, components: 'optional components' }
     };
     return sendMessage(data);
   }
   async function sendFlowMessage(to, layout, params) {
     const data = {
-      recipient_type: 'individual',
-      messaging_product: 'whatsapp',
+      recipient_type: "individual",
+      messaging_product: "whatsapp",
       to: to,
-      type: 'interactive',
+      type: "interactive",
       interactive: {
-        type: 'flow',
+        type: "flow",
         ...layout,
         action: {
-          name: 'flow',
+          name: "flow",
           parameters: {
-            flow_message_version: '3',
-            // flow_token: 'AQAAAAACS5FpgQ_cAAAAAD0QI3s.',
-            // flow_id: '1760272798116365', //Lead Sign Up
-
-            // flow_cta: 'Book!',
-            // flow_action: 'navigate',
-            // flow_action_payload: {
-            //   screen: '<SCREEN_NAME>',
-            //   data: {
-            //     product_name: 'name',
-            //     product_description: 'description',
-            //     product_price: 100,
-            //   },
-            // },
-            ...params,
-          },
-        },
-      },
+            flow_message_version: "3",
+            ...params
+          }
+        }
+      }
     };
-    console.log(
-      'flow_action_payload: ',
-      data.interactive.action.parameters.flow_action_payload
-    );
+    // console.log(
+    //   'flow_action_payload: ',
+    //   data.interactive.action.parameters.flow_action_payload
+    // );
     return sendMessage(data);
   }
   async function sendStatusUpdate(status, message) {
     const data = {
-      messaging_product: 'whatsapp',
+      messaging_product: "whatsapp",
       status,
-      message_id: message.id,
+      message_id: message.id
     };
     return sendMessage(data);
   }
@@ -182,8 +169,9 @@ function createWhatsAppClient(phoneNumberId) {
     sendDocumentMessage,
     sendTemplateMessage,
     sendFlowMessage,
-    sendStatusUpdate,
+    sendStatusUpdate
   };
 }
 
 export default createWhatsAppClient;
+/*global process, console */

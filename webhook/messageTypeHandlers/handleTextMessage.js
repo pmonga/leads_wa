@@ -20,7 +20,9 @@ export default async (req, res, next) => {
   const code = match && campaigns[match[1]] ? match[1] : null;
   const signedMessage = match && match[2] ? match[2] : null;
   const payload = verifyMessage(signedMessage);
-  let fieldsToUpdate = {};
+  let fieldsToUpdate = {
+    last_text_message_receivedAt: new Date(message.timestamp)
+  };
   let tagsToAdd = [];
   if (code) {
     res.locals.code = code;

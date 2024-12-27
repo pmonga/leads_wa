@@ -74,7 +74,10 @@ async function createContact(req, res) {
     phone,
     mobile,
     email: "",
-    wallet: { redeemable: { total: 0, used: 0, redeemed: 0 } },
+    wallet: {
+      convertible: { total: 0, used: 0, converted: 0 },
+      non_convertible: { total: 0, used: 0 }
+    },
     wa_name:
       req.body.entry?.[0].changes?.[0].value?.contacts?.[0].profile.name || "",
     wa_id: req.body.entry?.[0].changes?.[0].value?.contacts?.[0].wa_id
@@ -90,7 +93,7 @@ async function addToCRM(res) {
   const contact = res.locals.contact;
   const crmData = {
     source: "whatsApp LP",
-    first_name: contact.name,
+    name: contact.name,
     mobile: contact.mobile,
     email: contact.email,
     wa_name: contact.wa_name,
@@ -100,7 +103,7 @@ async function addToCRM(res) {
   if (process.env.ENV === "PROD") {
     await createCommInCRM(crmData);
   } else {
-    //console.log('CRM Entry :', JSON.stringify(crmData));
+    console.log("CRM Entry :", JSON.stringify(crmData));
   }
 }
 

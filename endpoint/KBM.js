@@ -56,16 +56,16 @@ export const getNextScreen = async (req, res, decryptedBody) => {
         if (flow_obj?.is_back) {
           // implement continue from back logic
         } else {
-          const level = 0;
+          const difficulty_level = flow_obj?.difficulty_level || 0;
           const cur = 1; //flow_obj?.cur ? flow_obj.cur : 1;
-          const prize = GAME_PRIZE?.[level] || GAME_PRIZE[0];
+          const prize = GAME_PRIZE?.[difficulty_level] || GAME_PRIZE[0];
           {
-            flow_obj.level = level;
             flow_obj.cur = cur;
             flow_obj.won = 0;
             flow_obj.prize = [...prize];
             flow_obj.time_allowed =
-              GAME_TIME?.[level] || GAME_TIME?.[GAME_TIME.length - 1];
+              GAME_TIME?.[difficulty_level] ||
+              GAME_TIME?.[GAME_TIME.length - 1];
             flow_obj.startedAt = new Date();
             flow_obj.end_time = getTimeWithOffset(
               flow_obj.startedAt,
@@ -228,7 +228,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
     if (flow_obj.finishedAt) {
       const { questions, ...details } = flow_obj;
       const entry = {
-        type: "redeemable",
+        type: "convertible",
         changes: { total: flow_obj.won },
         description: "KBM game winning",
         details

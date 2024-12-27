@@ -92,11 +92,13 @@ async function setCredentials(req, res, next) {
   }
 
   // type of payload
-  const message = req.body.entry?.[0]?.changes[0]?.value?.messages?.[0];
-  if (message) {
+  if (req.body.entry?.[0]?.changes[0]?.value?.messages?.[0]) {
     res.locals.type = "message";
-    res.locals.message = message;
+    res.locals.message = req.body.entry?.[0]?.changes[0]?.value?.messages?.[0];
     res.locals.crm = { message: "", utm: {} };
+  } else if (req.body.entry?.[0]?.changes[0]?.value?.statuses?.[0]) {
+    res.locals.type = "status";
+    res.locals.status = req.body.entry?.[0]?.changes[0]?.value?.statuses?.[0];
   }
   next();
 }
@@ -129,7 +131,6 @@ app.post("/webhook", [logger, setCredentials], async (req, res) => {
     console.log("hook type: ", res.locals.type);
     switch (res.locals.type) {
       case "message":
-        //console.log(`inside switch`);
         await handleMessage(req, res);
         break;
       default:
@@ -195,7 +196,7 @@ app.post("/endpoint", async (req, res) => {
   }
 
   const { aesKeyBuffer, initialVectorBuffer, decryptedBody } = decryptedRequest;
-  console.log("💬 Decrypted Request:", decryptedBody);
+  //console.log("💬 Decrypted Request:", decryptedBody);
 
   // TODO: Uncomment this block and add your flow token validation logic.
   // If the flow token becomes invalid, return HTTP code 427 to disable the flow and show the message in `error_msg` to the user
@@ -215,7 +216,7 @@ app.post("/endpoint", async (req, res) => {
   */
 
   const screenResponse = await getNextScreen(req, res, decryptedBody);
-  console.log("👉 Response to Encrypt:", screenResponse);
+  //console.log("👉 Response to Encrypt:", screenResponse);
 
   res.send(encryptResponse(screenResponse, aesKeyBuffer, initialVectorBuffer));
 });

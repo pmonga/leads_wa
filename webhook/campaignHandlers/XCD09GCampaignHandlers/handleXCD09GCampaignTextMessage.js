@@ -30,7 +30,7 @@ export default async (req, res, next) => {
             code: 1,
             phone: 1,
             last_attemptedAt: 1,
-            last_attempt_level: 1,
+            difficulty_level: 1,
             active_flow_token: 1
           }
         }
@@ -44,7 +44,8 @@ export default async (req, res, next) => {
         contact_id: contact._id,
         name: contact.name,
         phone,
-        mobile: contact.mobile
+        mobile: contact.mobile,
+        difficulty_level: 0
       };
       registered._id = (
         await campaignContactsCollection.create(registered)
@@ -91,7 +92,14 @@ export default async (req, res, next) => {
       }
       // setup a new flow_token and make ready to send flow
       const flow_id = FLOW_KBM;
-      const flow_obj = { phone, code, flow_id, createdAt: new Date() };
+      const flow_obj = {
+        campaign_contact_id: registered._id,
+        phone,
+        code,
+        flow_id,
+        difficulty_level: registered.difficulty_level,
+        createdAt: new Date()
+      };
       const token = generateToken(JSON.stringify(flow_obj));
       const layout = {
         header: {
@@ -116,12 +124,12 @@ export default async (req, res, next) => {
           data: { welcome_img: WELCOME.img }
         }
       };
-      await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);
       await set(token, flow_obj);
       await campaignContactsCollection.update(
         { _id: registered._id },
         { $set: { active_flow_token: token } }
       );
+      await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);
     }
   } else {
     // send Sign Up flow message here
@@ -156,15 +164,15 @@ export default async (req, res, next) => {
           courses_img_height: COURSES.height,
           courses: [
             {
-              id: "cat",
-              title: "CAT"
+              id: "cat25",
+              title: "CAT 25"
             },
             {
-              id: "omet",
+              id: "omet25",
               title: "OMETs (XAT, NMAT etc)"
             },
             {
-              id: "gmat",
+              id: "gmat25",
               title: "GMAT"
             }
           ]

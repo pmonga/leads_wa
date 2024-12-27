@@ -76,6 +76,13 @@ export default async (req, res) => {
       );
       if (registered) {
         const flow_obj = res.locals.flow_obj;
+        const { difficulty_level, cur } = { flow_obj };
+        if (cur > 10) {
+          await campaignContactsCollection.update(
+            { _id: registered._id },
+            { $set: { difficulty_level: difficulty_level + 1 } }
+          );
+        }
         const { ledgerCollection } = res.locals.collections;
         const wallet = { ...res.locals.contact.wallet };
         if (flow_obj?.entry) {
@@ -91,11 +98,11 @@ export default async (req, res) => {
             entry: flow_obj?.entry
           });
           await res.locals.waClient.sendTextMessage(contact.phone, {
-            body: `Thanks for playing. You won ${flow_obj.won}. Your balance is ${wallet.redeemable.total - wallet.redeemable.used - wallet.redeemable.redeemed}.`
+            body: `Thanks for playing. You won ${flow_obj.won}. Your balance is ${wallet.convertible.total - wallet.convertible.used - wallet.convertible.converted}. To know more / collect rewards mail to game.master@alchemistindia.com from your registered email.`
           });
         } else {
           await res.locals.waClient.sendTextMessage(contact.phone, {
-            body: `Thanks for playing. Your balance is ${wallet.redeemable.total - wallet.redeemable.used - wallet.redeemable.redeemed}.`
+            body: `Thanks for playing. Your balance is ${wallet.convertible.total - wallet.convertible.used - wallet.convertible.converted}.To know more / collect rewards mail to game.master@alchemistindia.com from your registered email.`
           });
         }
       }
@@ -119,9 +126,8 @@ async function getRegistration(campaign, contact, coll) {
     code: 1,
     phone: 1,
     last_attemptedAt: 1,
-    last_attempt_level: 1,
-    active_flow_token: 1,
-    wallet: 1
+    difficulty_level: 1,
+    active_flow_token: 1
   };
   const registered = (
     await coll.read(
@@ -139,7 +145,8 @@ async function register(campaign, contact, coll) {
     contact_id: contact._id,
     name: contact.name,
     phone: contact.phone,
-    mobile: contact.mobile
+    mobile: contact.mobile,
+    difficulty_level: 0
   };
   registered._id = (await coll.create(registered)).insertedId;
   return registered;
@@ -177,7 +184,14 @@ async function sendKBMFlow(registered, res) {
     }
     // setup a new flow_token and make ready to send flow
     const flow_id = FLOW_KBM;
-    const kbm_flow_obj = { phone, code, flow_id, createdAt: new Date() };
+    const kbm_flow_obj = {
+      campaign_contact_id: registered._id,
+      phone,
+      code,
+      flow_id,
+      difficulty_level: registered.difficulty_level,
+      createdAt: new Date()
+    };
     const token = generateToken(JSON.stringify(kbm_flow_obj));
     const layout = {
       header: {
