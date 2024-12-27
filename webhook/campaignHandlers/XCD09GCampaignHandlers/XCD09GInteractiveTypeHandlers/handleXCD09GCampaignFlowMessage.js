@@ -35,6 +35,13 @@ export default async (req, res) => {
         contact.email = flow_data.email;
         await signUp(contact, contactsCollection);
       }
+      // addTags
+      contact.tagsToAdd = [
+        ...contact.tagsToAdd,
+        code,
+        ...flow_data.courses,
+        ...campaign.tags
+      ];
       // get registration details
       let registered = await getRegistration(
         campaign,

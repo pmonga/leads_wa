@@ -26,7 +26,7 @@ const handleFlowMessage = async function (req, res) {
   switch (code) {
     case "TEST01": {
       res.locals.crm.message +=
-        " Data from Flow: " +
+        "[TEST01] Data from Flow: " +
         JSON.stringify({
           data: { ...flow_data },
           details: { ...flow_obj }
@@ -37,7 +37,7 @@ const handleFlowMessage = async function (req, res) {
     case "XCD09G": {
       const { questions, ...details } = flow_obj;
       res.locals.crm.message +=
-        " Data from Flow: " +
+        "[XCD09G] Data from Flow: " +
         JSON.stringify({
           message: "Played the game",
           details
