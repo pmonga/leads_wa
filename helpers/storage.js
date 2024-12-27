@@ -2,6 +2,7 @@
 import redis from "redis";
 import "dotenv/config";
 
+const { REDIS_HOST, REDIS_PASSWORD, REDIS_PORT, REDIS_USER } = process.env;
 const client = redis.createClient({
   username: REDIS_USER,
   password: REDIS_PASSWORD,
@@ -10,7 +11,7 @@ const client = redis.createClient({
     port: REDIS_PORT
   }
 });
-const { REDIS_HOST, REDIS_PASSWORD, REDIS_PORT, REDIS_USER } = process.env;
+
 client.connect();
 
 /**
