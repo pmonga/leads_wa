@@ -52,6 +52,7 @@ const handleMessage = async function (req, res) {
   // const tagsToAdd = contact.tagsToAdd.map(function (x) {
   //   return x.toUpperCase();
   // });
+  console.log("contact before update: ", contact);
   if (contact.tagsToAdd.length || Object.keys(contact.fieldsToUpdate).length) {
     await contactsCollection.update(
       { phone: contact.phone },
