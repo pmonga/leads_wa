@@ -3,6 +3,7 @@ import generateToken from "../../../../helpers/tokenizer.js";
 import { set, get, del } from "../../../../helpers/storage.js";
 import { FLOW_KBM, FLOW_SIGNUP } from "../../../../helpers/config.js";
 import { isSameDate } from "../../../../helpers/utils.js";
+import { WELCOME } from "../../../../assets/kbm_assets.js";
 
 dotnenv.config();
 export default async (req, res) => {
@@ -212,7 +213,8 @@ async function sendKBMFlow(registered, res) {
       flow_cta: "Play Now",
       flow_action: "navigate",
       flow_action_payload: {
-        screen: "WELCOME"
+        screen: "WELCOME",
+        data: { welcome_img: WELCOME.img, welcome_img_height: WELCOME.height }
       }
     };
     await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);

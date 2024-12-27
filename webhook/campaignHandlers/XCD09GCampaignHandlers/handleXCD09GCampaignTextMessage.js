@@ -121,7 +121,7 @@ export default async (req, res, next) => {
         flow_action: "navigate",
         flow_action_payload: {
           screen: "WELCOME",
-          data: { welcome_img: WELCOME.img }
+          data: { welcome_img: WELCOME.img, welcome_img_height: WELCOME.height }
         }
       };
       await set(token, flow_obj);
