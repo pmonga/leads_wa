@@ -61,6 +61,9 @@ export default async (req, res, next) => {
   contact.fieldsToUpdate = isObject(contact.fieldsToUpdate)
     ? { ...contact.fieldsToUpdate, ...fieldsToUpdate }
     : { ...fieldsToUpdate };
+  contact.tagsToAdd = Array.isArray(contact.tagsToAdd)
+    ? [...contact.tagsToAdd, ...tagsToAdd]
+    : [...tagsToAdd];
 
   switch (code) {
     case "TEST01":
