@@ -20,6 +20,7 @@ export default async (req, res, next) => {
   const code = match && campaigns[match[1]] ? match[1] : null;
   const signedMessage = match && match[2] ? match[2] : null;
   const payload = verifyMessage(signedMessage);
+  console.log("timestamp: ", message.timestamp, new Date(message.timestamp));
   let fieldsToUpdate = {
     last_text_message_receivedAt: new Date(message.timestamp)
   };
@@ -73,3 +74,4 @@ export default async (req, res, next) => {
       break;
   }
 };
+/* global console */
