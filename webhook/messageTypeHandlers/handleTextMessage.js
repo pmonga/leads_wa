@@ -14,36 +14,39 @@ export default async (req, res, next) => {
 
   // fields to be updated in contact;
 
-  // extract code from the campaign
+  // extract code and payload from the campaign
+  // payload:object with key value pair fields and tags:array
+  // add utm parameters to fields to override default campaign utm.
   const campaignRegex = /^\[([a-zA-Z0-9]{6})\](\{.*?\})?/;
   const match = message.text.body.match(campaignRegex);
   const code = match && campaigns[match[1]] ? match[1] : null;
   const signedMessage = match && match[2] ? match[2] : null;
-  const payload = verifyMessage(signedMessage);
-
+  const payload = verifyMessage(signedMessage)
+    ? verifyMessage(signedMessage)
+    : {};
+  const { tags, ...rest } = payload;
   let fieldsToUpdate = {
     lastTextMessageReceivedAt: Date(message.timestamp)
   };
-  let tagsToAdd = [];
+  let tagsToAdd = Array.isArray(tags) ? [...tags] : [];
   if (code) {
     res.locals.code = code;
     res.locals.payload = payload;
     res.locals.campaign = campaigns[code];
-    const utm =
-      res.locals.campaign?.utm || payload?.utm
-        ? { ...res.locals.campaign?.utm, ...payload?.utm }
-        : {};
+    const utm = isObject(res.locals.campaign?.utm)
+      ? {
+          ...res.locals.campaign?.utm,
+          ...rest
+        }
+      : { ...rest };
     res.locals.crm.utm = { ...res.locals.crm.utm, ...utm };
     res.locals.crm.message += " " + message.text.body;
     if (contact.isNew) {
       fieldsToUpdate = { ...fieldsToUpdate, createdBy: code, ...utm };
     }
     tagsToAdd = Array.isArray(campaigns[code]?.tags)
-      ? [code, ...campaigns[code].tags]
-      : [code];
-    if (Array.isArray(payload?.tags)) {
-      tagsToAdd = [...tagsToAdd, ...payload.tags];
-    }
+      ? [code, ...campaigns[code].tags, ...tagsToAdd]
+      : [code, ...tagsToAdd];
   } else {
     res.locals.crm.utm = {
       ...res.locals.crm.utm,

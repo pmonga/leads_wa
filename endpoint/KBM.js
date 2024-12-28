@@ -17,7 +17,8 @@ import { BACK, CORRECT, TIME_UP, WINNER, WRONG } from "../assets/kbm_assets.js";
 
 // handle initial request when opening the flow
 export const getNextScreen = async (req, res, decryptedBody) => {
-  const { screen, data, version, action, flow_token } = decryptedBody;
+  const { screen, data, action, flow_token } = decryptedBody;
+  const { gameStatsCollection } = res.locals.collections;
   let flow_obj = await get(flow_token);
   if (!flow_obj) {
     return {
@@ -53,9 +54,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
     let response;
     switch (screen) {
       case "WELCOME":
-        if (flow_obj?.is_back) {
-          // implement continue from back logic
-        } else {
+        {
           const difficulty_level = flow_obj?.difficulty_level || 0;
           const cur = 1; //flow_obj?.cur ? flow_obj.cur : 1;
           const prize = GAME_PRIZE?.[difficulty_level] || GAME_PRIZE[0];
@@ -78,12 +77,11 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             flow_obj.questions = [...SAMPLE_GAME];
           } else {
             // implement real game progress logic here;
-            //flow_obj.is_sample = true;
+            flow_obj.is_sample = false;
             flow_obj.questions = [...SAMPLE_GAME];
             // the last_attemptedAT, last_attempt_level needs to be set here in the campaignContacts.
             // update contactQuestions too, so it avoids repetition.
           }
-
           response = {
             screen: "PRE",
             data: {
@@ -98,6 +96,16 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             }
           };
         }
+        await gameStatsCollection.update(
+          { flow_token },
+          {
+            $set: {
+              is_sample: flow_obj.is_sample,
+              startedAt: flow_obj.startedAt,
+              end_time: flow_obj.end_time
+            }
+          }
+        );
         break;
       case "POST":
         if (data.has_quit) {

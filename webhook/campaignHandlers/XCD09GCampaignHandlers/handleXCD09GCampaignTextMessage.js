@@ -13,10 +13,10 @@ export default async (req, res, next) => {
   const code = res.locals.code; // should be 'XCD09G';
   const campaign = res.locals.campaign;
   const phone = contact.phone;
-  const contactsCollection = res.locals.collections.contactsCollection;
-  const campaignsCollection = res.locals.collections.campaignsCollection;
-  const campaignContactsCollection =
-    res.locals.collections.campaignContactsCollection;
+  //const contactsCollection = res.locals.collections.contactsCollection;
+  //const campaignsCollection = res.locals.collections.campaignsCollection;
+  const { campaignContactsCollection, gameStatsCollection } =
+    res.locals.collections;
 
   // check if contact has already provided name && registered for the game;
   if (contact.name) {
@@ -129,6 +129,10 @@ export default async (req, res, next) => {
         { _id: registered._id },
         { $set: { active_flow_token: token } }
       );
+      await gameStatsCollection.create({
+        flow_token: token,
+        ...flow_obj
+      });
       await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);
     }
   } else {

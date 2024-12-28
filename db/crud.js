@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb'; // Directly import ObjectId
+import { ObjectId } from "mongodb"; // Directly import ObjectId
 
 // Helper to convert string to ObjectId (if needed)
 const toObjectId = (id) => ObjectId(id);
@@ -8,7 +8,7 @@ const crud = (collectionName, db) => {
     // Create a new document
     create: async (data) => {
       if (!data.createdAt) data.createdAt = new Date();
-      if (!data.updatedAt) data.updatedAt = new Date();
+      if (!data.updatedAt) data.updatedAt = data.createdAt;
       const collection = db.collection(collectionName);
       const result = await collection.insertOne(data);
       return result;
@@ -23,23 +23,23 @@ const crud = (collectionName, db) => {
 
     // Update a document
     update: async (filter, updateData) => {
-      if (!updateData['$set']) updateData['$set'] = {};
-      updateData['$set'].updatedAt = new Date(); // Set updatedAt timestamp
+      if (!updateData["$set"]) updateData["$set"] = {};
+      updateData["$set"].updatedAt = new Date(); // Set updatedAt timestamp
       const collection = db.collection(collectionName);
       const result = await collection.updateOne(filter, updateData, {
-        upsert: false,
+        upsert: false
       });
       return result;
     },
 
     // findOneAndUpdate a document
     findOneAndUpdate: async (filter, updateData) => {
-      if (!updateData['$set']) updateData['$set'] = {};
-      updateData['$set'].updatedAt = new Date(); // Set updatedAt timestamp
+      if (!updateData["$set"]) updateData["$set"] = {};
+      updateData["$set"].updatedAt = new Date(); // Set updatedAt timestamp
       const collection = db.collection(collectionName);
       return collection.findOneAndUpdate(filter, updateData, {
         upsert: false,
-        returnNewDocument: true,
+        returnNewDocument: true
       });
     },
 
@@ -49,7 +49,7 @@ const crud = (collectionName, db) => {
       const result = await collection.updateOne(
         filter,
         {
-          $set: { deletedAt: new Date() },
+          $set: { deletedAt: new Date() }
         },
         { upsert: false }
       );
@@ -58,7 +58,7 @@ const crud = (collectionName, db) => {
     // expose the collection for native functions
     collection: async () => {
       return db.collection(collectionName);
-    },
+    }
   };
 };
 

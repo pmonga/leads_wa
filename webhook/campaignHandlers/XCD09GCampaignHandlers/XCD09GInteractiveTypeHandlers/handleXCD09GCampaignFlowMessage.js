@@ -11,10 +11,12 @@ export default async (req, res) => {
   const campaign = res.locals.campaign;
   const contact = res.locals.contact;
 
-  const contactsCollection = res.locals.collections.contactsCollection;
-  const campaignsCollection = res.locals.collections.campaignsCollection;
-  const campaignContactsCollection =
-    res.locals.collections.campaignContactsCollection;
+  const {
+    contactsCollection,
+    campaignContactsCollection,
+    gameStatsCollection
+  } = res.locals.collections;
+  //const campaignsCollection = res.locals.collections.campaignsCollection;
 
   const flow_data = res.locals.flow_data;
   const flow_token = res.locals.flow_token;
@@ -77,13 +79,16 @@ export default async (req, res) => {
     }
     case FLOW_KBM: {
       // get registration details
+      const { flow_token, flow_obj } = res.locals;
+      await gameStatsCollection.update(
+        { flow_token },
+        { $set: { won: flow_obj.won, finishedAt: flow_obj.finishedAt } }
+      );
       const registered = await getRegistration(
-        campaign,
-        contact,
+        flow_obj.campaign_contact_id,
         campaignContactsCollection
       );
       if (registered) {
-        const flow_obj = res.locals.flow_obj;
         const { difficulty_level, cur } = { flow_obj };
         if (cur > 10) {
           await campaignContactsCollection.update(
@@ -114,6 +119,7 @@ export default async (req, res) => {
           });
         }
       }
+
       break;
     }
   }
@@ -127,7 +133,7 @@ async function signUp(contact, collection) {
   return;
 }
 
-async function getRegistration(campaign, contact, coll) {
+async function getRegistration(_id, coll) {
   const fields = {
     _id: 1,
     name: 1,
@@ -137,12 +143,7 @@ async function getRegistration(campaign, contact, coll) {
     difficulty_level: 1,
     active_flow_token: 1
   };
-  const registered = (
-    await coll.read(
-      { code: campaign.code, phone: contact.phone },
-      { projection: fields }
-    )
-  )?.[0];
+  const registered = (await coll.read({ _id }, { projection: fields }))?.[0];
   return registered;
 }
 
