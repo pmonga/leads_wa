@@ -46,8 +46,7 @@ export default async (req, res) => {
       ];
       // get registration details
       let registered = await getRegistration(
-        campaign,
-        contact,
+        { code: campaign.code, phone: contact.phone },
         campaignContactsCollection
       );
       // if not registered; register for the Campaign
@@ -85,7 +84,7 @@ export default async (req, res) => {
         { $set: { won: flow_obj.won, finishedAt: flow_obj.finishedAt } }
       );
       const registered = await getRegistration(
-        flow_obj.campaign_contact_id,
+        { _id: flow_obj.campaign_contact_id },
         campaignContactsCollection
       );
       if (registered) {
@@ -133,7 +132,7 @@ async function signUp(contact, collection) {
   return;
 }
 
-async function getRegistration(_id, coll) {
+async function getRegistration(filter, coll) {
   const fields = {
     _id: 1,
     name: 1,
@@ -143,7 +142,7 @@ async function getRegistration(_id, coll) {
     difficulty_level: 1,
     active_flow_token: 1
   };
-  const registered = (await coll.read({ _id }, { projection: fields }))?.[0];
+  const registered = (await coll.read(filter, { projection: fields }))?.[0];
   return registered;
 }
 

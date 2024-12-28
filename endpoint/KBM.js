@@ -233,7 +233,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
       default:
         break;
     }
-    if (flow_obj.finishedAt) {
+    if (flow_obj.finishedAt && flow_obj.won > 0) {
       const { questions, ...details } = flow_obj;
       const entry = {
         type: "convertible",
