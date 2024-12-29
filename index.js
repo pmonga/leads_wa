@@ -12,6 +12,7 @@ import {
   decryptRequest,
   encryptResponse,
   FlowEndpointException,
+  signMessage,
   verifyMessage
 } from "./helpers/encryption.js";
 import { getNextScreen } from "./flow.js";
@@ -185,7 +186,7 @@ app.get("/encrypt", (req, res) => {
     return res.status(400).json({ error: "Message parameter is missing" });
   }
   const msg = decodeURIComponent(message);
-  const payload = verifyMessage(msg);
+  const payload = signMessage(msg);
   console.log(payload);
   res.send(payload);
 });
