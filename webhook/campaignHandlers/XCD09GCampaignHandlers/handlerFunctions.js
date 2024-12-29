@@ -69,33 +69,22 @@ async function sendPostGameMessage(registered, wallet, res) {
 async function sendAlreadyPlayedMessage(res) {
   const { code, contact } = res.locals;
   const body = {
-    text: `You have already played the game today 🥲. 
-     Please try again tomorrow.
-     1. Item 1
-     2. Item 2
-      -Click on _*Remind Me*_ to set up a reminder and we will update you when the game becomes available.
-      -Click on *_Refer friends_* to generate a referral link and forward it to your friends who may also enjoy playing.`
+    text: `You have already played the game today 🥲.
+    Please try again tomorrow.
+    1. Click on _*Remind Me*_ to set up a reminder and we will update you when the game becomes available.
+    2. Click on *_Refer friends_* to generate a referral link and forward it to your friends who may also enjoy playing.`
   };
+  //
   const action = {
-    buttons: [
-      {
-        type: "reply",
-        reply: {
-          id: `${code}-reminder`,
-          title: "Remind Me"
-        }
-      },
-      {
-        type: "reply",
-        reply: {
-          id: `${code}-refer`,
-          title: "Refer friends"
-        }
-      }
-    ]
+    name: "cta_url",
+    parameters: {
+      display_text: "Play Again",
+      url: "https://www.alchemistindia.com.com"
+    }
   };
   const params = { body, action };
-  await res.locals.waClient.sendReplyButtonMessage(contact.phone, params);
+  //await res.locals.waClient.sendReplyButtonMessage(contact.phone, params);
+  await res.locals.waClient.sendCta_urlButtonMessage(contact.phone, params);
 }
 async function sendSignUpFlow(res) {
   // send Sign Up flow message here

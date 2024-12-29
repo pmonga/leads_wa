@@ -148,6 +148,24 @@ function createWhatsAppClient(phoneNumberId) {
     return sendMessage(data);
   }
 
+  async function sendCta_urlButtonMessage(to, params) {
+    const { header, body, footer, action } = params;
+    const interactive = { type: "cta_url", body, action };
+    if (header) {
+      interactive.header = { ...header };
+    }
+    if (footer) {
+      interactive.footer = { ...footer };
+    }
+    const data = {
+      ...baseDataTemplate,
+      to,
+      type: "interactive",
+      interactive
+    };
+    return sendMessage(data);
+  }
+
   async function sendFlowMessage(to, layout, params) {
     const data = {
       recipient_type: "individual",
@@ -189,6 +207,7 @@ function createWhatsAppClient(phoneNumberId) {
     sendTemplateMessage,
     sendReplyButtonMessage,
     sendFlowMessage,
+    sendCta_urlButtonMessage,
     sendStatusUpdate
   };
 }
