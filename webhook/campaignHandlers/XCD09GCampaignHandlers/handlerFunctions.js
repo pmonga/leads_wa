@@ -168,9 +168,10 @@ async function sendKBMFlow(registered, res) {
     (registered.last_attemptedAt &&
       isSameDate(new Date(registered.last_attemptedAt)))
   ) {
-    await res.locals.waClient.sendTextMessage(contact.phone, {
-      body: `You have already played the game today. Please try again tomorrow `
-    });
+    await sendAlreadyPlayedMessage(res);
+    // await res.locals.waClient.sendTextMessage(contact.phone, {
+    //   body: `You have already played the game today. Please try again tomorrow `
+    // });
   } else {
     //check if there is a previously active flow token
     if (registered?.active_flow_token) {
