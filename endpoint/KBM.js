@@ -238,7 +238,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
       const entry = {
         type: "convertible",
         changes: { total: flow_obj.won },
-        description: "KBM game winning",
+        description: "KBM game winnings",
         details
       };
       flow_obj.entry = entry;
