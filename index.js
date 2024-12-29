@@ -177,7 +177,9 @@ Checkout README.md to start.</pre>`);
 });
 
 app.get("/kbm", (req, res) => {
-  res.redirect(`https://wa.me/919811233305?text=%5BXCD09G%5D%20Play%20now`);
+  res.redirect(
+    `https://wa.me/919811233305?text=%5BXCD09G%5D%7BeyJ1dG1fbWVkaXVtIjoiaW4gYXBwIHJlZmVycmFsIn0%3D.qvcreREMQFlQlBD6J8fY1uVF6mBJWmyzZTQZZQ%2BfXI4%3D%7D%20Play%20now`
+  );
 });
 
 app.get("/encrypt", (req, res) => {
@@ -187,6 +189,17 @@ app.get("/encrypt", (req, res) => {
   }
   const msg = decodeURIComponent(message);
   const payload = signMessage(msg);
+  console.log(payload);
+  res.send(payload);
+});
+
+app.get("/decrypt", (req, res) => {
+  const { message } = req.query; // Get 'message' from query parameters
+  if (!message) {
+    return res.status(400).json({ error: "Message parameter is missing" });
+  }
+  const msg = decodeURIComponent(message);
+  const payload = verifyMessage(msg);
   console.log(payload);
   res.send(payload);
 });
