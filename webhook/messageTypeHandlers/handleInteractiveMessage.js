@@ -7,7 +7,7 @@ const handleInteractiveMessage = async function (req, res) {
     case "nfm_reply":
       await handleFlowMessage(req, res);
       break;
-    case "button":
+    case "button_reply":
       await handleButtonMessage(req, res);
       break;
     default:

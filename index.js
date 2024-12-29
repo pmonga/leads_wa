@@ -11,7 +11,8 @@ import handleMessage from "./webhook/handleMessage.js";
 import {
   decryptRequest,
   encryptResponse,
-  FlowEndpointException
+  FlowEndpointException,
+  verifyMessage
 } from "./helpers/encryption.js";
 import { getNextScreen } from "./flow.js";
 import { get, set, del } from "./helpers/storage.js";
@@ -175,7 +176,17 @@ Checkout README.md to start.</pre>`);
 });
 
 app.get("/kbm", (req, res) => {
-  res.redirect(`https://wa.me/919811233305?text=%5BXCD09G%5D%20Play%20time`);
+  res.redirect(`https://wa.me/919811233305?text=%5BXCD09G%5D%20Play%20now`);
+});
+
+app.get("/encrypt", (req, res) => {
+  const { message } = req.query; // Get 'message' from query parameters
+  if (!message) {
+    return res.status(400).json({ error: "Message parameter is missing" });
+  }
+  const msg = decodeURIComponent(message);
+  const payload = verifyMessage(msg);
+  res.send(payload);
 });
 
 app.post("/endpoint", async (req, res) => {

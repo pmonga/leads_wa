@@ -22,9 +22,7 @@ const handleFlowMessage = async function (req, res) {
   res.locals.flow_token = flow_token;
   res.locals.flow_obj = flow_obj;
   res.locals.flow_data = flow_data;
-  const utm = res.locals.campaign?.utm
-    ? { ...res.locals.campaign.utm }
-    : { flow_token };
+  const utm = res.locals.campaign?.utm ? { ...res.locals.campaign.utm } : {};
   res.locals.crm.utm = { ...utm };
   switch (code) {
     case "TEST01": {

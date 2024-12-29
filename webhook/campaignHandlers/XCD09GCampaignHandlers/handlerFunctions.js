@@ -184,7 +184,7 @@ async function sendKBMFlow(registered, res) {
     (registered.last_attemptedAt &&
       isSameDate(new Date(registered.last_attemptedAt)))
   ) {
-    await sendPlayMessage(res);
+    await sendAlreadyPlayedMessage(res);
   } else {
     //check if there is a previously active flow token
     if (registered?.active_flow_token) {
