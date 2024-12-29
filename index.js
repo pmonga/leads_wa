@@ -14,7 +14,7 @@ import {
   FlowEndpointException
 } from "./helpers/encryption.js";
 import { getNextScreen } from "./flow.js";
-import { get, set } from "./helpers/storage.js";
+import { get, set, del } from "./helpers/storage.js";
 import { FLOW_KBM } from "./helpers/config.js";
 
 const {
@@ -172,6 +172,10 @@ app.get("/refresh-campaigns", async (req, res) => {
 app.get("/", (req, res) => {
   res.send(`<pre>Nothing to see here.
 Checkout README.md to start.</pre>`);
+});
+
+app.get("/kbm", (req, res) => {
+  res.redirect(`https://wa.me/919811233305?text=%5BXCD09G%5D%20Play%20time`);
 });
 
 app.post("/endpoint", async (req, res) => {

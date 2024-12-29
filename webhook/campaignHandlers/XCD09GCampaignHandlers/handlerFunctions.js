@@ -1,6 +1,6 @@
 import generateToken from "../../../helpers/tokenizer.js";
 import { set, get, del } from "../../../helpers/storage.js";
-import { FLOW_KBM, FLOW_SIGNUP } from "../../../helpers/config.js";
+import { BASE_URL, FLOW_KBM, FLOW_SIGNUP } from "../../../helpers/config.js";
 import { isSameDate } from "../../../helpers/utils.js";
 import { WELCOME } from "../../../assets/kbm_assets.js";
 import { COURSES, JOIN_NOW } from "../../../assets/signup_assets.js";
@@ -74,18 +74,42 @@ async function sendAlreadyPlayedMessage(res) {
     1. Click on _*Remind Me*_ to set up a reminder and we will update you when the game becomes available.
     2. Click on *_Refer friends_* to generate a referral link and forward it to your friends who may also enjoy playing.`
   };
-  //
+  const action = {
+    buttons: [
+      {
+        type: "reply",
+        reply: {
+          id: `${code}-reminder`,
+          title: "Remind Me"
+        }
+      },
+      {
+        type: "reply",
+        reply: {
+          id: `${code}-refer`,
+          title: "Refer friends"
+        }
+      }
+    ]
+  };
+  const params = { body, action };
+  await res.locals.waClient.sendReplyButtonMessage(contact.phone, params);
+}
+
+async function sendPlayMessage(res) {
+  const { code, contact } = res.locals;
+  const body = { text: `Let's play now  ${BASE_URL}/kbm` };
   const action = {
     name: "cta_url",
     parameters: {
-      display_text: "Play Again",
-      url: "https://wa.link/89talv"
+      display_text: "Lets Play",
+      url: BASE_URL + "/kbm"
     }
   };
   const params = { body, action };
-  //await res.locals.waClient.sendReplyButtonMessage(contact.phone, params);
   await res.locals.waClient.sendCta_urlButtonMessage(contact.phone, params);
 }
+
 async function sendSignUpFlow(res) {
   // send Sign Up flow message here
   // to get the contact's name
@@ -160,7 +184,7 @@ async function sendKBMFlow(registered, res) {
     (registered.last_attemptedAt &&
       isSameDate(new Date(registered.last_attemptedAt)))
   ) {
-    await sendAlreadyPlayedMessage(res);
+    await sendPlayMessage(res);
   } else {
     //check if there is a previously active flow token
     if (registered?.active_flow_token) {
