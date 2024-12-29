@@ -69,12 +69,12 @@ async function sendPostGameMessage(registered, wallet, res) {
 async function sendAlreadyPlayedMessage(res) {
   const { code, contact } = res.locals;
   const body = {
-    text: `You have already played the game today %F0%9F%98%80. 
+    text: `You have already played the game today 🥲. 
      Please try again tomorrow.
      1. Item 1
      2. Item 2
-      -Click on _Remind Me_ to set up a reminder and we will update you when the game becomes available.
-      -Click on *Refer friends* to generate a referral link and forward it to your friends who may also enjoy playing.`
+      -Click on _*Remind Me*_ to set up a reminder and we will update you when the game becomes available.
+      -Click on *_Refer friends_* to generate a referral link and forward it to your friends who may also enjoy playing.`
   };
   const action = {
     buttons: [
