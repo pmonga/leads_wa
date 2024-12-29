@@ -186,6 +186,7 @@ app.get("/encrypt", (req, res) => {
   }
   const msg = decodeURIComponent(message);
   const payload = verifyMessage(msg);
+  console.log(payload);
   res.send(payload);
 });
 
