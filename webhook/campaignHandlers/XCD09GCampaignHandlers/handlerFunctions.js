@@ -69,9 +69,11 @@ async function sendPostGameMessage(registered, wallet, res) {
 async function sendAlreadyPlayedMessage(res) {
   const { code, contact } = res.locals;
   const body = {
-    text: `You have already played the game today. Please try again tomorrow \n
-      -Click on **Remind Me** to set up a remider and we will update you when the game becomes available.
-      -Click on **Refer friends** to generate a referral link and forward it to your friends who may also enjoy playing.`
+    text: `#You \n
+     have already played the game today :sweat:. 
+     Please try again tomorrow.
+      -Click on ==*Remind Me*== to set up a reminder and we will update you when the game becomes available.
+      -Click on *Refer friends* to generate a referral link and forward it to your friends who may also enjoy playing.`
   };
   const action = {
     buttons: [
@@ -169,9 +171,6 @@ async function sendKBMFlow(registered, res) {
       isSameDate(new Date(registered.last_attemptedAt)))
   ) {
     await sendAlreadyPlayedMessage(res);
-    // await res.locals.waClient.sendTextMessage(contact.phone, {
-    //   body: `You have already played the game today. Please try again tomorrow `
-    // });
   } else {
     //check if there is a previously active flow token
     if (registered?.active_flow_token) {
