@@ -79,7 +79,7 @@ async function sendAlreadyPlayedMessage(res) {
     name: "cta_url",
     parameters: {
       display_text: "Play Again",
-      url: "https://wa.me/919811233305?text=[XCD09G]Let's%20play"
+      url: "https://wa.link/89talv"
     }
   };
   const params = { body, action };
