@@ -7,7 +7,7 @@ import { COURSES, JOIN_NOW } from "../../../assets/signup_assets.js";
 
 async function getRegistration(res) {
   const { code, contact } = res.locals;
-  const coll = res.locals.collections.campaingnContactsColection;
+  const coll = res.locals.collections.campaingnContactsCollection;
   const fields = {
     _id: 1,
     name: 1,
@@ -26,7 +26,7 @@ async function getRegistration(res) {
 
 async function register(res) {
   const { campaign, contact } = res.locals;
-  const coll = res.locals.collections.campaingnContactsColection;
+  const coll = res.locals.collections.campaingnContactsCollection;
   const registered = {
     campaign_id: campaign._id,
     code: campaign.code,
