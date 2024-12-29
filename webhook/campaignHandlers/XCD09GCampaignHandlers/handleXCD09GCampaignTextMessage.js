@@ -11,7 +11,7 @@ import {
   sendKBMFlow,
   sendSignUpFlow,
   sendRegistrationMessage
-} from "./XCD09GChandlerFunctions.js";
+} from "./XCD09GCHandlerFunctions.js";
 
 dotnenv.config();
 export default async (req, res, next) => {

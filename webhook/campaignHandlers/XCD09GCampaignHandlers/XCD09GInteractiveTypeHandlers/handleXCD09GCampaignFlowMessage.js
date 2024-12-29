@@ -11,7 +11,7 @@ import {
   sendRegistrationMessage,
   sendPostGameMessage,
   sendKBMFlow
-} from "../XCD09GHandlerFunctions.js";
+} from "../XCD09GCHandlerFunctions.js";
 
 dotnenv.config();
 export default async (req, res) => {
