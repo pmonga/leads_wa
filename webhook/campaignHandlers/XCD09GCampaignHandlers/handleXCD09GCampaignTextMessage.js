@@ -20,8 +20,6 @@ export default async (req, res, next) => {
   const code = res.locals.code; // should be 'XCD09G';
   const campaign = res.locals.campaign;
   const phone = contact.phone;
-  //const contactsCollection = res.locals.collections.contactsCollection;
-  //const campaignsCollection = res.locals.collections.campaignsCollection;
   const { campaignContactsCollection, gameStatsCollection } =
     res.locals.collections;
 
