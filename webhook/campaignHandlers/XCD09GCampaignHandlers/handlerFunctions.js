@@ -2,7 +2,7 @@
 import generateToken from "../../../helpers/tokenizer.js";
 import { set, get, del } from "../../../helpers/storage.js";
 import { BASE_URL, FLOW_KBM, FLOW_SIGNUP } from "../../../helpers/config.js";
-import { isSameDate, setReminder, timeout } from "../../../helpers/utils.js";
+import { isSameDate } from "../../../helpers/utils.js";
 import { WELCOME } from "../../../assets/kbm_assets.js";
 import { COURSES, JOIN_NOW } from "../../../assets/signup_assets.js";
 
