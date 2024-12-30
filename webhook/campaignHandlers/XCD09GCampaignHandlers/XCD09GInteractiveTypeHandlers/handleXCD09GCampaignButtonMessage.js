@@ -1,5 +1,5 @@
-import { BASE_URL } from "../../../../helpers/config";
-import { timeout } from "../../../../helpers/utils";
+import { BASE_URL } from "../../../../helpers/config.js";
+import { timeout } from "../../../../helpers/utils.js";
 
 export default async (req, res) => {
   const { contact, action, waClient } = res.locals;
