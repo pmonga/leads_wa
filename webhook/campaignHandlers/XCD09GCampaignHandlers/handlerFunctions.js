@@ -1,4 +1,4 @@
-/*global setTimeout, Promise */
+/*global setTimeout, console, Promise */
 import generateToken from "../../../helpers/tokenizer.js";
 import { set, get, del } from "../../../helpers/storage.js";
 import { BASE_URL, FLOW_KBM, FLOW_SIGNUP } from "../../../helpers/config.js";
@@ -181,8 +181,7 @@ async function sendSignUpFlow(res) {
   });
 }
 async function sendKBMFlow(registered, res) {
-  const code = registered.code;
-  const phone = registered.phone;
+  const { code, phone } = registered;
   const { waClient, collections } = res.locals;
   const {
     campaignContactsCollection,

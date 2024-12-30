@@ -25,7 +25,11 @@ export default async (req, res, next) => {
 
   // check if contact has already provided name && registered for the game;
   if (contact.name) {
-    let registered = getRegistration(code, phone, campaignContactsCollection);
+    let registered = await getRegistration(
+      code,
+      phone,
+      campaignContactsCollection
+    );
     // if not registered then register now
     if (!registered) {
       registered = await register(res);
