@@ -17,7 +17,7 @@ export default async (req, res, next) => {
   // extract code and payload from the campaign
   // payload:object with key value pair fields and tags:array
   // add utm parameters to fields to override default campaign utm.
-  const campaignRegex = /^\[([a-zA-Z0-9]{6})\](\{.*?\})?/;
+  const campaignRegex = /^\[([a-zA-Z0-9]{6})\](?:\{(.*?)\})?/;
   const match = message.text.body.match(campaignRegex);
   const code = match && campaigns[match[1]] ? match[1] : null;
   const signedMessage = match && match[2] ? match[2] : null;
