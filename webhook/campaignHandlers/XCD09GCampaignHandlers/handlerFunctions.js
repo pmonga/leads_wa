@@ -206,7 +206,7 @@ async function sendKBMFlow(registered, res) {
       registered,
       { locals: { waClient, collections } }
     );
-    await set(`KBMReminder:${phone}`, id);
+    await set(`KBMReminder:${phone}`, { id });
     await sendAlreadyPlayedMessage(registered, waClient);
   } else {
     //check if there is a previously active flow token

@@ -154,7 +154,7 @@ function setReminder(targetFunction, givenTime, ...params) {
   const executionTime = Math.min(istTomorrowNoonUTC, futureTime);
 
   // Calculate the delay in milliseconds
-  const delay = executionTime - now;
+  const delay = 30000; //executionTime - now;
 
   if (delay > 0) {
     console.log(`Function will execute in ${delay / 1000} seconds.`);
