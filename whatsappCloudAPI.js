@@ -72,13 +72,16 @@ function createWhatsAppClient(phoneNumberId) {
    * @param {object} message - Message object with `body` and other properties.
    * @returns {Promise} - Axios response promise.
    */
-  async function sendTextMessage(to, message) {
+  async function sendTextMessage(to, message, context = null) {
     const data = {
       ...baseDataTemplate,
       to,
       type: "text",
       text: message // message object expected to contain { body: 'your message' }
     };
+    if (context) {
+      data.context = context;
+    }
     return sendMessage(data);
   }
 

@@ -1,25 +1,25 @@
+/*global setTimeout, Promise */
 import generateToken from "../../../helpers/tokenizer.js";
 import { set, get, del } from "../../../helpers/storage.js";
 import { BASE_URL, FLOW_KBM, FLOW_SIGNUP } from "../../../helpers/config.js";
-import { isSameDate } from "../../../helpers/utils.js";
+import { isSameDate, setReminder, timeout } from "../../../helpers/utils.js";
 import { WELCOME } from "../../../assets/kbm_assets.js";
 import { COURSES, JOIN_NOW } from "../../../assets/signup_assets.js";
 
-async function getRegistration(res) {
-  const { code, contact } = res.locals;
-  const coll = res.locals.collections.campaignContactsCollection;
+async function getRegistration(code, phone, coll) {
   const fields = {
     _id: 1,
     name: 1,
     campaign: 1,
     code: 1,
     phone: 1,
-    last_attemptedAt: 1,
+    lastAttemptedAt: 1,
     difficulty_level: 1,
-    active_flow_token: 1
+    active_flow_token: 1,
+    active_flow_message_id: 1
   };
   const registered = (
-    await coll.read({ code, phone: contact.phone }, { projection: fields })
+    await coll.read({ code, phone }, { projection: fields })
   )?.[0];
   return registered;
 }
@@ -53,36 +53,46 @@ async function sendRegistrationMessage(registered, res) {
 }
 
 async function sendPostGameMessage(registered, wallet, res) {
-  const { contact, flow_obj } = res.locals;
+  const { flow_obj } = res.locals;
+  const email = "game.master@alchemistindia.com";
+  const balance =
+    wallet.convertible.total -
+    wallet.convertible.used -
+    wallet.convertible.converted;
   let reply;
-  if (flow_obj.won) {
+  if (flow_obj.is_sample) {
     reply = {
-      body: `Thanks for playing. You won ${flow_obj.won} credits. Your balance is ${wallet.convertible.total - wallet.convertible.used - wallet.convertible.converted}. To know more / collect rewards mail to game.master@alchemistindia.com from your registered email.`
+      body: `You just finished a sample game with us. Let's play a real game now and win real credits. Real game can be played once a day and has new questions every day.`
+    };
+  } else if (flow_obj.won) {
+    reply = {
+      body: `Thanks for playing. You won ${flow_obj.won} credits.`
     };
   } else {
     reply = {
-      body: `Thanks for playing. Your balance is ${wallet.convertible.total - wallet.convertible.used - wallet.convertible.converted} credits.To know more / collect rewards mail to game.master@alchemistindia.com from your registered email.`
+      body: `Thanks for playing. Sorry you didn't win any credits today. Sometimes you win and sometimes you learn.`
     };
   }
-  await res.locals.waClient.sendTextMessage(registered.phone, reply);
+  if (balance) {
+    reply.body += `
+    Your balance is ${balance} credits. To know more / collect rewards mail to ${email} from your registered email.`;
+  }
+  await Promise.all([
+    res.locals.waClient.sendTextMessage(registered.phone, reply),
+    timeout(2000)
+  ]);
+  await sendKBMFlow(registered, res);
 }
-async function sendAlreadyPlayedMessage(res) {
-  const { code, contact } = res.locals;
+async function sendAlreadyPlayedMessage(registered, waClient) {
+  const { code, phone } = registered;
   const body = {
-    text: `You have already played the game today 🥲.
-    Please try again tomorrow.
-    1. Click on _*Remind Me*_ to set up a reminder and we will update you when the game becomes available.
-    2. Click on *_Refer friends_* to generate a referral link and forward it to your friends who may also enjoy playing.`
+    text: `🥳 Hope you have enjoyed playing today's game. We will send you tomorrow's game when it becomes available so that you don't miss out. If you play daily with us you would do thousands of questions till your exam.
+    Keep playing, keep learning and keep winning.
+
+    If you want your friends to _play and learn_ too, click on *_Refer friends_* below and we will send you a message with a link. Just forward it to them.`
   };
   const action = {
     buttons: [
-      {
-        type: "reply",
-        reply: {
-          id: `${code}-reminder`,
-          title: "Remind Me"
-        }
-      },
       {
         type: "reply",
         reply: {
@@ -93,7 +103,7 @@ async function sendAlreadyPlayedMessage(res) {
     ]
   };
   const params = { body, action };
-  await res.locals.waClient.sendReplyButtonMessage(contact.phone, params);
+  await waClient.sendReplyButtonMessage(phone, params);
 }
 
 async function sendPlayMessage(res) {
@@ -171,29 +181,44 @@ async function sendSignUpFlow(res) {
   });
 }
 async function sendKBMFlow(registered, res) {
-  const code = res.locals.code;
-  const contact = res.locals.contact;
-  const phone = contact.phone;
-  const { campaignContactsCollection, gameStatsCollection } =
-    res.locals.collections;
+  const code = registered.code;
+  const phone = registered.phone;
+  const { waClient, collections } = res.locals;
+  const {
+    campaignContactsCollection,
+    gameStatsCollection,
+    contactsCollection
+  } = collections;
 
   // send the KBM flow message for KBM flow_id = FLOW_KBM
   // check if has already played the game today
   if (
-    code ||
-    (registered.last_attemptedAt &&
-      isSameDate(new Date(registered.last_attemptedAt)))
+    registered.lastAttemptedAt &&
+    isSameDate(new Date(registered.lastAttemptedAt))
   ) {
-    await sendAlreadyPlayedMessage(res);
+    const contact = await contactsCollection.read(
+      { phone },
+      { projection: { lastMessageReceivedAt: 1, lastTextMessageRecivedAt: 1 } }
+    )[0];
+    let id = setReminder(
+      sendKBMFlow(registered, { locals: { waClient, collections } }),
+      contact.lastMessageReceivedAt
+    );
+    await set(`KBMReminder:${phone}`, id);
+    await sendAlreadyPlayedMessage(registered, waClient);
   } else {
     //check if there is a previously active flow token
     if (registered?.active_flow_token) {
       let flow_obj = await get(registered.active_flow_token);
       // that previous has a valid started game not yet expired or ended.
       if (new Date(flow_obj?.end_time) > new Date()) {
-        res.locals.waClient.sendTextMessage(contact.phone, {
-          body: `You already have a game in progress, please finish it or wait for it to expire.`
-        });
+        waClient.sendTextMessage(
+          phone,
+          {
+            body: `You already have a game in progress, please finish it or wait for it to expire.`
+          },
+          { message_id: registered.active_flow_message_id }
+        );
         return;
       }
       // delete the existing flow_token
@@ -213,19 +238,20 @@ async function sendKBMFlow(registered, res) {
     const layout = {
       header: {
         type: "text",
-        text: "Flow message header"
+        text: "Welcome to Play & Learn"
       },
       body: {
-        text: "Flow message body"
-      },
-      footer: {
-        text: "Flow message footer"
+        text: `Dear ${registered.name},
+        Play daily with us. It will help you learn better for your exam. You get to practice thousands of questions and get a chance to win exciting rewards.
+        Happy Learning.
+        
+        *TEAM ALCHEMIST*`
       }
     };
     const params = {
       flow_token: token,
       mode: "draft",
-      flow_id, //KBM
+      flow_id,
       flow_cta: "Play Now",
       flow_action: "navigate",
       flow_action_payload: {
@@ -233,11 +259,16 @@ async function sendKBMFlow(registered, res) {
         data: { welcome_img: WELCOME.img, welcome_img_height: WELCOME.height }
       }
     };
-    await res.locals.waClient.sendFlowMessage(contact.phone, layout, params);
+    let response = await waClient.sendFlowMessage(phone, layout, params);
     await set(token, flow_obj);
     await campaignContactsCollection.update(
       { _id: registered._id },
-      { $set: { active_flow_token: token } }
+      {
+        $set: {
+          active_flow_token: token,
+          active_flow_message_id: response.messages?.[0].id
+        }
+      }
     );
     await gameStatsCollection.create({
       flow_token: token,

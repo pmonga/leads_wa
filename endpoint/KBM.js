@@ -79,7 +79,8 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             // implement real game progress logic here;
             flow_obj.is_sample = false;
             flow_obj.questions = [...SAMPLE_GAME];
-            // the last_attemptedAT, last_attempt_level needs to be set here in the campaignContacts.
+            // await del(`KBMReminder:${phone}`);
+            // the lastAttemptedAt, last_attempt_level needs to be set here in the campaignContacts.
             // update contactQuestions too, so it avoids repetition.
           }
           response = {

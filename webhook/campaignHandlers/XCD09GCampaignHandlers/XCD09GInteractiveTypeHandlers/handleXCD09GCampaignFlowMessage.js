@@ -43,7 +43,11 @@ export default async (req, res) => {
         await signUp(res);
       }
       // get registration details
-      let registered = await getRegistration(res);
+      let registered = await getRegistration(
+        code,
+        contact.phone,
+        campaignContactsCollection
+      );
       if (!registered) {
         registered = await register(res);
       }
@@ -71,7 +75,11 @@ export default async (req, res) => {
       );
 
       // update difficulty level of the registered contact based on performance
-      const registered = await getRegistration(res);
+      const registered = await getRegistration(
+        code,
+        contact.phone,
+        campaignContactsCollection
+      );
       if (registered) {
         const { difficulty_level, cur } = { flow_obj };
         if (cur > 10) {
