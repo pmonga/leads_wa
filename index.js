@@ -18,6 +18,7 @@ import {
 import { getNextScreen } from "./flow.js";
 import { get, set, del } from "./helpers/storage.js";
 import { FLOW_KBM } from "./helpers/config.js";
+import { createReminderManager } from "./helpers/utils.js";
 
 const {
   WEBHOOK_VERIFY_TOKEN,
@@ -38,6 +39,7 @@ let contactsCollection,
   log,
   gameStatsCollection;
 let campaigns;
+const KBMreminder = createReminderManager({ timeOffsetMinutes: 0.5 });
 
 async function initdb() {
   try {
@@ -127,6 +129,7 @@ app.use(async (req, res, next) => {
     ledgerCollection
   };
   res.locals.campaigns = campaigns;
+  res.locals.KBMreminder = KBMreminder;
   console.log("setting up collections in res");
   next();
 });

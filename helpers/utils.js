@@ -126,50 +126,108 @@ function isObject(x) {
   return typeof x === "object" && !Array.isArray(x) && x !== null;
 }
 
-function setReminder(targetFunction, givenTime, ...params) {
-  // Get the current time in milliseconds
-  const now = new Date().getTime();
+function createReminderManager({
+  timeOffsetMinutes = 23 * 60 + 59,
+  fixedTime = "12:00",
+  timeZone = "Asia/Kolkata"
+} = {}) {
+  const reminders = new Map();
 
-  // Calculate 12 PM IST tomorrow
-  const currentDateIST = new Date().toLocaleString("en-US", {
-    timeZone: "Asia/Kolkata"
-  });
-  const istNow = new Date(currentDateIST);
-  const istTomorrowNoon = new Date(
-    istNow.getFullYear(),
-    istNow.getMonth(),
-    istNow.getDate() + 1,
-    12,
-    0,
-    0
-  );
-
-  // Convert 12 PM IST tomorrow to UTC milliseconds
-  const istTomorrowNoonUTC = istTomorrowNoon.getTime();
-
-  // Calculate 23 hours and 55 minutes from the given time
-  const futureTime = new Date(givenTime).getTime() + (23 * 60 + 55) * 60 * 1000;
-
-  // Determine the earlier of the two times
-  const executionTime = Math.min(istTomorrowNoonUTC, futureTime);
-
-  // Calculate the delay in milliseconds
-  const delay = 30000; //executionTime - now;
-
-  if (delay > 0) {
-    console.log(`Function will execute in ${delay / 1000} seconds.`);
-    const timeoutId = setTimeout(async () => {
-      try {
-        await targetFunction(...params);
-      } catch (error) {
-        console.error("Error occurred in the scheduled function:", error);
-      }
-    }, delay);
-    return timeoutId; // Return the timeout ID
-  } else {
-    console.log("The target time has already passed.");
-    return null;
+  /**
+   * Parse the fixed time string into hours and minutes.
+   * @param {string} time - Time string in "HH:mm" format.
+   * @returns {{ hours: number, minutes: number }} - Parsed hours and minutes.
+   */
+  function parseFixedTime(time) {
+    const [hours, minutes] = time.split(":").map(Number);
+    return { hours, minutes };
   }
+
+  /**
+   * Set a reminder with a given key.
+   * @param {string} key - Unique key to identify the reminder.
+   * @param {Function} targetFunction - The function to be executed.
+   * @param {Date|string|number} givenTime - The base time for scheduling.
+   * @param {...any} params - Parameters to pass to the target function.
+   * @returns {{timeout: Object, executionTime: Date}} - The timeout object and execution time.
+   */
+  function set(key, targetFunction, givenTime, ...params) {
+    // Clear any existing reminder with the same key
+    if (reminders.has(key)) {
+      clear(key);
+    }
+
+    const now = new Date().getTime();
+
+    // Calculate the fixed time for tomorrow in the specified time zone
+    const currentDateInZone = new Date().toLocaleString("en-US", { timeZone });
+    const zoneNow = new Date(currentDateInZone);
+    const { hours, minutes } = parseFixedTime(fixedTime);
+    const fixedTimeTomorrow = new Date(
+      zoneNow.getFullYear(),
+      zoneNow.getMonth(),
+      zoneNow.getDate() + 1,
+      hours,
+      minutes,
+      0
+    );
+    const fixedTimeUTC = fixedTimeTomorrow.getTime();
+
+    // Calculate the offset time from the given time
+    const offsetTime =
+      new Date(givenTime).getTime() + timeOffsetMinutes * 60 * 1000;
+
+    // Determine the earlier of the two times
+    const executionTime = Math.min(fixedTimeUTC, offsetTime);
+    const delay = executionTime - now;
+
+    if (delay > 0) {
+      const timeout = setTimeout(async () => {
+        try {
+          await targetFunction(...params);
+        } catch (error) {
+          console.error("Error occurred in the scheduled function:", error);
+        }
+      }, delay);
+
+      reminders.set(key, timeout);
+
+      return { timeout, executionTime: new Date(executionTime) };
+    } else {
+      console.log("The target time has already passed.");
+      return { timeout: null, executionTime: null };
+    }
+  }
+
+  /**
+   * Get a reminder by its key.
+   * @param {string} key - The key of the reminder to retrieve.
+   * @returns {Object|null} - The timeout object if found, otherwise null.
+   */
+  function get(key) {
+    return reminders.get(key) || null;
+  }
+
+  /**
+   * Clear a reminder with a given key.
+   * @param {string} key - The key of the reminder to clear.
+   * @returns {boolean} - True if the reminder was cleared, false otherwise.
+   */
+  function clear(key) {
+    if (reminders.has(key)) {
+      const timeout = reminders.get(key);
+      clearTimeout(timeout);
+      reminders.delete(key);
+      return true;
+    }
+    return false;
+  }
+
+  return {
+    set,
+    get,
+    clear
+  };
 }
 
 function timeout(ms) {
@@ -183,7 +241,7 @@ export {
   isSameDate,
   isWithinAllowedPeriod,
   isObject,
-  setReminder,
+  createReminderManager,
   timeout
 };
-/* global console, Intl, setTimeout Promise */
+/* global console, Intl, setTimeout Promise Map clearTimeout */

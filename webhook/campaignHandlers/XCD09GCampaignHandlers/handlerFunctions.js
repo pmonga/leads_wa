@@ -178,7 +178,7 @@ async function sendSignUpFlow(res) {
 }
 async function sendKBMFlow(registered, res) {
   const { code, phone } = registered;
-  const { waClient, collections } = res.locals;
+  const { waClient, collections, KBMreminder } = res.locals;
   const {
     campaignContactsCollection,
     gameStatsCollection,
@@ -200,13 +200,13 @@ async function sendKBMFlow(registered, res) {
         }
       )
     )[0];
-    let id = setReminder(
+    KBMreminder.set(
+      `KBMReminder:${phone}`,
       sendKBMFlow,
       contact.lastMessageReceivedAt,
       registered,
-      { locals: { waClient, collections } }
+      { locals: { waClient, collections, KBMreminder } }
     );
-    await set(`KBMReminder:${phone}`, { id });
     await sendAlreadyPlayedMessage(registered, waClient);
   } else {
     //check if there is a previously active flow token
