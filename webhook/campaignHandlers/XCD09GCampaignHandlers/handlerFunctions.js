@@ -196,11 +196,12 @@ async function sendKBMFlow(registered, res) {
       { phone },
       { projection: { lastMessageReceivedAt: 1, lastTextMessageRecivedAt: 1 } }
     )[0];
-    let id = setReminder(
-      sendKBMFlow(registered, { locals: { waClient, collections } }),
-      contact.lastMessageReceivedAt
-    );
-    await set(`KBMReminder:${phone}`, id);
+    console.log("contact: ", contact);
+    // let id = setReminder(
+    //   sendKBMFlow(registered, { locals: { waClient, collections } }),
+    //   contact.lastMessageReceivedAt
+    // );
+    //await set(`KBMReminder:${phone}`, id);
     await sendAlreadyPlayedMessage(registered, waClient);
   } else {
     //check if there is a previously active flow token
