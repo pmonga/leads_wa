@@ -39,7 +39,7 @@ let contactsCollection,
   log,
   gameStatsCollection;
 let campaigns;
-const KBMreminder = createReminderManager({ timeOffsetMinutes: 0.5 });
+const KBMreminder = createReminderManager();
 
 async function initdb() {
   try {

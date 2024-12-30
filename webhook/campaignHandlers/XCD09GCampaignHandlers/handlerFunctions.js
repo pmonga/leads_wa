@@ -188,9 +188,8 @@ async function sendKBMFlow(registered, res) {
   // send the KBM flow message for KBM flow_id = FLOW_KBM
   // check if has already played the game today
   if (
-    code ||
-    (registered.lastAttemptedAt &&
-      isSameDate(new Date(registered.lastAttemptedAt)))
+    registered.lastAttemptedAt &&
+    isSameDate(new Date(registered.lastAttemptedAt))
   ) {
     const contact = (
       await contactsCollection.read(
