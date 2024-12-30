@@ -126,7 +126,7 @@ function isObject(x) {
   return typeof x === "object" && !Array.isArray(x) && x !== null;
 }
 
-function setReminder(targetFunction, givenTime) {
+function setReminder(targetFunction, givenTime, ...params) {
   // Get the current time in milliseconds
   const now = new Date().getTime();
 
@@ -151,7 +151,7 @@ function setReminder(targetFunction, givenTime) {
   const futureTime = new Date(givenTime).getTime() + (23 * 60 + 55) * 60 * 1000;
 
   // Determine the earlier of the two times
-  const executionTime = 30000; // = Math.min(istTomorrowNoonUTC, futureTime);
+  const executionTime = Math.min(istTomorrowNoonUTC, futureTime);
 
   // Calculate the delay in milliseconds
   const delay = executionTime - now;
@@ -160,7 +160,7 @@ function setReminder(targetFunction, givenTime) {
     console.log(`Function will execute in ${delay / 1000} seconds.`);
     const timeoutId = setTimeout(async () => {
       try {
-        await targetFunction();
+        await targetFunction(...params);
       } catch (error) {
         console.error("Error occurred in the scheduled function:", error);
       }

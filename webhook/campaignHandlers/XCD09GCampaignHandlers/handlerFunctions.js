@@ -201,8 +201,10 @@ async function sendKBMFlow(registered, res) {
       )
     )[0];
     let id = setReminder(
-      sendKBMFlow(registered, { locals: { waClient, collections } }),
-      contact.lastMessageReceivedAt
+      sendKBMFlow,
+      contact.lastMessageReceivedAt,
+      registered,
+      { locals: { waClient, collections } }
     );
     await set(`KBMReminder:${phone}`, id);
     await sendAlreadyPlayedMessage(registered, waClient);
