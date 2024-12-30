@@ -151,7 +151,7 @@ function setReminder(targetFunction, givenTime) {
   const futureTime = new Date(givenTime).getTime() + (23 * 60 + 55) * 60 * 1000;
 
   // Determine the earlier of the two times
-  const executionTime = Math.min(istTomorrowNoonUTC, futureTime);
+  const executionTime = 30000; // = Math.min(istTomorrowNoonUTC, futureTime);
 
   // Calculate the delay in milliseconds
   const delay = executionTime - now;

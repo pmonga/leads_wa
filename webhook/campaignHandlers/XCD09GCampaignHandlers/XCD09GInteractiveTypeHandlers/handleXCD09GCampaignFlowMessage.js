@@ -105,11 +105,14 @@ export default async (req, res) => {
         }
       }
       await sendPostGameMessage(registered, wallet, res);
+      setTimeout(async () => {
+        await sendKBMFlow(registered, res);
+      }, 10 * 1000);
       break;
     }
   }
   // clean up, remove the token
-  del(flow_token);
+  await del(flow_token);
 };
 
-/*global console*/
+/*global setTimeout console*/

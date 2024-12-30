@@ -78,9 +78,6 @@ async function sendPostGameMessage(registered, wallet, res) {
     Your balance is ${balance} credits. To know more / collect rewards mail to ${email} from your registered email.`;
   }
   await res.locals.waClient.sendTextMessage(registered.phone, reply);
-  setTimeout(async () => {
-    await sendKBMFlow(registered, res);
-  }, 10 * 1000);
 }
 async function sendAlreadyPlayedMessage(registered, waClient) {
   const { code, phone } = registered;
@@ -191,8 +188,9 @@ async function sendKBMFlow(registered, res) {
   // send the KBM flow message for KBM flow_id = FLOW_KBM
   // check if has already played the game today
   if (
-    registered.lastAttemptedAt &&
-    isSameDate(new Date(registered.lastAttemptedAt))
+    code ||
+    (registered.lastAttemptedAt &&
+      isSameDate(new Date(registered.lastAttemptedAt)))
   ) {
     const contact = await contactsCollection.read(
       { phone },
