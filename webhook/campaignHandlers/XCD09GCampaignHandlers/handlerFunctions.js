@@ -196,7 +196,7 @@ async function sendKBMFlow(registered, res) {
       await contactsCollection.read(
         { phone },
         {
-          projection: { lastMessageReceivedAt: 1, lastTextMessageRecivedAt: 1 }
+          projection: { lastMessageReceivedAt: 1, lastTextMessageReceivedAt: 1 }
         }
       )
     )[0];
