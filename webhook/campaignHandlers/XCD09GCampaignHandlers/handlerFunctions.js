@@ -259,6 +259,7 @@ async function sendKBMFlow(registered, res) {
         data: { welcome_img: WELCOME.img, welcome_img_height: WELCOME.height }
       }
     };
+    console.log("phone: ", phone);
     let response = await waClient.sendFlowMessage(phone, layout, params);
     await set(token, flow_obj);
     await campaignContactsCollection.update(
