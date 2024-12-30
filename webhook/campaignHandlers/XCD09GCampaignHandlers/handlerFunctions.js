@@ -128,13 +128,11 @@ async function sendSignUpFlow(res) {
   const layout = {
     header: {
       type: "text",
-      text: "Flow message header"
+      text: "SIGN UP"
     },
     body: {
-      text: "Flow message body"
-    },
-    footer: {
-      text: "Flow message footer"
+      text: `Please register with your full name and email.
+      These details will be verified at the time of reward collection.`
     }
   };
   const params = {
