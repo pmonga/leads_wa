@@ -77,11 +77,10 @@ async function sendPostGameMessage(registered, wallet, res) {
     reply.body += `
     Your balance is ${balance} credits. To know more / collect rewards mail to ${email} from your registered email.`;
   }
-  await Promise.all([
-    res.locals.waClient.sendTextMessage(registered.phone, reply),
-    timeout(2000)
-  ]);
-  await sendKBMFlow(registered, res);
+  await res.locals.waClient.sendTextMessage(registered.phone, reply);
+  setTimeout(async () => {
+    await sendKBMFlow(registered, res);
+  }, 10 * 1000);
 }
 async function sendAlreadyPlayedMessage(registered, waClient) {
   const { code, phone } = registered;
