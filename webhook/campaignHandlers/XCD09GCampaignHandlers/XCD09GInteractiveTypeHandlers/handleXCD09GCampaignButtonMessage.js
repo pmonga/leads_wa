@@ -14,7 +14,7 @@ export default async (req, res) => {
       ]);
       await waClient.sendTextMessage(contact.phone, {
         preview_url: false,
-        body: `I enjoy learning while playing this game. You can join th efun too. Just click on the link and send the pre-filled message.
+        body: `I enjoy learning while playing this game. You can join the fun too. Just click on the link and send the pre-filled message.
         
         ${link}`
       });

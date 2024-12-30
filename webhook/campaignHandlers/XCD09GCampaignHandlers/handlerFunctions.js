@@ -192,9 +192,13 @@ async function sendKBMFlow(registered, res) {
     (registered.lastAttemptedAt &&
       isSameDate(new Date(registered.lastAttemptedAt)))
   ) {
-    const contact = await contactsCollection.read(
-      { phone },
-      { projection: { lastMessageReceivedAt: 1, lastTextMessageRecivedAt: 1 } }
+    const contact = (
+      await contactsCollection.read(
+        { phone },
+        {
+          projection: { lastMessageReceivedAt: 1, lastTextMessageRecivedAt: 1 }
+        }
+      )
     )[0];
     console.log("contact: ", contact);
     // let id = setReminder(
