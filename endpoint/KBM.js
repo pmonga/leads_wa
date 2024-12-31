@@ -1,4 +1,4 @@
-/*global console*/
+/* global console, setTimeout, Promise, clearTimeout */
 import { get, set, del } from "../helpers/storage.js";
 import {
   decryptRequest,
@@ -7,7 +7,7 @@ import {
 } from "../helpers/encryption.js";
 import { FLOW_KBM } from "../helpers/config.js";
 import { SAMPLE_GAME } from "./KBM/sample.js";
-import { GAME_PRIZE, GAME_TIME } from "./KBM/config.js";
+import { GAME_PRIZE, GAME_QS_DEF, GAME_TIME } from "./KBM/config.js";
 import {
   getTimeWithOffset,
   formatTohhmmDateIST,
@@ -37,6 +37,34 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   if (flow_id != FLOW_KBM) {
     //return with error
   }
+  const { phone, campaign_contact_id, is_sample, contact_id } = flow_obj;
+  const { kbmQs, contactKbmQs, campaignContactsCollection } =
+    res.locals.collections;
+  // getQsImg stores the next image too
+  let nextImg;
+  async function getQsImg(i) {
+    let img;
+    const { is_sample, questions } = flow_obj;
+    if (is_sample) return SAMPLE_GAME?.[i].img;
+    if (nextImg) {
+      img = nextImg;
+      nextImg = "";
+    } else {
+      img = (
+        await kbmQs.read(
+          { _id: questions?.[i]._id },
+          { projection: { img: 1 } }
+        )
+      )?.[0].img;
+    }
+    questions[i].createdAt = new Date();
+    if (++i < questions.length) {
+      kbmQs
+        .read({ _id: questions[i]._id }, { projection: { img: 1 } })
+        .then((val) => (nextImg = val[0].img));
+    }
+    return img;
+  }
 
   if (action === "BACK") {
     let back_img = BACK.img;
@@ -58,6 +86,9 @@ export const getNextScreen = async (req, res, decryptedBody) => {
           const difficulty_level = flow_obj?.difficulty_level || 0;
           const cur = 1; //flow_obj?.cur ? flow_obj.cur : 1;
           const prize = GAME_PRIZE?.[difficulty_level] || GAME_PRIZE[0];
+          const qsDef =
+            GAME_QS_DEF?.[difficulty_level] ||
+            GAME_QS_DEF[GAME_QS_DEF.length - 1];
           {
             flow_obj.cur = cur;
             flow_obj.won = 0;
@@ -71,23 +102,52 @@ export const getNextScreen = async (req, res, decryptedBody) => {
               flow_obj.time_allowed
             );
           }
-          if (data.is_sample || flow_obj.is_sample) {
+          if (data.is_sample) {
             // implement sample logic here
+            let id = 0;
             flow_obj.is_sample = true;
-            flow_obj.questions = [...SAMPLE_GAME];
+            flow_obj.questions = SAMPLE_GAME.map(({ ans }) => ({
+              _id: id++,
+              ans
+            }));
+            await gameStatsCollection.update(
+              { flow_token },
+              {
+                $set: {
+                  is_sample: flow_obj.is_sample,
+                  startedAt: flow_obj.startedAt,
+                  end_time: flow_obj.end_time
+                }
+              }
+            );
           } else {
             // implement real game progress logic here;
             flow_obj.is_sample = false;
-            flow_obj.questions = [...SAMPLE_GAME];
-            // await del(`KBMReminder:${phone}`);
-            // the lastAttemptedAt, last_attempt_level needs to be set here in the campaignContacts.
-            // update contactQuestions too, so it avoids repetition.
+            [flow_obj.questions] = await Promise.all([
+              buildQsSet(qsDef, phone, kbmQs.collection),
+              campaignContactsCollection.update(
+                { _id: campaign_contact_id },
+                { $set: { lastAttemptedAt: flow_obj.startedAt } }
+              ),
+              gameStatsCollection.update(
+                { flow_token },
+                {
+                  $set: {
+                    is_sample: flow_obj.is_sample,
+                    startedAt: flow_obj.startedAt,
+                    end_time: flow_obj.end_time
+                  }
+                }
+              )
+            ]);
           }
+          const qs_img = await getQsImg(flow_obj.cur - 1);
+          flow_obj.questions[flow_obj.cur - 1].createdAt = new Date();
           response = {
             screen: "PRE",
             data: {
               cur: `Q${flow_obj.cur}`,
-              qs_img: flow_obj.questions[flow_obj.cur - 1].qs_img,
+              qs_img,
               pre_subheading: `Answer next for ${
                 flow_obj.prize?.[flow_obj.cur - 1] || 0
               }`,
@@ -97,16 +157,6 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             }
           };
         }
-        await gameStatsCollection.update(
-          { flow_token },
-          {
-            $set: {
-              is_sample: flow_obj.is_sample,
-              startedAt: flow_obj.startedAt,
-              end_time: flow_obj.end_time
-            }
-          }
-        );
         break;
       case "POST":
         if (data.has_quit) {
@@ -147,6 +197,24 @@ export const getNextScreen = async (req, res, decryptedBody) => {
         break;
       case "QS":
         {
+          // update the collection contact questions to mark question as used
+          if (!is_sample) {
+            flow_obj.questions[[flow_obj.cur - 1]].response = data?.ans;
+            flow_obj.questions[[flow_obj.cur - 1]].is_correct =
+              flow_obj.questions?.[flow_obj.cur - 1]?.ans.toUpperCase() ===
+              data?.ans?.toUpperCase();
+            contactKbmQs.create({
+              kbm_question_id: flow_obj.questions[[flow_obj.cur - 1]]._id,
+              campaign_contact_id,
+              flow_token,
+              contact_id,
+              phone,
+              ans: flow_obj.questions[[flow_obj.cur - 1]].ans,
+              response: flow_obj.questions[[flow_obj.cur - 1]].response,
+              is_correct: flow_obj.questions[[flow_obj.cur - 1]].is_correct,
+              createdAt: flow_obj.questions[[flow_obj.cur - 1]].createdAt
+            });
+          }
           if (flow_obj.end_time < new Date()) {
             flow_obj.finishedAt = new Date();
             let final_img = TIME_UP.img;
@@ -180,10 +248,10 @@ export const getNextScreen = async (req, res, decryptedBody) => {
                 }
               };
             } else {
-              const post_title = "Sahi Jawaab!";
+              const post_title = "Correct Answer";
               const post_img = CORRECT.img;
               const post_img_height = CORRECT.height;
-              const post_msg = `That's correct. You win ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
+              const post_msg = `That's right. You win ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
               response = {
                 screen: "POST",
                 data: {
@@ -253,3 +321,101 @@ export const getNextScreen = async (req, res, decryptedBody) => {
     "Unhandled endpoint request. Make sure you handle the request action & screen logged above."
   );
 };
+
+async function buildQsSet(def, phone, qsCol) {
+  let q = [];
+  def.array.forEach(async (e) => {
+    q = [...q, ...(await getQs(e.level, e.num, phone, qsCol))];
+  });
+  return q;
+}
+
+async function getQs(level, num, phone, mainCollection) {
+  const referenceCollectionName = "wa_contact_kbm_questions";
+  try {
+    let qs = [];
+    let correctCount = 0;
+    let usedTimes = 0;
+    // add a fail safe for while loop
+    let failed = false;
+    const failsafe = setTimeout(() => {
+      failed = true; // Force condition to end
+      console.error(
+        "Failsafe triggered: Exiting loop at KBM.js; getQs: ",
+        level,
+        num,
+        phone
+      );
+    }, 5000);
+
+    //
+    while (qs.length < num && !failed) {
+      // Aggregation pipeline
+      const pipeline = [
+        {
+          $match: {
+            level // Apply filters on indexed fields here
+          }
+        },
+        {
+          $lookup: {
+            from: referenceCollectionName,
+            let: { id: "$_id" }, // Define a variable for `_id` in the source
+            pipeline: [
+              {
+                $match: {
+                  $and: [
+                    { $expr: { $eq: ["$kbm_question_id", "$$id"] } },
+                    { $expr: { $eq: ["$phone", phone] } }
+                  ] // Match `reference_id` with `_id` from the source
+                }
+              }
+            ],
+            as: "references"
+          }
+        },
+        {
+          $match: {
+            references: { $size: usedTimes }
+          }
+        },
+        {
+          $addFields: {
+            num_of_correct: {
+              $size: {
+                $filter: {
+                  input: "$references", // References array
+                  as: "ref", // Variable for each element
+                  cond: { $eq: ["$$ref.is_correct", true] }
+                }
+              }
+            }
+          }
+        },
+        {
+          $match: { num_of_correct: correctCount }
+        },
+        {
+          $sample: { size: num - qs.length }
+        },
+        {
+          $project: {
+            ans: 1
+          }
+        }
+      ];
+      qs = [...qs, ...(await mainCollection.aggregate(pipeline).toArray())];
+      if (correctCount < usedTimes) correctCount++;
+      else {
+        usedTimes++;
+        correctCount = 0;
+      }
+    }
+    if (failed) return [];
+    clearTimeout(failsafe);
+    console.log("Random Unreferenced Documents:", qs);
+    return qs;
+  } catch (error) {
+    console.error("Error fetching documents:", error);
+  }
+}

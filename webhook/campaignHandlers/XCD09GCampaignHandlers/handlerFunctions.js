@@ -121,7 +121,6 @@ async function sendSignUpFlow(res) {
   // to get the contact's name
   const { code } = res.locals;
   const phone = res.locals.contact.phone;
-
   const token = generateToken(
     JSON.stringify({ phone, code, flow_id: FLOW_SIGNUP })
   );
@@ -175,7 +174,7 @@ async function sendSignUpFlow(res) {
   });
 }
 async function sendKBMFlow(registered, res) {
-  const { code, phone } = registered;
+  const { contact_id, code, phone } = registered;
   const { waClient, collections, KBMreminder } = res.locals;
   const {
     campaignContactsCollection,
@@ -227,6 +226,7 @@ async function sendKBMFlow(registered, res) {
     const flow_id = FLOW_KBM;
     const flow_obj = {
       campaign_contact_id: registered._id,
+      contact_id,
       phone,
       code,
       flow_id,

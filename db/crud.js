@@ -8,7 +8,7 @@ const crud = (collectionName, db) => {
     // Create a new document
     create: async (data) => {
       if (!data.createdAt) data.createdAt = new Date();
-      if (!data.updatedAt) data.updatedAt = data.createdAt;
+      if (!data.updatedAt) data.updatedAt = new Date();
       const collection = db.collection(collectionName);
       const result = await collection.insertOne(data);
       return result;
@@ -56,7 +56,7 @@ const crud = (collectionName, db) => {
       return result;
     },
     // expose the collection for native functions
-    collection: async () => {
+    collection: () => {
       return db.collection(collectionName);
     }
   };

@@ -1,5 +1,5 @@
-import { MongoClient } from 'mongodb';
-import dotenv from 'dotenv'; // Import dotenv
+import { MongoClient } from "mongodb";
+import dotenv from "dotenv"; // Import dotenv
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -11,7 +11,7 @@ async function connect() {
   const uri = process.env.MONGO_URI;
 
   if (!uri) {
-    throw new Error('MONGODB_URI is not defined in the environment variables');
+    throw new Error("MONGODB_URI is not defined in the environment variables");
   }
 
   if (client && db) {
@@ -28,9 +28,10 @@ async function connect() {
     console.log(`Connected to database: ${db.databaseName}`);
     return db;
   } catch (error) {
-    console.error('Error connecting to MongoDB:', error);
+    console.error("Error connecting to MongoDB:", error);
     throw error;
   }
 }
 
 export { connect };
+/*global console, process*/

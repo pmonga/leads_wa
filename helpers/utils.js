@@ -186,7 +186,14 @@ function createReminderManager({
         try {
           await targetFunction(...params);
         } catch (error) {
-          console.error("Error occurred in the scheduled function:", error);
+          console.error(
+            "Error occurred in the scheduled function:",
+            key,
+            error
+          );
+        } finally {
+          // Automatically remove the key after execution
+          reminders.delete(key);
         }
       }, delay);
 
@@ -223,10 +230,30 @@ function createReminderManager({
     return false;
   }
 
+  function size() {
+    return reminders.size;
+  }
+
+  function keys() {
+    return [...reminders.keys()];
+  }
+
+  function values() {
+    return [...reminders.values()];
+  }
+
+  function entries() {
+    return [...reminders.entries()];
+  }
+
   return {
     set,
     get,
-    clear
+    clear,
+    size,
+    keys, // Exposes the keys of the reminders map
+    values, // Exposes the values of the reminders map
+    entries // Exposes the entries of the reminders map
   };
 }
 
