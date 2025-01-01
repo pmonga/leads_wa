@@ -56,18 +56,14 @@ export default async (req, res, next) => {
     const layout = {
       header: {
         type: "text",
-        text: "Flow message header"
+        text: "SIGN UP"
       },
       body: {
-        text: "Flow message body"
-      },
-      footer: {
-        text: "Flow message footer"
+        text: `Please register with your full name and email.`
       }
     };
     const params = {
       flow_token: token,
-      mode: "draft",
       flow_id, //Lead Sign Up
       flow_cta: "Register",
       flow_action: "navigate",

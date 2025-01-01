@@ -6,7 +6,7 @@ const VERSION = "1.0.0";
 const GAME_QS_DEF = [
   [
     { level: "easy", num: 0 },
-    { level: "medium", num: 7 },
+    { level: "medium", num: 0 },
     { level: "hard", num: 8 }
   ]
 ];
@@ -15,10 +15,12 @@ const GAME_PRIZE = [
   [1, 2, 4, 7, 10, 15, 20, 25, 35, 50, 70, 100, 200, 500, 1000]
 ];
 const TERMS = `## 1. Eligibility
-1.1. Participants for reward must be a resident of India and between 18 to 25 years of age as of the date of participation.
-1.2. The name registered for the game must match the name of the reward recipient. No exceptions will be entertained.
-1.3. Participation for rewards is restricted to students preparing for CAT 2025 or CAT 2026. Proof of preparation may be requested.
-1.4. Participants’ details, including name, email ID, and phone number, must match the information provided during registration.
+1.0. The game is presently in testing mode, so no rewards presently. All credits earned during this phase will be removed in sometime.
+1.1. Everybody can participate in this game for fun.
+1.2. Participants must be residents of India and between 18 to 25 years of age as of the date of participation to claim reward.
+1.3. The name registered for the game must match the name of the reward recipient. No exceptions will be entertained.
+1.4. Participation for rewards is restricted to students preparing for CAT 2025 or CAT 2026. Proof of preparation may be requested.
+1.5. Participants' details, including name, email ID, and phone number, must match the information provided during registration.
 
 ## 2. Gameplay Rules
 2.1. Each player can participate once per day. Multiple attempts or registrations under different email IDs or phones will result in immediate disqualification.

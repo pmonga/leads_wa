@@ -138,7 +138,6 @@ async function sendSignUpFlow(res) {
   };
   const params = {
     flow_token: token,
-    mode: "draft",
     flow_id: FLOW_SIGNUP, //Lead Sign Up
     flow_cta: "Register",
     flow_action: "navigate",
@@ -251,7 +250,6 @@ async function sendKBMFlow(registered, res) {
     };
     const params = {
       flow_token: token,
-      mode: "draft",
       flow_id,
       flow_cta: "Play Now",
       flow_action: "navigate",
