@@ -61,7 +61,10 @@ export const getNextScreen = async (req, res, decryptedBody) => {
     if (++i < questions.length) {
       kbmQs
         .read({ _id: questions[i]._id }, { projection: { img: 1 } })
-        .then((val) => (nextImg = val[0].img));
+        .then((val) => {
+          console.log("returned value: ", val);
+          nextImg = val[0].img;
+        });
     }
     return img;
   }
