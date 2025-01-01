@@ -43,6 +43,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   // getQsImg stores the next image too
   let nextImg;
   async function getQsImg(i) {
+    console.log("type of id, i: ", typeof questions?.[i]._id, i);
     let img;
     const { is_sample, questions } = flow_obj;
     if (is_sample) return SAMPLE_GAME?.[i].img;
