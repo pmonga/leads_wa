@@ -121,7 +121,12 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             buildQsSet(qsDef, phone, kbmQs.collection()),
             campaignContactsCollection.update(
               { _id: campaign_contact_id },
-              { $set: { lastAttemptedAt: flow_obj.startedAt } }
+              {
+                $set: {
+                  lastAttemptedAt: flow_obj.startedAt,
+                  lastAttemptWasSample: is_sample
+                }
+              }
             ),
             gameStatsCollection.update(
               { flow_token },
