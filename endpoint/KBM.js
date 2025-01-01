@@ -331,6 +331,7 @@ async function buildQsSet(def, phone, qsCol) {
 }
 
 async function getQs(level, num, phone, mainCollection) {
+  console.log("level, num: ", level, num);
   const referenceCollectionName = "wa_contact_kbm_questions";
   try {
     let qs = [];
