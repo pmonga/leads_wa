@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb"; // Directly import ObjectId
 
 // Helper to convert string to ObjectId (if needed)
-const toObjectId = (id) => ObjectId(id);
+const toObjectId = (id) => new ObjectId(id);
 
 const crud = (collectionName, db) => {
   return {
