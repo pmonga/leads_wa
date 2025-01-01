@@ -260,7 +260,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
                   post_img,
                   post_img_height,
                   post_msg,
-                  qs_img: flow_obj.questions[flow_obj.cur - 1].qs_img,
+                  qs_img: await getQsImg(flow_obj.cur - 1),
                   pre_subheading: `Answer next for ${
                     flow_obj.prize?.[flow_obj.cur - 1] || 0
                   }`,

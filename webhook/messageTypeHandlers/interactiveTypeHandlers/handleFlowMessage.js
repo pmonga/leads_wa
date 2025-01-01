@@ -49,6 +49,7 @@ const handleFlowMessage = async function (req, res) {
       break;
     }
     default:
+      res.locals.crm.message += "SYS MSG:Invalid flow token or campaign code";
       console.log("Flow: Invalid campaign code:  ", code);
       res.locals.waClient.sendTextMessage(message.from, {
         body: `Your token is invalid or has expired. Please try again after sometime.`
