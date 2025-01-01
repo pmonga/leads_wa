@@ -27,6 +27,9 @@ const crud = (collectionName, db) => {
     // Update a document
     update: async (filter, updateData) => {
       if (!updateData["$set"]) updateData["$set"] = {};
+      if (typeof filter._id === "string") {
+        filter._id = toObjectId(filter._id);
+      }
       updateData["$set"].updatedAt = new Date(); // Set updatedAt timestamp
       const collection = db.collection(collectionName);
       const result = await collection.updateOne(filter, updateData, {
