@@ -5,6 +5,7 @@ import { BASE_URL, FLOW_KBM, FLOW_SIGNUP } from "../../../helpers/config.js";
 import { isSameDate } from "../../../helpers/utils.js";
 import { WELCOME } from "../../../assets/kbm_assets.js";
 import { COURSES, JOIN_NOW } from "../../../assets/signup_assets.js";
+import { TERMS } from "../../../endpoint/KBM/config.js";
 
 async function getRegistration(code, phone, coll) {
   const fields = {
@@ -256,7 +257,11 @@ async function sendKBMFlow(registered, res) {
       flow_action: "navigate",
       flow_action_payload: {
         screen: "WELCOME",
-        data: { welcome_img: WELCOME.img, welcome_img_height: WELCOME.height }
+        data: {
+          welcome_img: WELCOME.img,
+          welcome_img_height: WELCOME.height,
+          terms: TERMS
+        }
       }
     };
     console.log("phone: ", phone);
