@@ -324,9 +324,10 @@ export const getNextScreen = async (req, res, decryptedBody) => {
 
 async function buildQsSet(def, phone, qsCol) {
   let q = [];
-  def.forEach(async (e) => {
-    q = [...q, ...(await getQs(e.level, e.num, phone, qsCol))];
-  });
+  for (const e of def) {
+    let newQ = await getQs(e.level, e.num, phone, qsCol);
+    q = [...q, ...newQ];
+  }
   return q;
 }
 
