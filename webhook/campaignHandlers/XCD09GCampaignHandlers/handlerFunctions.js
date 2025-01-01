@@ -9,6 +9,7 @@ import { COURSES, JOIN_NOW } from "../../../assets/signup_assets.js";
 async function getRegistration(code, phone, coll) {
   const fields = {
     _id: 1,
+    contact_id: 1,
     name: 1,
     campaign: 1,
     code: 1,

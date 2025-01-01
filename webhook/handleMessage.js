@@ -92,7 +92,7 @@ async function addToCRM(res) {
   const { message, utm } = res.locals.crm;
   const contact = res.locals.contact;
   const crmData = {
-    source: "whatsApp LP",
+    source: "whatsApp",
     name: contact.name,
     mobile: contact.mobile,
     email: contact.email,
