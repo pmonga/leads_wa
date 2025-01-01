@@ -6,8 +6,13 @@ import {
   FlowEndpointException
 } from "../helpers/encryption.js";
 import { FLOW_KBM } from "../helpers/config.js";
-import { SAMPLE_GAME } from "./KBM/sample.js";
-import { GAME_PRIZE, GAME_QS_DEF, GAME_TIME } from "./KBM/config.js";
+//import { SAMPLE_GAME } from "./KBM/sample.js";
+import {
+  GAME_PRIZE,
+  GAME_QS_DEF,
+  GAME_TIME,
+  SAMPLE_QS_DEF
+} from "./KBM/config.js";
 import {
   getTimeWithOffset,
   formatTohhmmDateIST,
@@ -44,9 +49,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   let nextImg;
   async function getQsImg(i) {
     let img;
-    const { is_sample, questions } = flow_obj;
-    console.log("type of id, i: ", typeof questions?.[i]._id, i);
-    if (is_sample) return SAMPLE_GAME?.[i].img;
+    const { questions } = flow_obj;
     if (nextImg) {
       img = nextImg;
       nextImg = "";
@@ -63,7 +66,6 @@ export const getNextScreen = async (req, res, decryptedBody) => {
       kbmQs
         .read({ _id: questions[i]._id }, { projection: { img: 1 } })
         .then((val) => {
-          console.log("returned value: ", val);
           nextImg = val[0].img;
         });
     }
@@ -90,7 +92,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
           const difficulty_level = flow_obj?.difficulty_level || 0;
           const cur = 1; //flow_obj?.cur ? flow_obj.cur : 1;
           const prize = GAME_PRIZE?.[difficulty_level] || GAME_PRIZE[0];
-          const qsDef =
+          let qsDef =
             GAME_QS_DEF?.[difficulty_level] ||
             GAME_QS_DEF[GAME_QS_DEF.length - 1];
           {
@@ -107,14 +109,21 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             );
           }
           if (data.is_sample) {
-            // implement sample logic here
-            let id = 0;
             flow_obj.is_sample = true;
-            flow_obj.questions = SAMPLE_GAME.map(({ ans }) => ({
-              _id: id++,
-              ans
-            }));
-            await gameStatsCollection.update(
+            qsDef = SAMPLE_QS_DEF;
+          } else {
+            flow_obj.is_sample = false;
+            qsDef =
+              GAME_QS_DEF?.[difficulty_level] ||
+              GAME_QS_DEF[GAME_QS_DEF.length - 1];
+          }
+          [flow_obj.questions] = await Promise.all([
+            buildQsSet(qsDef, phone, kbmQs.collection()),
+            campaignContactsCollection.update(
+              { _id: campaign_contact_id },
+              { $set: { lastAttemptedAt: flow_obj.startedAt } }
+            ),
+            gameStatsCollection.update(
               { flow_token },
               {
                 $set: {
@@ -123,28 +132,8 @@ export const getNextScreen = async (req, res, decryptedBody) => {
                   end_time: flow_obj.end_time
                 }
               }
-            );
-          } else {
-            // implement real game progress logic here;
-            flow_obj.is_sample = false;
-            [flow_obj.questions] = await Promise.all([
-              buildQsSet(qsDef, phone, kbmQs.collection()),
-              campaignContactsCollection.update(
-                { _id: campaign_contact_id },
-                { $set: { lastAttemptedAt: flow_obj.startedAt } }
-              ),
-              gameStatsCollection.update(
-                { flow_token },
-                {
-                  $set: {
-                    is_sample: flow_obj.is_sample,
-                    startedAt: flow_obj.startedAt,
-                    end_time: flow_obj.end_time
-                  }
-                }
-              )
-            ]);
-          }
+            )
+          ]);
           const qs_img = await getQsImg(flow_obj.cur - 1);
           flow_obj.questions[flow_obj.cur - 1].createdAt = new Date();
           response = {
@@ -325,6 +314,8 @@ export const getNextScreen = async (req, res, decryptedBody) => {
     "Unhandled endpoint request. Make sure you handle the request action & screen logged above."
   );
 };
+
+//helper functions below
 
 async function buildQsSet(def, phone, qsCol) {
   let q = [];

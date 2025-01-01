@@ -5,10 +5,16 @@ const APP_NAME = "Kaun Banega MBA";
 const VERSION = "1.0.0";
 const GAME_QS_DEF = [
   [
+    { level: "sample", num: 1 },
     { level: "easy", num: 0 },
     { level: "medium", num: 0 },
-    { level: "hard", num: 8 }
+    { level: "hard", num: 14 }
   ]
+];
+const SAMPLE_QS_DEF = [
+  { level: "sample", num: 15 },
+  { level: "medium", num: 0 },
+  { level: "hard", num: 0 }
 ];
 const GAME_TIME = [10 * 60 * 1000, 8 * 60 * 1000, 7 * 60 * 1000]; // 10 minutes in milliseconds
 const GAME_PRIZE = [
@@ -63,4 +69,12 @@ const TERMS = `## 1. Eligibility
 9.1. Any legal dispute arising from participation in this game will be resolved under the jurisdiction of the courts in Delhi, India.`;
 
 // Export individually
-export { APP_NAME, VERSION, GAME_TIME, GAME_PRIZE, GAME_QS_DEF, TERMS };
+export {
+  APP_NAME,
+  VERSION,
+  GAME_TIME,
+  GAME_PRIZE,
+  GAME_QS_DEF,
+  SAMPLE_QS_DEF,
+  TERMS
+};
