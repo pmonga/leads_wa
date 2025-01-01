@@ -124,7 +124,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             // implement real game progress logic here;
             flow_obj.is_sample = false;
             [flow_obj.questions] = await Promise.all([
-              buildQsSet(qsDef, phone, kbmQs.collection),
+              buildQsSet(qsDef, phone, kbmQs.collection()),
               campaignContactsCollection.update(
                 { _id: campaign_contact_id },
                 { $set: { lastAttemptedAt: flow_obj.startedAt } }
