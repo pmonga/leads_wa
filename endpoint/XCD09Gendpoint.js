@@ -40,7 +40,16 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   flow_obj = convertKeysToDate(flow_obj, "startedAt", "end_time", "finishedAt");
   const flow_id = { flow_obj };
   if (flow_id != FLOW_KBM) {
-    //return with error
+    return {
+      screen: "SUCCESS",
+      data: {
+        extension_message_response: {
+          params: {
+            flow_token
+          }
+        }
+      }
+    };
   }
   const { phone, campaign_contact_id, is_sample, contact_id } = flow_obj;
   const { kbmQs, contactKbmQs, campaignContactsCollection } =
