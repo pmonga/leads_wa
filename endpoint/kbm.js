@@ -34,7 +34,6 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   } = res.locals.collections;
   let flow_obj = await get(flow_token);
   if (!flow_obj) {
-    console.log("in kbm.js: line 37 ", flow_obj);
     return {
       screen: "SUCCESS",
       data: {
@@ -49,7 +48,6 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   flow_obj = convertKeysToDate(flow_obj, "startedAt", "end_time", "finishedAt");
   const { flow_id } = flow_obj;
   if (flow_id != FLOW_KBM) {
-    console.log("in kbm.js: line 52 ", flow_obj);
     return {
       screen: "SUCCESS",
       data: {
@@ -90,7 +88,6 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             isSameDate(new Date(registered.lastAttemptedAt)) &&
             registered?.lastDayAttempts?.length >= MAX_ATTEMPTS
           ) {
-            console.log("in welcome switch kbm.js: ", flow_obj);
             return {
               screen: "SUCCESS",
               data: {
@@ -160,7 +157,6 @@ export const getNextScreen = async (req, res, decryptedBody) => {
               );
             }
           }
-          console.log("promises now: ", promises);
           promises = [
             buildQsSet(qsDef, phone, kbmQs.collection()),
             gameStatsCollection.update(
@@ -175,7 +171,6 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             )
           ].concat(promises);
           [flow_obj.questions] = await Promise.all(promises);
-          console.log("flow_obj qs: ", flow_obj.questions, promises);
           const qs_img = await getQsImg(flow_obj.cur - 1);
           flow_obj.questions[flow_obj.cur - 1].createdAt = new Date();
           response = {
@@ -357,7 +352,6 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   );
   async function getQsImg(i) {
     const { questions } = flow_obj;
-    console.log("inside getQsIMg: ", i, questions);
     const img = (
       await kbmQs.read({ _id: questions?.[i]._id }, { projection: { img: 1 } })
     )?.[0].img;
@@ -461,7 +455,6 @@ async function getQs(level, num, phone, mainCollection) {
     }
     if (failed) return [];
     clearTimeout(failsafe);
-    console.log("Random Unreferenced Documents:", qs);
     return qs;
   } catch (error) {
     console.error("Error fetching documents:", error);
