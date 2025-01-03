@@ -26,7 +26,7 @@ export default async (req, res) => {
   } = res.locals.collections;
   //const campaignsCollection = res.locals.collections.campaignsCollection;
 
-  const { flow_data, flow_token, flow_obj, waClient } = res.locals.flow_data;
+  const { flow_data, flow_token, flow_obj, waClient } = res.locals;
   if (flow_obj.phone != contact.phone) {
     let reply = {
       body: "Sorry, Incorrect parameters. Please try again later."

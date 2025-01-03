@@ -43,6 +43,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
       break;
     default:
       // close the flow;
+      console.log("in flow.js: ", flow_obj);
       response = {
         screen: "SUCCESS",
         data: {

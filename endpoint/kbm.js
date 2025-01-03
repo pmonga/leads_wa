@@ -34,6 +34,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   } = res.locals.collections;
   let flow_obj = await get(flow_token);
   if (!flow_obj) {
+    console.log("in flow.js: ", flow_obj);
     return {
       screen: "SUCCESS",
       data: {
