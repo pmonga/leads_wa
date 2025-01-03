@@ -316,10 +316,8 @@ async function sendKBMFlow(registered, res) {
   // check if has already played the game today
   if (
     registered.lastAttemptedAt &&
-    isSameDate(
-      new Date(registered.lastAttemptedAt) &&
-        registered.lastDayAttempts.length >= MAX_ATTEMPTS
-    )
+    isSameDate(new Date(registered.lastAttemptedAt)) &&
+    registered.lastDayAttempts.length >= MAX_ATTEMPTS
   ) {
     const contact = (
       await contactsCollection.read(
