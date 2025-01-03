@@ -124,16 +124,18 @@ export default async (req, res) => {
           campaignContactsCollection.update(
             { _id: registered._id },
             {
-              $set: {
-                lastDayWins:
-                  flow_obj.won > registered.lastDayWins
-                    ? flow_obj.won
-                    : registered.lastDayWins,
-                lastDayWinToken:
-                  flow_obj.won > registered.lastDayWins
-                    ? flow_token
-                    : registered.lastDayWinToken
-              },
+              $set: flow_obj.is_sample
+                ? {}
+                : {
+                    lastDayWins:
+                      flow_obj.won > registered.lastDayWins
+                        ? flow_obj.won
+                        : registered.lastDayWins,
+                    lastDayWinToken:
+                      flow_obj.won > registered.lastDayWins
+                        ? flow_token
+                        : registered.lastDayWinToken
+                  },
               $unset: {
                 active_flow_token: "",
                 active_flow_message_id: ""

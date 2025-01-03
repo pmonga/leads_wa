@@ -228,23 +228,24 @@ export const getNextScreen = async (req, res, decryptedBody) => {
       case "QS":
         {
           // update the collection contact questions to mark question as used
-          if (!is_sample) {
-            flow_obj.questions[[flow_obj.cur - 1]].response = data?.ans;
-            flow_obj.questions[[flow_obj.cur - 1]].is_correct =
-              flow_obj.questions?.[flow_obj.cur - 1]?.ans.toUpperCase() ===
-              data?.ans?.toUpperCase();
-            contactKbmQs.create({
-              kbm_question_id: flow_obj.questions[[flow_obj.cur - 1]]._id,
-              campaign_contact_id,
-              flow_token,
-              contact_id,
-              phone,
-              ans: flow_obj.questions[[flow_obj.cur - 1]].ans,
-              response: flow_obj.questions[[flow_obj.cur - 1]].response,
-              is_correct: flow_obj.questions[[flow_obj.cur - 1]].is_correct,
-              createdAt: flow_obj.questions[[flow_obj.cur - 1]].createdAt
-            });
-          }
+
+          flow_obj.questions[[flow_obj.cur - 1]].response = data?.ans;
+          flow_obj.questions[[flow_obj.cur - 1]].is_correct =
+            flow_obj.questions?.[flow_obj.cur - 1]?.ans.toUpperCase() ===
+            data?.ans?.toUpperCase();
+          contactKbmQs.create({
+            kbm_question_id: flow_obj.questions[[flow_obj.cur - 1]]._id,
+            campaign_contact_id,
+            flow_token,
+            contact_id,
+            phone,
+            ans: flow_obj.questions[[flow_obj.cur - 1]].ans,
+            response: flow_obj.questions[[flow_obj.cur - 1]].response,
+            is_correct: flow_obj.questions[[flow_obj.cur - 1]].is_correct,
+            createdAt: flow_obj.questions[[flow_obj.cur - 1]].createdAt
+          });
+          // check if time remains
+
           if (flow_obj.end_time < new Date()) {
             flow_obj.finishedAt = new Date();
             let final_img = TIME_UP.img;
@@ -264,7 +265,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
               let final_img = WINNER.img;
               let final_img_height = WINNER.height;
               let final_img_width = WINNER.width;
-              let final_msg = `Congratulations, You have won ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
+              let final_msg = `Congratulations, You have won ${flow_obj.prize?.[flow_obj.cur - 2]} credits.`;
               flow_obj.won = flow_obj.is_sample
                 ? 0
                 : flow_obj.prize?.[flow_obj.cur - 2];

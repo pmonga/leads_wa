@@ -15,7 +15,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
     }
   }
 
-  // tesing code ends
+  // testing code ends
   // handle health check request
   if (action === "ping") {
     return {
