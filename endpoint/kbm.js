@@ -132,7 +132,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             if (
               isSameDate(
                 registered.lastAttemptedAt &&
-                  isSameDate(registered?.lastAttemptedAt)
+                  isSameDate(registered.lastAttemptedAt)
               )
             ) {
               promises.push(

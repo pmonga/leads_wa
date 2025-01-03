@@ -83,6 +83,7 @@ function isSameDate(givenDate) {
   );
 
   // Adjust the given date to IST
+  console.log("in utils: ", typeof givenDate);
   const istGivenDate = new Date(
     givenDate.getTime() +
       givenDate.getTimezoneOffset() * 60000 +
