@@ -174,7 +174,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             )
           ]);
           [, flow_obj.questions] = await Promise.all(promises);
-          console.log("qs: ", promises.length, flow_obj.questions);
+          console.log("qs: ", promises.length, promises);
           const qs_img = await getQsImg(flow_obj.cur - 1);
           flow_obj.questions[flow_obj.cur - 1].createdAt = new Date();
           response = {
@@ -213,7 +213,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             let final_img = WINNER.img;
             let final_img_height = WINNER.height;
             let final_img_width = WINNER.width;
-            let final_msg = `Congratulations, You have won ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
+            let final_msg = `Congratulations, You have won ${flow_obj.prize?.[flow_obj.cur - 2]} credits.`;
             flow_obj.won = flow_obj.is_sample
               ? 0
               : flow_obj.prize?.[flow_obj.cur - 2];
