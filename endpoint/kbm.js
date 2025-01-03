@@ -47,7 +47,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
     };
   }
   flow_obj = convertKeysToDate(flow_obj, "startedAt", "end_time", "finishedAt");
-  const flow_id = { flow_obj };
+  const { flow_id } = flow_obj;
   if (flow_id != FLOW_KBM) {
     console.log("in kbm.js: line 52 ", flow_obj);
     return {
