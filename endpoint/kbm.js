@@ -62,11 +62,12 @@ export const getNextScreen = async (req, res, decryptedBody) => {
     };
   }
   const { code, phone, campaign_contact_id, is_sample, contact_id } = flow_obj;
-  const registered = await getRegistration(
+  let registered = await getRegistration(
     code,
     phone,
     campaignContactsCollection
   );
+  registered = convertKeysToDate(registered, "lastAttemptedAt");
   if (action === "BACK") {
     let back_img = BACK.img;
     let back_img_height = BACK.height;
