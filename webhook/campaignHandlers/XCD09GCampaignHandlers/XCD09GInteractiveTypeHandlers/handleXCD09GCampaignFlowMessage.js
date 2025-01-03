@@ -120,7 +120,12 @@ export default async (req, res) => {
           }
         }
         await Promise.all([
-          sendPostGameMessage(registered, wallet, flow_obj, waClient),
+          sendPostGameMessage(registered, wallet, flow_obj, {
+            coll: campaignContactsCollection,
+            contactsCollection,
+            waClient,
+            KBMreminder: res.locals.KBMreminder
+          }),
           campaignContactsCollection.update(
             { _id: registered._id },
             {

@@ -59,8 +59,61 @@ async function sendRegistrationMessage(registered, res) {
   };
   await res.locals.waClient.sendTextMessage(registered.phone, reply);
 }
+async function sendReminderNewDay(
+  code,
+  phone,
+  { coll, contactsCollection, waClient, KBMreminder }
+) {
+  const registered = await getRegistration(code, phone, coll);
+  const playButton = {
+    type: "reply",
+    reply: {
+      id: `${code}-play`,
+      title: "Play Now"
+    }
+  };
+  const action = {
+    buttons: [playButton]
+  };
+  if (registered) {
+    const { lastAttemptedAt, lastDayAttempts, name } = registered;
+    const attemptsLeft =
+      MAX_ATTEMPTS - (isSameDate(lastAttemptedAt) ? lastDayAttempts.length : 0);
+    if (attemptsLeft > 0) {
+      const body = {
+        text: ` Dear ${name}, You have ${attemptsLeft} for today. Don't forget to play and win credits.`
+      };
+      await waClient.sendReplyButtonMessage(phone, { body, action });
+    } else {
+      const contact = (
+        await contactsCollection.read(
+          { phone },
+          {
+            projection: {
+              lastMessageReceivedAt: 1,
+              lastTextMessageReceivedAt: 1
+            }
+          }
+        )
+      )[0];
+      KBMreminder.set(
+        `KBMReminder:${phone}`,
+        sendReminderNewDay,
+        contact.lastMessageReceivedAt,
+        code,
+        phone,
+        { coll, contactsCollection, waClient, KBMreminder }
+      );
+    }
+  }
+}
 
-async function sendPostGameMessage(registered, wallet, flow_obj, waClient) {
+async function sendPostGameMessage(
+  registered,
+  wallet,
+  flow_obj,
+  { coll, contactsCollection, waClient, KBMreminder }
+) {
   const { won, is_sample } = flow_obj;
   const { code, phone, lastDayAttempts, lastDayWins } = registered;
   const action = {
@@ -96,7 +149,7 @@ async function sendPostGameMessage(registered, wallet, flow_obj, waClient) {
     };
   } else if (won > lastDayWins) {
     body = {
-      text: `Thanks for playing. You have won ${won} credits today.`
+      text: `Thanks for playing. You have won ${won} credit(s) today.`
     };
   } else {
     body = {
@@ -104,10 +157,29 @@ async function sendPostGameMessage(registered, wallet, flow_obj, waClient) {
     };
   }
   if (attemptsLeft) {
-    body.text += ` You have ${attemptsLeft} attempts left for today. You can win more credits if you win more than ${won > lastDayWins ? won : lastDayWins} credits in your next attempt.`;
+    body.text += ` You have ${attemptsLeft} attempt(s) left for today. You can win more credits if you win more than ${won > lastDayWins ? won : lastDayWins} credit(s) in your next attempt.`;
     action.buttons.push(playButton);
   } else {
     body.text += ` You have played all your ${MAX_ATTEMPTS} attempts for today and have won ${won > lastDayWins ? won : lastDayWins} credits. You can win more credits tomorrow`;
+    const contact = (
+      await contactsCollection.read(
+        { phone },
+        {
+          projection: {
+            lastMessageReceivedAt: 1,
+            lastTextMessageReceivedAt: 1
+          }
+        }
+      )
+    )[0];
+    KBMreminder.set(
+      `KBMReminder:${phone}`,
+      sendReminderNewDay,
+      contact.lastMessageReceivedAt,
+      code,
+      phone,
+      { coll, contactsCollection, waClient, KBMreminder }
+    );
   }
   if (balance) {
     body.text += `
@@ -243,7 +315,6 @@ async function sendKBMFlow(registered, res) {
 
   // check if has already played the game today
   if (
-    !code &&
     registered.lastAttemptedAt &&
     isSameDate(
       new Date(registered.lastAttemptedAt) &&
@@ -260,10 +331,16 @@ async function sendKBMFlow(registered, res) {
     )[0];
     KBMreminder.set(
       `KBMReminder:${phone}`,
-      sendKBMFlow,
+      sendReminderNewDay,
       contact.lastMessageReceivedAt,
-      registered,
-      { locals: { waClient, collections, KBMreminder } }
+      code,
+      phone,
+      {
+        coll: campaignContactsCollection,
+        waClient,
+        contactsCollection,
+        KBMreminder
+      }
     );
     await sendAlreadyPlayedMessage(registered, waClient);
   } else {
