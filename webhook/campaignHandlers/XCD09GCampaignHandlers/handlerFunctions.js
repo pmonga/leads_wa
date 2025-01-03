@@ -157,6 +157,7 @@ async function sendPostGameMessage(
     };
   }
   if (attemptsLeft) {
+    console.log(`won, lastDayWins`, won, lastDayWins);
     body.text += ` You have ${attemptsLeft} attempt(s) left for today. You can win more credits if you win more than ${won > lastDayWins ? won : lastDayWins} credit(s) in your next attempt.`;
     action.buttons.push(playButton);
   } else {
