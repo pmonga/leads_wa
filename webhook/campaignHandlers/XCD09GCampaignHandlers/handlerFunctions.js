@@ -79,7 +79,7 @@ async function sendPostGameMessage(registered, wallet, flow_obj, waClient) {
   };
 
   const email = "game.master@alchemistindia.com";
-  const attemptsLeft = MAX_ATTEMPTS - lastDayAttempts.length;
+  const attemptsLeft = MAX_ATTEMPTS - lastDayAttempts?.length;
   const balance =
     wallet.convertible.total -
     wallet.convertible.used -
