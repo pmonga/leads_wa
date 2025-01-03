@@ -40,7 +40,10 @@ async function register(res) {
     name: contact.name,
     phone: contact.phone,
     mobile: contact.mobile,
-    difficulty_level: 0
+    difficulty_level: 0,
+    lastAttemptedAt: new Date(0),
+    lastDayAttempts: [],
+    lastDayWins: 0
   };
   registered._id = (await coll.create(registered)).insertedId;
   return registered;
