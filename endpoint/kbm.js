@@ -174,7 +174,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             )
           ]);
           [, flow_obj.questions] = await Promise.all(promises);
-          console.log("qs: ", flow_obj.questions, await Promise.all(promises));
+          console.log("qs: ", flow_obj.questions);
           const qs_img = await getQsImg(flow_obj.cur - 1);
           flow_obj.questions[flow_obj.cur - 1].createdAt = new Date();
           response = {
