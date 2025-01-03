@@ -160,6 +160,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
               );
             }
           }
+          console.log("promises: ", promises);
           promises = promises.concat([
             buildQsSet(qsDef, phone, kbmQs.collection()),
             gameStatsCollection.update(
