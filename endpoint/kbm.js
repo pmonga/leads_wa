@@ -356,8 +356,8 @@ export const getNextScreen = async (req, res, decryptedBody) => {
     "Unhandled endpoint request. Make sure you handle the request action & screen logged above."
   );
   async function getQsImg(i) {
-    console.log("inside getQsIMg: ", i, questions);
     const { questions } = flow_obj;
+    console.log("inside getQsIMg: ", i, questions);
     const img = (
       await kbmQs.read({ _id: questions?.[i]._id }, { projection: { img: 1 } })
     )?.[0].img;
