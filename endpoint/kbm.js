@@ -67,7 +67,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
     phone,
     campaignContactsCollection
   );
-  registered = convertKeysToDate(registered, "lastAttemptedAt");
+  //registered = convertKeysToDate(registered, "lastAttemptedAt");
   if (action === "BACK") {
     let back_img = BACK.img;
     let back_img_height = BACK.height;
@@ -130,10 +130,8 @@ export const getNextScreen = async (req, res, decryptedBody) => {
               GAME_QS_DEF[GAME_QS_DEF.length - 1];
             // if attempt is on the same day
             if (
-              isSameDate(
-                registered.lastAttemptedAt &&
-                  isSameDate(registered.lastAttemptedAt)
-              )
+              registered.lastAttemptedAt &&
+              isSameDate(registered.lastAttemptedAt)
             ) {
               promises.push(
                 campaignContactsCollection.update(
