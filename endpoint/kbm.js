@@ -160,8 +160,8 @@ export const getNextScreen = async (req, res, decryptedBody) => {
               );
             }
           }
-          console.log("promises: ", promises);
-          promises = promises.concat([
+          console.log("promises now: ", promises);
+          promises = [
             buildQsSet(qsDef, phone, kbmQs.collection()),
             gameStatsCollection.update(
               { flow_token },
@@ -173,8 +173,8 @@ export const getNextScreen = async (req, res, decryptedBody) => {
                 }
               }
             )
-          ]);
-          [, flow_obj.questions] = await Promise.all(promises);
+          ].concat(promises);
+          [flow_obj.questions] = await Promise.all(promises);
           console.log("qs: ", promises.length, promises);
           const qs_img = await getQsImg(flow_obj.cur - 1);
           flow_obj.questions[flow_obj.cur - 1].createdAt = new Date();
