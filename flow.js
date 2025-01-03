@@ -1,7 +1,7 @@
 /*global console*/
 import { get } from "./helpers/storage.js";
 import { FLOW_KBM } from "./helpers/config.js";
-import { getNextScreen as XCD09GgetNextScreen } from "./endpoint/XCD09Gendpoint.js";
+import { getNextScreen as kbmgetNextScreen } from "./endpoint/kbm.js";
 import { set } from "./helpers/storage.js";
 
 export const getNextScreen = async (req, res, decryptedBody) => {
@@ -39,7 +39,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   switch (flow_obj?.code) {
     // Flow KBM_test id 1214667192982073
     case "XCD09G":
-      response = await XCD09GgetNextScreen(req, res, decryptedBody);
+      response = await kbmgetNextScreen(req, res, decryptedBody);
       break;
     default:
       // close the flow;

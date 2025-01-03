@@ -11,19 +11,27 @@ import {
   GAME_PRIZE,
   GAME_QS_DEF,
   GAME_TIME,
+  MAX_ATTEMPTS,
   SAMPLE_QS_DEF
 } from "./KBM/config.js";
 import {
   getTimeWithOffset,
   formatTohhmmDateIST,
-  convertKeysToDate
+  convertKeysToDate,
+  isSameDate
 } from "../helpers/utils.js";
 import { BACK, CORRECT, TIME_UP, WINNER, WRONG } from "../assets/kbm_assets.js";
+import { getRegistration } from "../webhook/campaignHandlers/XCD09GCampaignHandlers/handlerFunctions.js";
 
 // handle initial request when opening the flow
 export const getNextScreen = async (req, res, decryptedBody) => {
   const { screen, data, action, flow_token } = decryptedBody;
-  const { gameStatsCollection } = res.locals.collections;
+  const {
+    gameStatsCollection,
+    kbmQs,
+    contactKbmQs,
+    campaignContactsCollection
+  } = res.locals.collections;
   let flow_obj = await get(flow_token);
   if (!flow_obj) {
     return {
@@ -51,36 +59,12 @@ export const getNextScreen = async (req, res, decryptedBody) => {
       }
     };
   }
-  const { phone, campaign_contact_id, is_sample, contact_id } = flow_obj;
-  const { kbmQs, contactKbmQs, campaignContactsCollection } =
-    res.locals.collections;
-  // getQsImg stores the next image too
-  let nextImg;
-  async function getQsImg(i) {
-    let img;
-    const { questions } = flow_obj;
-    if (nextImg) {
-      img = nextImg;
-      nextImg = "";
-    } else {
-      img = (
-        await kbmQs.read(
-          { _id: questions?.[i]._id },
-          { projection: { img: 1 } }
-        )
-      )?.[0].img;
-    }
-    questions[i].createdAt = new Date();
-    if (++i < questions.length) {
-      kbmQs
-        .read({ _id: questions[i]._id }, { projection: { img: 1 } })
-        .then((val) => {
-          nextImg = val[0].img;
-        });
-    }
-    return img;
-  }
-
+  const { code, phone, campaign_contact_id, is_sample, contact_id } = flow_obj;
+  const registered = await getRegistration(
+    code,
+    phone,
+    campaignContactsCollection
+  );
   if (action === "BACK") {
     let back_img = BACK.img;
     let back_img_height = BACK.height;
@@ -98,25 +82,40 @@ export const getNextScreen = async (req, res, decryptedBody) => {
     switch (screen) {
       case "WELCOME":
         {
+          if (
+            registered.lastAttemptedAt &&
+            isSameDate(new Date(registered.lastAttemptedAt)) &&
+            registered.lastDayAttempts.length >= MAX_ATTEMPTS
+          ) {
+            return {
+              screen: "SUCCESS",
+              data: {
+                extension_message_response: {
+                  params: {
+                    flow_token
+                  }
+                }
+              }
+            };
+          }
           const difficulty_level = flow_obj?.difficulty_level || 0;
           const cur = 1; //flow_obj?.cur ? flow_obj.cur : 1;
           const prize = GAME_PRIZE?.[difficulty_level] || GAME_PRIZE[0];
           let qsDef =
             GAME_QS_DEF?.[difficulty_level] ||
             GAME_QS_DEF[GAME_QS_DEF.length - 1];
-          {
-            flow_obj.cur = cur;
-            flow_obj.won = 0;
-            flow_obj.prize = [...prize];
-            flow_obj.time_allowed =
-              GAME_TIME?.[difficulty_level] ||
-              GAME_TIME?.[GAME_TIME.length - 1];
-            flow_obj.startedAt = new Date();
-            flow_obj.end_time = getTimeWithOffset(
-              flow_obj.startedAt,
-              flow_obj.time_allowed
-            );
-          }
+          let promises = [];
+          flow_obj.cur = cur;
+          flow_obj.won = 0;
+          flow_obj.prize = [...prize];
+          flow_obj.time_allowed =
+            GAME_TIME?.[difficulty_level] || GAME_TIME?.[GAME_TIME.length - 1];
+          flow_obj.startedAt = new Date();
+          flow_obj.end_time = getTimeWithOffset(
+            flow_obj.startedAt,
+            flow_obj.time_allowed
+          );
+
           if (data.is_sample) {
             flow_obj.is_sample = true;
             qsDef = SAMPLE_QS_DEF;
@@ -125,18 +124,42 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             qsDef =
               GAME_QS_DEF?.[difficulty_level] ||
               GAME_QS_DEF[GAME_QS_DEF.length - 1];
+            // if attempt is on the same day
+            if (
+              isSameDate(
+                registered.lastAttemptedAt &&
+                  isSameDate(registered?.lastAttemptedAt)
+              )
+            ) {
+              promises.push(
+                campaignContactsCollection.update(
+                  { _id: campaign_contact_id },
+                  {
+                    $set: {
+                      lastAttemptedAt: flow_obj.startedAt
+                    },
+                    $push: { lastDayAttempts: flow_token }
+                  }
+                )
+              );
+            } else {
+              promises.push(
+                campaignContactsCollection.update(
+                  { _id: campaign_contact_id },
+                  {
+                    $set: {
+                      lastAttemptedAt: flow_obj.startedAt,
+                      lastDayAttempts: [flow_token],
+                      lastDayWins: 0,
+                      lastDayWinToken: ""
+                    }
+                  }
+                )
+              );
+            }
           }
-          [flow_obj.questions] = await Promise.all([
+          promises = promises.concat([
             buildQsSet(qsDef, phone, kbmQs.collection()),
-            campaignContactsCollection.update(
-              { _id: campaign_contact_id },
-              {
-                $set: {
-                  lastAttemptedAt: flow_obj.startedAt,
-                  lastAttemptWasSample: is_sample
-                }
-              }
-            ),
             gameStatsCollection.update(
               { flow_token },
               {
@@ -148,6 +171,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
               }
             )
           ]);
+          [, flow_obj.questions] = await Promise.all(promises);
           const qs_img = await getQsImg(flow_obj.cur - 1);
           flow_obj.questions[flow_obj.cur - 1].createdAt = new Date();
           response = {
@@ -327,6 +351,14 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   throw new Error(
     "Unhandled endpoint request. Make sure you handle the request action & screen logged above."
   );
+  async function getQsImg(i) {
+    const { questions } = flow_obj;
+    const img = (
+      await kbmQs.read({ _id: questions?.[i]._id }, { projection: { img: 1 } })
+    )?.[0].img;
+    questions[i].createdAt = new Date();
+    return img;
+  }
 };
 
 //helper functions below

@@ -102,7 +102,10 @@ async function setCredentials(req, res, next) {
   }
 
   // type of payload
-  if (req.body.entry?.[0]?.changes[0]?.value?.messages?.[0]) {
+  if (
+    req.body.entry?.[0]?.changes[0]?.value?.messages?.[0] &&
+    !req.body.entry?.[0]?.changes[0]?.value?.messages?.[0]?.errors
+  ) {
     res.locals.type = "message";
     res.locals.message = req.body.entry?.[0]?.changes[0]?.value?.messages?.[0];
     res.locals.crm = { message: "", utm: {} };

@@ -5,7 +5,7 @@ import { BASE_URL, FLOW_KBM, FLOW_SIGNUP } from "../../../helpers/config.js";
 import { isSameDate } from "../../../helpers/utils.js";
 import { WELCOME } from "../../../assets/kbm_assets.js";
 import { COURSES, JOIN_NOW } from "../../../assets/signup_assets.js";
-import { TERMS } from "../../../endpoint/KBM/config.js";
+import { MAX_ATTEMPTS, TERMS } from "../../../endpoint/KBM/config.js";
 
 async function getRegistration(code, phone, coll) {
   const fields = {
@@ -16,6 +16,9 @@ async function getRegistration(code, phone, coll) {
     code: 1,
     phone: 1,
     lastAttemptedAt: 1,
+    lastDayAttempts: 1,
+    lastDayWins: 1,
+    lastDayWinToken: 1,
     difficulty_level: 1,
     active_flow_token: 1,
     active_flow_message_id: 1
@@ -54,32 +57,62 @@ async function sendRegistrationMessage(registered, res) {
   await res.locals.waClient.sendTextMessage(registered.phone, reply);
 }
 
-async function sendPostGameMessage(registered, wallet, res) {
-  const { flow_obj } = res.locals;
+async function sendPostGameMessage(registered, wallet, flow_obj, waClient) {
+  const { won, is_sample } = flow_obj;
+  const { code, phone, lastDayAttempts, lastDayWins } = registered;
+  const action = {
+    buttons: []
+  };
+  const referButton = {
+    type: "reply",
+    reply: {
+      id: `${code}-refer`,
+      title: "Refer friends"
+    }
+  };
+  const playButton = {
+    type: "reply",
+    reply: {
+      id: `${code}-play`,
+      title: "Play Again"
+    }
+  };
+
   const email = "game.master@alchemistindia.com";
+  const attemptsLeft = MAX_ATTEMPTS - lastDayAttempts.length;
   const balance =
     wallet.convertible.total -
     wallet.convertible.used -
     wallet.convertible.converted;
-  let reply;
+  let body;
   if (flow_obj.is_sample) {
-    reply = {
-      body: `You just finished a sample game with us. Let's play a real game now and win real credits. Real game can be played once a day and has new questions every day.`
+    body = {
+      text: `You just finished a sample game with us. Play a real game now and win real credits.`
     };
-  } else if (flow_obj.won) {
-    reply = {
-      body: `Thanks for playing. You won ${flow_obj.won} credits.`
+  } else if (won > lastDayWins) {
+    body = {
+      text: `Thanks for playing. You have won ${won} credits today.`
     };
   } else {
-    reply = {
-      body: `Thanks for playing. Sorry you didn't win any credits today. Sometimes you win and sometimes you learn.`
+    body = {
+      text: `Thanks for playing.`
     };
   }
+  if (attemptsLeft) {
+    body.text += ` You have ${attemptsLeft} attempts left for today. You can win more credits if you win more than ${won > lastDayWins ? won : lastDayWins} credits in your next attempt.`;
+    action.buttons.push(playButton);
+  } else {
+    body.text += ` You have played all your ${MAX_ATTEMPTS} attempts for today and have won ${won > lastDayWins ? won : lastDayWins} credits. You can win more credits tomorrow`;
+  }
   if (balance) {
-    reply.body += `
+    body.text += `
     Your balance is ${balance} credits. To know more / collect rewards mail to ${email} from your registered email.`;
   }
-  await res.locals.waClient.sendTextMessage(registered.phone, reply);
+
+  body.text += `
+  If you want your friends to _play and learn_ too, click on *_Refer friends_* below and we will send you a message with a link. Just forward it to them.`;
+  action.buttons.push(referButton);
+  await waClient.sendReplyButtonMessage(phone, { body, action });
 }
 async function sendAlreadyPlayedMessage(registered, waClient) {
   const { code, phone } = registered;
@@ -184,11 +217,33 @@ async function sendKBMFlow(registered, res) {
   } = collections;
 
   // send the KBM flow message for KBM flow_id = FLOW_KBM
+  //check if there is a previously active flow token
+
+  if (registered?.active_flow_token) {
+    let flow_obj = await get(registered.active_flow_token);
+    // that previous has a valid started game not yet expired or ended.
+    if (new Date(flow_obj?.end_time) > new Date()) {
+      waClient.sendTextMessage(
+        phone,
+        {
+          body: `You already have a game in progress, please finish it or wait for it to expire.`
+        },
+        { message_id: registered.active_flow_message_id }
+      );
+      return;
+    }
+    // delete the existing flow_token
+    await del(registered.active_flow_token);
+  }
+
   // check if has already played the game today
   if (
     !code &&
     registered.lastAttemptedAt &&
-    isSameDate(new Date(registered.lastAttemptedAt))
+    isSameDate(
+      new Date(registered.lastAttemptedAt) &&
+        registered.lastDayAttempts.length >= MAX_ATTEMPTS
+    )
   ) {
     const contact = (
       await contactsCollection.read(
@@ -207,23 +262,6 @@ async function sendKBMFlow(registered, res) {
     );
     await sendAlreadyPlayedMessage(registered, waClient);
   } else {
-    //check if there is a previously active flow token
-    if (registered?.active_flow_token) {
-      let flow_obj = await get(registered.active_flow_token);
-      // that previous has a valid started game not yet expired or ended.
-      if (new Date(flow_obj?.end_time) > new Date()) {
-        waClient.sendTextMessage(
-          phone,
-          {
-            body: `You already have a game in progress, please finish it or wait for it to expire.`
-          },
-          { message_id: registered.active_flow_message_id }
-        );
-        return;
-      }
-      // delete the existing flow_token
-      await del(registered.active_flow_token);
-    }
     // setup a new flow_token and make ready to send flow
     const flow_id = FLOW_KBM;
     const flow_obj = {

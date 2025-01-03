@@ -26,9 +26,7 @@ export default async (req, res) => {
   } = res.locals.collections;
   //const campaignsCollection = res.locals.collections.campaignsCollection;
 
-  const flow_data = res.locals.flow_data;
-  const flow_token = res.locals.flow_token;
-  const flow_obj = res.locals.flow_obj;
+  const { flow_data, flow_token, flow_obj, waClient } = res.locals.flow_data;
   if (flow_obj.phone != contact.phone) {
     let reply = {
       body: "Sorry, Incorrect parameters. Please try again later."
@@ -81,38 +79,76 @@ export default async (req, res) => {
         campaignContactsCollection
       );
       if (registered) {
-        const { difficulty_level, cur } = { flow_obj };
-        if (cur > 10) {
-          await campaignContactsCollection.update(
-            { _id: registered._id },
-            { $set: { difficulty_level: difficulty_level + 1 } }
-          );
-        }
+        //const { difficulty_level, cur } = { flow_obj };
+        // if (cur > 10) {
+        //   await campaignContactsCollection.update(
+        //     { _id: registered._id },
+        //     { $set: { difficulty_level: difficulty_level + 1 } }
+        //   );
+        // }
 
         // update winnings if applicable
-        if (flow_obj?.entry) {
-          const { type, changes } = flow_obj.entry;
-          for (const k in changes) {
-            wallet[type][k] += changes[k];
+        if (flow_obj.won > registered.lastDayWins) {
+          const entries = [
+            {
+              type: "convertible",
+              changes: { total: flow_obj.won },
+              description: "KBM game winnings",
+              flow_token
+            }
+          ];
+          if (registered.lastDayWins) {
+            entries.push({
+              type: "convertible",
+              changes: { used: registered.lastDayWins },
+              description: "reverse previous highest winning",
+              flow_token: registered?.lastDayWinToken
+            });
           }
-          res.locals.contact.fieldsToUpdate.wallet = wallet;
-          await ledgerCollection.create({
-            contact_id: contact._id,
-            phone: contact.phone,
-            name: contact.name,
-            entry: flow_obj?.entry
-          });
+          for (const entry of entries) {
+            const { type, changes } = entry;
+            for (const k in changes) {
+              wallet[type][k] += changes[k];
+            }
+            res.locals.contact.fieldsToUpdate.wallet = wallet;
+            await ledgerCollection.create({
+              contact_id: contact._id,
+              phone: contact.phone,
+              name: contact.name,
+              entry: flow_obj?.entry
+            });
+          }
         }
+        await Promise.all([
+          sendPostGameMessage(registered, wallet, flow_obj, waClient),
+          campaignContactsCollection.update(
+            { _id: registered._id },
+            {
+              $set: {
+                lastDayWins:
+                  flow_obj.won > registered.lastDayWins
+                    ? flow_obj.won
+                    : registered.lastDayWins,
+                lastDayWinToken:
+                  flow_obj.won > registered.lastDayWins
+                    ? flow_token
+                    : registered.lastDayWinToken
+              },
+              $unset: {
+                active_flow_token: "",
+                active_flow_message_id: ""
+              }
+            }
+          )
+        ]);
+        // setTimeout(async () => {
+        //   await sendKBMFlow(registered, res);
+        // }, 5 * 1000);
       }
-      await sendPostGameMessage(registered, wallet, res);
-      setTimeout(async () => {
-        await sendKBMFlow(registered, res);
-      }, 10 * 1000);
       break;
     }
   }
   // clean up, remove the token
   await del(flow_token);
 };
-
-/*global setTimeout console*/
+/*global setTimeout Promise console*/

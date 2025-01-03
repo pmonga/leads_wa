@@ -3,6 +3,7 @@
 // Constants and settings
 const APP_NAME = "Kaun Banega MBA";
 const VERSION = "1.0.0";
+const MAX_ATTEMPTS = 3;
 const GAME_QS_DEF = [
   [
     { level: "sample", num: 1 },
@@ -29,7 +30,7 @@ const TERMS = `## 1. Eligibility
 1.5. Participants' details, including name, email ID, and phone number, must match the information provided during registration.
 
 ## 2. Gameplay Rules
-2.1. Each player can participate once per day. Multiple attempts or registrations under different email IDs or phones will result in immediate disqualification.
+2.1. Each player can participate thrice per day. Multiple attempts or registrations under different email IDs or phones will result in immediate disqualification.
 2.2. Players can only leave the game between questions, not during an ongoing question. Once a question is started, the player must answer it.
 2.3. Players must solve each question in the given time. There is no independent or additional time provided for any question.
 2.4. An incorrect answer at any stage will result in forfeiture of all accumulated rewards. No appeals or reviews will be allowed.
@@ -76,5 +77,6 @@ export {
   GAME_PRIZE,
   GAME_QS_DEF,
   SAMPLE_QS_DEF,
-  TERMS
+  TERMS,
+  MAX_ATTEMPTS
 };

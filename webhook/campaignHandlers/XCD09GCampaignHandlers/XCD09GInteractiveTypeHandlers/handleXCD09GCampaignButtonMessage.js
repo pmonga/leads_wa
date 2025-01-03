@@ -1,5 +1,6 @@
 import { BASE_URL } from "../../../../helpers/config.js";
 import { timeout } from "../../../../helpers/utils.js";
+import handleXCD09GCampaignTextMessage from "../handleXCD09GCampaignTextMessage.js";
 
 export default async (req, res) => {
   const { contact, action, waClient } = res.locals;
@@ -14,10 +15,13 @@ export default async (req, res) => {
       ]);
       await waClient.sendTextMessage(contact.phone, {
         preview_url: false,
-        body: `I enjoy learning while playing this game. You can join the fun too. Just click on the link and send the pre-filled message.
+        body: `I enjoy playing this game. You can join the fun too. Just click on the link and send the pre-filled message.
         
         ${link}`
       });
+      break;
+    case "play":
+      handleXCD09GCampaignTextMessage(req, res);
       break;
     default:
       break;

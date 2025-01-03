@@ -15,10 +15,10 @@ import {
 
 dotnenv.config();
 export default async (req, res, next) => {
-  const message = res.locals.message;
+  // const message = res.locals.message;
   const contact = res.locals.contact;
   const code = res.locals.code; // should be 'XCD09G';
-  const campaign = res.locals.campaign;
+  // const campaign = res.locals.campaign;
   const phone = contact.phone;
   const { campaignContactsCollection, gameStatsCollection } =
     res.locals.collections;
