@@ -5,15 +5,16 @@ import { del, get } from "../../../helpers/storage.js";
 
 const handleFlowMessage = async function (req, res) {
   const { message, campaigns, contact } = res.locals;
-  let campaign;
   const flow_data = JSON.parse(message.interactive.nfm_reply?.response_json);
 
   const flow_token = flow_data?.flow_token;
   const flow_obj = await get(flow_token);
-  const code = campaigns[flow_obj?.code] ? flow_obj.code : false;
-  if (code) {
+  const code = flow_obj?.code;
+  const campaign = campaigns?.[code];
+  res.locals.code = code;
+  if (campaign) {
     res.locals.code = code;
-    campaign = res.locals.campaign = campaigns[code];
+    res.locals.campaign = campaign;
     contact.tagsToAdd.push(code);
     if (Array.isArray(campaign.tags)) {
       contact.tagsToAdd = [...contact.tagsToAdd, ...campaign.tags];
@@ -48,6 +49,12 @@ const handleFlowMessage = async function (req, res) {
       await handleXCD09GCampaign(req, res);
       break;
     }
+    case "COMMON":
+      break;
+    case "VIDCON":
+      break;
+    case "RQCALL":
+      break;
     default:
       res.locals.crm.message += "SYS MSG:Invalid flow token or campaign code";
       console.log("Flow: Invalid campaign code:  ", code);

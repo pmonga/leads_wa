@@ -262,6 +262,33 @@ function timeout(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function isOfficeOpen(startTime, endTime) {
+  const now = new Date();
+
+  // Set the current time to IST explicitly
+  const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+  const istNow = new Date(
+    now.getTime() + istOffset - now.getTimezoneOffset() * 60 * 1000
+  );
+
+  // Parse start and end times into Date objects
+  const [startHour, startMinute] = startTime.split(":").map(Number);
+  const [endHour, endMinute] = endTime.split(":").map(Number);
+
+  const start = new Date(istNow);
+  start.setHours(startHour, startMinute, 0, 0);
+
+  const end = new Date(istNow);
+  end.setHours(endHour, endMinute, 0, 0);
+
+  if (end < start) {
+    // Handle cases where the office is open past midnight
+    return istNow >= start || istNow < end;
+  }
+
+  return istNow >= start && istNow < end;
+}
+
 export {
   getTimeWithOffset,
   formatTohhmmDateIST,
@@ -270,6 +297,7 @@ export {
   isWithinAllowedPeriod,
   isObject,
   createReminderManager,
-  timeout
+  timeout,
+  isOfficeOpen
 };
 /* global console, Intl, setTimeout Promise Map clearTimeout */

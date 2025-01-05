@@ -6,6 +6,7 @@ This is when NO running campaign code is found.
 import dotnenv from "dotenv";
 import createCommInCRM from "../../helpers/crm.js";
 import handleDefaultCampaignTextMessage from "./defaultCampaignHandlers/handleDefaultCampaignTextMessage.js";
+import handleDefaultCampaignInteractiveMessage from "./defaultCampaignHandlers/handleDefaultCampaignInteractiveMessage.js";
 
 dotnenv.config();
 
@@ -15,6 +16,9 @@ export default async (req, res, next) => {
       switch (res.locals.message.type) {
         case "text":
           await handleDefaultCampaignTextMessage(req, res);
+          break;
+        case "interactive":
+          await handleDefaultCampaignInteractiveMessage(req, res);
           break;
         default:
           console.log(

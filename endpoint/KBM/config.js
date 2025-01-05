@@ -1,7 +1,7 @@
 // KBN Game config.js
 
 // Constants and settings
-const APP_NAME = "Kaun Banega MBA";
+const APP_NAME = "Play & Learn";
 const VERSION = "1.0.0";
 const MAX_ATTEMPTS = 3;
 const GAME_QS_DEF = [

@@ -1,6 +1,6 @@
 import handleXCD09GCampaign from "../../campaignHandlers/handleXCD09GCampaign.js";
 
-const handleButtonMessage = async function (req, res) {
+const handleReplyButtonMessage = async function (req, res) {
   const { message, campaigns, contact } = res.locals;
   const [code, action] = message.interactive.button_reply.id.split("-");
   const campaign = campaigns[code];
@@ -21,15 +21,17 @@ const handleButtonMessage = async function (req, res) {
       await handleXCD09GCampaign(req, res);
       break;
     }
+    case "COMMON":
+      res.locals.crm.message += `${action} requested`;
+      break;
     default:
       console.log("button_reply: Invalid campaign code:  ", code);
       res.locals.waClient.sendTextMessage(message.from, {
         body: `Your have clicked on an expired campaign link`
       });
-
       break;
   }
 };
 
-export default handleButtonMessage;
+export default handleReplyButtonMessage;
 /*global console*/

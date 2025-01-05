@@ -1,4 +1,4 @@
-import handleButtonMessage from "./interactiveTypeHandlers/handleButtonMessage.js";
+import handleReplyButtonMessage from "./interactiveTypeHandlers/handleReplyButtonMessage.js";
 import handleFlowMessage from "./interactiveTypeHandlers/handleFlowMessage.js";
 
 const handleInteractiveMessage = async function (req, res) {
@@ -8,7 +8,7 @@ const handleInteractiveMessage = async function (req, res) {
       await handleFlowMessage(req, res);
       break;
     case "button_reply":
-      await handleButtonMessage(req, res);
+      await handleReplyButtonMessage(req, res);
       break;
     default:
       console.log("Not supported Interactive message type: ", type);
