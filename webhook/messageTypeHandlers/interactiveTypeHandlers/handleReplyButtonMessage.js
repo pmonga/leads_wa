@@ -1,3 +1,4 @@
+import handleDefaultCampaignInteractiveMessage from "../../campaignHandlers/defaultCampaignHandlers/handleDefaultCampaignInteractiveMessage.js";
 import handleXCD09GCampaign from "../../campaignHandlers/handleXCD09GCampaign.js";
 
 const handleReplyButtonMessage = async function (req, res) {
@@ -22,6 +23,7 @@ const handleReplyButtonMessage = async function (req, res) {
       break;
     }
     case "COMMON":
+      await handleDefaultCampaignInteractiveMessage(req, res);
       res.locals.crm.message += `${action} requested`;
       break;
     default:

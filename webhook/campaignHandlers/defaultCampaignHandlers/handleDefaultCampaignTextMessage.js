@@ -32,8 +32,8 @@ export default async (req, res, next) => {
       collections.campaignContactsCollection
     );
     body.text = `Welcome back, ${name}, what will you like to do?
-    1. Request a call back (10:30-6:30)
-    2. Take a counselling on Zoom (10:30-6:30)`;
+1. Request a call back (10:30-6:30)
+2. Take a counselling on Zoom (10:30-6:30)`;
     if (registered) {
       body.text += `
       3. Play the game`;
