@@ -32,11 +32,11 @@ const handleDefaultCampaignFlowMessage = async function (req, res) {
           collections.campaignContactsCollection
         );
         if (registered) {
-          body.text = `
+          body.text += `
          Meanwhile why don't you play a game`;
           action.buttons = [playButton];
         } else {
-          body.text = `
+          body.text += `
          Meanwhile why don't you try our MBA game`;
           action.buttons = [tryMBAGameButton];
         }
@@ -58,11 +58,11 @@ const handleDefaultCampaignFlowMessage = async function (req, res) {
             collections.campaignContactsCollection
           );
           if (registered) {
-            body.text = `
+            body.text += `
          Meanwhile why don't you play a game`;
             action.buttons = [playButton];
           } else {
-            body.text = `
+            body.text += `
          Meanwhile why don't you try our MBA game`;
             action.buttons = [tryMBAGameButton];
           }
