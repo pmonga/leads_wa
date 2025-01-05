@@ -13,7 +13,8 @@ const GAME_QS_DEF = [
   ]
 ];
 const SAMPLE_QS_DEF = [
-  { level: "sample", num: 15 },
+  { level: "testing", num: 1 },
+  { level: "sample", num: 1 },
   { level: "medium", num: 0 },
   { level: "hard", num: 0 }
 ];

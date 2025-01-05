@@ -171,16 +171,19 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             )
           ].concat(promises);
           [flow_obj.questions] = await Promise.all(promises);
-          const qs_img = await getQsImg(flow_obj.cur - 1);
+          const { img: qs_img, height: qs_img_height } = await getQsImg(
+            flow_obj.cur - 1
+          );
           flow_obj.questions[flow_obj.cur - 1].createdAt = new Date();
           response = {
             screen: "PRE",
             data: {
               cur: `Q${flow_obj.cur}`,
               qs_img,
+              qs_img_height,
               pre_subheading: `Answer next for ${
                 flow_obj.prize?.[flow_obj.cur - 1] || 0
-              }`,
+              } credits`,
               pre_instruction: `Instructions:\n1. Please finish the attempt by **${formatTohhmmDateIST(
                 flow_obj.end_time
               )}** to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game on this screen before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
@@ -283,6 +286,9 @@ export const getNextScreen = async (req, res, decryptedBody) => {
               const post_img = CORRECT.img;
               const post_img_height = CORRECT.height;
               const post_msg = `That's right. You win ${flow_obj.prize?.[flow_obj.cur - 2]}.`;
+              const { img: qs_img, height: qs_img_height } = await getQsImg(
+                flow_obj.cur - 1
+              );
               response = {
                 screen: "POST",
                 data: {
@@ -291,7 +297,8 @@ export const getNextScreen = async (req, res, decryptedBody) => {
                   post_img,
                   post_img_height,
                   post_msg,
-                  qs_img: await getQsImg(flow_obj.cur - 1),
+                  qs_img,
+                  qs_img_height,
                   pre_subheading: `Answer next for ${
                     flow_obj.prize?.[flow_obj.cur - 1] || 0
                   }`,
@@ -353,9 +360,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
   );
   async function getQsImg(i) {
     const { questions } = flow_obj;
-    const img = (
-      await kbmQs.read({ _id: questions?.[i]._id }, { projection: { img: 1 } })
-    )?.[0].img;
+    const img = (await kbmQs.read({ _id: questions?.[i]._id }))?.[0];
     questions[i].createdAt = new Date();
     return img;
   }
