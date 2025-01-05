@@ -6,15 +6,13 @@ const VERSION = "1.0.0";
 const MAX_ATTEMPTS = 3;
 const GAME_QS_DEF = [
   [
-    { level: "sample", num: 1 },
-    { level: "easy", num: 0 },
+    { level: "easy", num: 8 },
     { level: "medium", num: 0 },
-    { level: "hard", num: 14 }
+    { level: "hard", num: 7 }
   ]
 ];
 const SAMPLE_QS_DEF = [
-  { level: "testing", num: 1 },
-  { level: "sample", num: 1 },
+  { level: "sample", num: 15 },
   { level: "medium", num: 0 },
   { level: "hard", num: 0 }
 ];
