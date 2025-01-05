@@ -5,10 +5,10 @@ const handleReplyButtonMessage = async function (req, res) {
   const { message, campaigns, contact } = res.locals;
   const [code, action] = message.interactive.button_reply.id.split("-");
   const campaign = campaigns[code];
+  res.locals.code = code;
+  res.locals.action = action;
   if (campaign) {
     res.locals.campaign = campaign;
-    res.locals.code = code;
-    res.locals.action = action;
     contact.tagsToAdd.push(code);
     if (Array.isArray(campaign.tags)) {
       contact.tagsToAdd = [...contact.tagsToAdd, ...campaign.tags];
