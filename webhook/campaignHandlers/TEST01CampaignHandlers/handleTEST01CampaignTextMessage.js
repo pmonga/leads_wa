@@ -96,7 +96,7 @@ export default async (req, res, next) => {
       phone,
       code,
       flow_id,
-      created: new Date()
+      createdAt: new Date()
     });
   }
 };

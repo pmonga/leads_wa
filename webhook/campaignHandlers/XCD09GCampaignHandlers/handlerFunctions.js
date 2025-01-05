@@ -281,7 +281,7 @@ async function sendSignUpFlow(res) {
     phone,
     code,
     flow_id: FLOW_SIGNUP,
-    created: new Date()
+    createdAt: new Date()
   });
 }
 async function sendKBMFlow(registered, res) {
