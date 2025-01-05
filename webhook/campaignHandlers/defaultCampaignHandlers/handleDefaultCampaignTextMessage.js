@@ -11,7 +11,7 @@ import {
 
 dotnenv.config();
 export default async (req, res, next) => {
-  const { contact, waClient, collections } = res.locals.contact;
+  const { contact, waClient, collections } = res.locals;
   const { name, phone } = contact;
   const action = {
     buttons: []
