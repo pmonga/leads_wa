@@ -59,11 +59,11 @@ const handleDefaultCampaignFlowMessage = async function (req, res) {
           );
           if (registered) {
             body.text += `
-         Meanwhile why don't you play a game`;
+Meanwhile why don't you play a game`;
             action.buttons = [playButton];
           } else {
             body.text += `
-         Meanwhile why don't you try our MBA game`;
+Meanwhile why don't you try our MBA game`;
             action.buttons = [tryMBAGameButton];
           }
           await waClient.sendReplyButtonMessage(phone, { body, action });
@@ -76,15 +76,15 @@ const handleDefaultCampaignFlowMessage = async function (req, res) {
           collections.campaignContactsCollection
         );
         body.text = `Thank you for your details, what will you like to do next?
-    1. Request a call back (10:30-6:30)
-    2. Take a counselling on Zoom (10:30-6:30)`;
+1. Request a call back (10:30-6:30)
+2. Take a counselling on Zoom (10:30-6:30)`;
         if (registered) {
           body.text += `
-      3. Play the game`;
+3. Play the game`;
           action.buttons = [callBackButton, vcButton, playButton];
         } else {
           body.text += `
-      3. Try our game for MBA`;
+3. Try our game for MBA`;
           action.buttons = [callBackButton, vcButton, tryMBAGameButton];
         }
 

@@ -21,9 +21,9 @@ export default async (req, res, next) => {
   };
   if (!name) {
     body.text = `Thank you for contacting *Alchemist*, what will you like to do?
-    1. Tell us more about yourself
-    2. Request a call back (10:30-6:30)
-    3. Take a counselling on Zoom (10:30-6:30)`;
+1. Tell us more about yourself
+2. Request a call back (10:30-6:30)
+3. Take a counselling on Zoom (10:30-6:30)`;
     action.buttons = [registerButton, callBackButton, vcButton];
   } else {
     const registered = await getRegistration(
@@ -36,11 +36,11 @@ export default async (req, res, next) => {
 2. Take a counselling on Zoom (10:30-6:30)`;
     if (registered) {
       body.text += `
-      3. Play the game`;
+3. Play the game`;
       action.buttons = [callBackButton, vcButton, playButton];
     } else {
       body.text += `
-      3. Try our game for MBA`;
+3. Try our game for MBA`;
       action.buttons = [callBackButton, vcButton, tryMBAGameButton];
     }
   }
