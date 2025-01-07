@@ -86,7 +86,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
           if (
             registered.lastAttemptedAt &&
             isSameDate(new Date(registered.lastAttemptedAt)) &&
-            registered?.lastDayAttempts?.length >= MAX_ATTEMPTS
+            registered?.lastDayAttempts.length >= MAX_ATTEMPTS
           ) {
             return {
               screen: "SUCCESS",
@@ -120,6 +120,24 @@ export const getNextScreen = async (req, res, decryptedBody) => {
           if (data.is_sample) {
             flow_obj.is_sample = true;
             qsDef = SAMPLE_QS_DEF;
+            if (
+              registered.lastAttemptedAt &&
+              !isSameDate(registered.lastAttemptedAt) &&
+              registered?.lastDayAttempts.length
+            ) {
+              promises.push(
+                campaignContactsCollection.update(
+                  { _id: campaign_contact_id },
+                  {
+                    $set: {
+                      lastDayAttempts: [],
+                      lastDayWins: 0,
+                      lastDayWinToken: ""
+                    }
+                  }
+                )
+              );
+            }
           } else {
             flow_obj.is_sample = false;
             qsDef =
@@ -179,6 +197,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             screen: "PRE",
             data: {
               cur: `Q${flow_obj.cur}`,
+              quit_label: `hidden`,
               qs_img,
               qs_img_height,
               pre_subheading: `Answer next for ${
@@ -186,7 +205,7 @@ export const getNextScreen = async (req, res, decryptedBody) => {
               } credits`,
               pre_instruction: `Instructions:\n1. Please finish the attempt by **${formatTohhmmDateIST(
                 flow_obj.end_time
-              )}** to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game on this screen before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
+              )}** to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game without answering but before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
             }
           };
         }
@@ -247,9 +266,66 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             is_correct: flow_obj.questions[[flow_obj.cur - 1]].is_correct,
             createdAt: flow_obj.questions[[flow_obj.cur - 1]].createdAt
           });
+          if (data.has_quit) {
+            flow_obj.finishedAt = new Date();
+            if (flow_obj.end_time < new Date()) {
+              let final_img = TIME_UP.img;
+              let final_img_height = TIME_UP.height;
+              let final_img_width = TIME_UP.width;
+              let final_msg = "Sorry time over. Better luck next time.";
+              response = {
+                screen: "FINAL",
+                data: {
+                  final_img,
+                  final_img_height,
+                  final_img_width,
+                  final_msg
+                }
+              };
+            } else {
+              let post_title, post_img, post_img_height, post_msg;
+              if (
+                flow_obj.questions?.[flow_obj.cur - 1]?.ans.toUpperCase() ===
+                data.ans.toUpperCase()
+              ) {
+                flow_obj.cur++;
+                post_title = "Correct Answer";
+                post_img = CORRECT.img;
+                post_img_height = CORRECT.height;
+                post_msg = `Oops! You knew it. You could have won ${flow_obj.prize?.[flow_obj.cur - 2]} credits.`;
+              } else {
+                flow_obj.cur++;
+                post_title = "That's wrong";
+                post_img = WRONG.img;
+                post_img_height = WRONG.height;
+                post_msg = `Good call. You didn't know the answer.`;
+              }
+              response = {
+                screen: "POST",
+                data: {
+                  cur: `Q${flow_obj.cur}`,
+                  has_quit: data.has_quit,
+                  post_title,
+                  post_img,
+                  post_img_height,
+                  post_msg,
+                  qs_img: "",
+                  qs_img_height: 400,
+                  pre_subheading: `Answer next for ${
+                    flow_obj.prize?.[flow_obj.cur - 1] || 0
+                  }`,
+                  quit_label: `I want to quit now and claim ${
+                    flow_obj.prize?.[flow_obj.cur - 2] || 0
+                  }`,
+                  pre_instruction: `Instructions:\n1. Please finish the attempt by **${formatTohhmmDateIST(
+                    flow_obj.end_time
+                  )}** to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game without answeringbut before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
+                }
+              };
+            }
+          }
           // check if time remains
-
-          if (flow_obj.end_time < new Date()) {
+          else if (flow_obj.end_time < new Date()) {
             flow_obj.finishedAt = new Date();
             let final_img = TIME_UP.img;
             let final_img_height = TIME_UP.height;
@@ -302,12 +378,12 @@ export const getNextScreen = async (req, res, decryptedBody) => {
                   pre_subheading: `Answer next for ${
                     flow_obj.prize?.[flow_obj.cur - 1] || 0
                   }`,
-                  post_quit_label: `I want to quit now and claim ${
+                  quit_label: `I want to quit now and claim ${
                     flow_obj.prize?.[flow_obj.cur - 2] || 0
                   }`,
                   pre_instruction: `Instructions:\n1. Please finish the attempt by **${formatTohhmmDateIST(
                     flow_obj.end_time
-                  )}** to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game on this screen before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
+                  )}** to win.\n2. The game ends if you answer any question incorrectly and you do not win anything.\n3. You may quit the game without answeringbut before time is over.\n4. You will not win any points if time runs out.\n5. Do not use the back button as it may interfere with game play.`
                 }
               };
             }
