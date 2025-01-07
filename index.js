@@ -198,6 +198,7 @@ app.get("/kbm", (req, res) => {
 
 app.get("/sendkbmReminder", async (req, res) => {
   if (!isInTimeRange("10:00", "23:01")) {
+    console.log("out of range");
     return res.status(403).send("Not in allowed time range");
   }
   const code = "XCD09G";
@@ -239,7 +240,8 @@ app.get("/sendkbmReminder", async (req, res) => {
       }
     }
   ];
-  const contacts = await contactsCollection.collection
+  const contacts = await contactsCollection
+    .collection()
     .aggregrate(pipeline)
     .toArray();
   let promises = [];
@@ -261,6 +263,7 @@ app.get("/sendkbmReminder", async (req, res) => {
         `Sent ${promises.lemgth} reminders at ${new Date().toLocaleDateString}`
       );
   } catch (err) {
+    console.log(err);
     res.status(500).send(err);
   }
 });
