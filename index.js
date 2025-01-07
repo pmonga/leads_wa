@@ -204,22 +204,6 @@ app.get("/sendkbmReminder", async (req, res) => {
   const code = "XCD09G";
   const { collections, waClient, KBMreminder } = res.locals;
   const { contactsCollection, campaignContactsCollection: coll } = collections;
-  const c = await contactsCollection.read({
-    lastTextMessageReceivedAt: { $exists: 1 }
-  });
-  console.log("c: ", c);
-  for (const e of c) {
-    await contactsCollection.update(
-      { _id: e._id },
-      {
-        $set: {
-          lastTextMessageReceivedAt: new Date(e.lastTextMessageReceivedAt),
-          lastMessageReceivedAt: new Date(e.lastMessageReceivedAt)
-        },
-        $unset: { lastMessageRecievedAt: 1 }
-      }
-    );
-  }
   const pipeline = [
     {
       $match: {
@@ -228,28 +212,28 @@ app.get("/sendkbmReminder", async (req, res) => {
         } // Apply filters on indexed fields here
       }
     },
-    // {
-    //   $lookup: {
-    //     from: "campaignContactsCollection",
-    //     let: { phone: "$phone" }, // Define a variable for `_id` in the source
-    //     pipeline: [
-    //       {
-    //         $match: {
-    //           $and: [
-    //             { $expr: { $eq: ["$code", code] } },
-    //             { $expr: { $eq: ["$phone", "$$phone"] } }
-    //           ] // Match `reference_id` with `_id` from the source
-    //         }
-    //       }
-    //     ],
-    //     as: "registered"
-    //   }
-    // },
-    // {
-    //   $match: {
-    //     registered: { $ne: [] }
-    //   }
-    // },
+    {
+      $lookup: {
+        from: "campaignContactsCollection",
+        let: { phone: "$phone" }, // Define a variable for `_id` in the source
+        pipeline: [
+          {
+            $match: {
+              $and: [
+                { $expr: { $eq: ["$code", code] } },
+                { $expr: { $eq: ["$phone", "$$phone"] } }
+              ] // Match `reference_id` with `_id` from the source
+            }
+          }
+        ],
+        as: "registered"
+      }
+    },
+    {
+      $match: {
+        registered: { $ne: [] }
+      }
+    },
     {
       $project: {
         phone: 1
