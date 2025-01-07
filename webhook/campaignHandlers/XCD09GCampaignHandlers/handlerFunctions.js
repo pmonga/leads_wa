@@ -75,6 +75,7 @@ async function sendReminderNewDay(
   const action = {
     buttons: [playButton]
   };
+  console.log("handlerFunction.js 78 registered: ", registered);
   if (registered) {
     const { lastAttemptedAt, lastDayAttempts, name } = registered;
     const attemptsLeft =

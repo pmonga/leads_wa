@@ -245,7 +245,6 @@ app.get("/sendkbmReminder", async (req, res) => {
     .aggregate(pipeline)
     .toArray();
   let promises = [];
-  console.log("contacts: ", contacts);
   contacts.forEach;
   (e) =>
     promises.push(
@@ -260,9 +259,7 @@ app.get("/sendkbmReminder", async (req, res) => {
     await Promise.all(promises);
     res
       .status(200)
-      .send(
-        `Sent ${promises.length} reminders at ${new Date().toLocaleDateString()}`
-      );
+      .send(`Sent ${promises.length} reminders at ${new Date().toISOString()}`);
   } catch (err) {
     console.log(err);
     res.status(500).send(err);
