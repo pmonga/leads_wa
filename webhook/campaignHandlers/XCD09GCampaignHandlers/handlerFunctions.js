@@ -81,9 +81,8 @@ async function sendReminderNewDay(
       MAX_ATTEMPTS - (isSameDate(lastAttemptedAt) ? lastDayAttempts.length : 0);
     if (attemptsLeft > 0) {
       const body = {
-        text: ` Dear ${name}, You have ${attemptsLeft} for today. Don't forget to play and win credits.`
+        text: ` Dear ${name}, You have ${attemptsLeft} attempt(s) for today. Don't forget to play and win credits.`
       };
-      console.log("handlerFunctions 86, message to phone: ", phone);
       await waClient.sendReplyButtonMessage(phone, { body, action });
     } else {
       const contact = (
