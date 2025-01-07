@@ -260,7 +260,7 @@ app.get("/sendkbmReminder", async (req, res) => {
     res
       .status(200)
       .send(
-        `Sent ${promises.lemgth} reminders at ${new Date().toLocaleDateString}`
+        `Sent ${promises.length} reminders at ${new Date().toLocaleDateString}`
       );
   } catch (err) {
     console.log(err);
