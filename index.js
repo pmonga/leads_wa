@@ -245,8 +245,7 @@ app.get("/sendkbmReminder", async (req, res) => {
     .aggregate(pipeline)
     .toArray();
   let promises = [];
-  contacts.forEach;
-  (e) =>
+  contacts.forEach((e) =>
     promises.push(
       sendReminderNewDay(code, e.phone, {
         coll,
@@ -254,7 +253,8 @@ app.get("/sendkbmReminder", async (req, res) => {
         waClient,
         KBMreminder
       })
-    );
+    )
+  );
   try {
     await Promise.all(promises);
     res
