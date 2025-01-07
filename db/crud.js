@@ -64,6 +64,10 @@ const crud = (collectionName, db) => {
     // expose the collection for native functions
     collection: () => {
       return db.collection(collectionName);
+    },
+    // return the collection name for aggregation pipeline
+    name: () => {
+      return collectionName;
     }
   };
 };

@@ -214,7 +214,7 @@ app.get("/sendkbmReminder", async (req, res) => {
     },
     {
       $lookup: {
-        from: "campaignContactsCollection",
+        from: "wa_campaign_contacts",
         let: { phone: "$phone" }, // Define a variable for `_id` in the source
         pipeline: [
           {
