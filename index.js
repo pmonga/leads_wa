@@ -207,6 +207,7 @@ app.get("/sendkbmReminder", async (req, res) => {
   const c = await contactsCollection.read({
     lastTextMessageReceivedAt: { $exists: 1 }
   });
+  console.log("c: ", c);
   for (const e of c) {
     await contactsCollection.update(
       { _id: e._id },
