@@ -288,13 +288,11 @@ export const getNextScreen = async (req, res, decryptedBody) => {
                 flow_obj.questions?.[flow_obj.cur - 1]?.ans.toUpperCase() ===
                 data.ans.toUpperCase()
               ) {
-                flow_obj.cur++;
                 post_title = "Correct Answer";
                 post_img = CORRECT.img;
                 post_img_height = CORRECT.height;
-                post_msg = `Oops! You knew it. You could have won ${flow_obj.prize?.[flow_obj.cur - 2]} credits.`;
+                post_msg = `Oops! You knew it. You could have won ${flow_obj.prize?.[flow_obj.cur - 1]} credits.`;
               } else {
-                flow_obj.cur++;
                 post_title = "That's wrong";
                 post_img = WRONG.img;
                 post_img_height = WRONG.height;
