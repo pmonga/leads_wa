@@ -242,7 +242,7 @@ app.get("/sendkbmReminder", async (req, res) => {
   ];
   const contacts = await contactsCollection
     .collection()
-    .aggregrate(pipeline)
+    .aggregate(pipeline)
     .toArray();
   let promises = [];
   contacts.forEach;
