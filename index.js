@@ -97,9 +97,6 @@ async function logger(req, res, next) {
     next();
 }
 async function setCredentials(req, res, next) {
-  // setup whatsapp api client
-  res.locals.waClient = createWhatsAppClient(PHONE_NUMBER_ID);
-
   // type of payload
   if (
     req.body.entry?.[0]?.changes[0]?.value?.messages?.[0] &&
@@ -125,7 +122,7 @@ app.use(
   })
 );
 
-app.use(async (req, res, next) => {
+app.use((req, res, next) => {
   res.locals.collections = {
     contactsCollection,
     messagesCollection,
@@ -138,6 +135,8 @@ app.use(async (req, res, next) => {
   };
   res.locals.campaigns = campaigns;
   res.locals.KBMreminder = KBMreminder;
+  // setup whatsapp api client
+  res.locals.waClient = createWhatsAppClient(PHONE_NUMBER_ID);
   console.log("setting up collections in res");
   next();
 });
