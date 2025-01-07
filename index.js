@@ -212,23 +212,23 @@ app.get("/sendkbmReminder", async (req, res) => {
         } // Apply filters on indexed fields here
       }
     },
-    {
-      $lookup: {
-        from: "campaignContactsCollection",
-        let: { phone: "$phone" }, // Define a variable for `_id` in the source
-        pipeline: [
-          {
-            $match: {
-              $and: [
-                { $expr: { $eq: ["$code", code] } },
-                { $expr: { $eq: ["$phone", "$$phone"] } }
-              ] // Match `reference_id` with `_id` from the source
-            }
-          }
-        ],
-        as: "registered"
-      }
-    },
+    // {
+    //   $lookup: {
+    //     from: "campaignContactsCollection",
+    //     let: { phone: "$phone" }, // Define a variable for `_id` in the source
+    //     pipeline: [
+    //       {
+    //         $match: {
+    //           $and: [
+    //             { $expr: { $eq: ["$code", code] } },
+    //             { $expr: { $eq: ["$phone", "$$phone"] } }
+    //           ] // Match `reference_id` with `_id` from the source
+    //         }
+    //       }
+    //     ],
+    //     as: "registered"
+    //   }
+    // },
     // {
     //   $match: {
     //     registered: { $ne: [] }
