@@ -24,8 +24,10 @@ const handleMessage = async function (req, res) {
     (await contactsCollection.read({ phone }))?.[0] ||
     (await createContact(req, res));
   contact.tagsToAdd = [];
-  contact.lastMessageReceivedAt = Date(message.timestamp);
-  contact.fieldsToUpdate = { lastMessageReceivedAt: Date(message.timestamp) };
+  contact.lastMessageReceivedAt = new Date(message.timestamp);
+  contact.fieldsToUpdate = {
+    lastMessageReceivedAt: contact.lastMessageReceivedAt
+  };
   res.locals.contact = contact;
 
   // Save the message in messages collection

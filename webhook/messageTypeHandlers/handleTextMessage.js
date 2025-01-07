@@ -26,8 +26,9 @@ export default async (req, res, next) => {
     : {};
   console.log("signedmessage payload: ", signedMessage, payload.utm_medium);
   const { tags, ...rest } = payload;
+  contact.lastTextMessageReceivedAt = new Date(message.timestamp);
   let fieldsToUpdate = {
-    lastTextMessageReceivedAt: Date(message.timestamp)
+    lastTextMessageReceivedAt: new Date(message.timestamp)
   };
   let tagsToAdd = Array.isArray(tags) ? [...tags] : [];
   if (code) {
