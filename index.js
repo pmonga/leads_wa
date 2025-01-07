@@ -207,7 +207,7 @@ app.get("/sendkbmReminder", async (req, res) => {
   const pipeline = [
     {
       $match: {
-        lastMessageRecievedAt: {
+        lastMessageReceivedAt: {
           $gt: new Date(Date.now() - 24 * 60 * 60 * 1000)
         } // Apply filters on indexed fields here
       }
