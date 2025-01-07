@@ -259,7 +259,7 @@ app.get("/sendkbmReminder", async (req, res) => {
       .status(200)
       .send(`Sent ${promises.length} reminders at ${new Date().toISOString()}`);
   } catch (err) {
-    console.log(err);
+    console.warn("error in reminder: ", err);
     res.status(500).send(err);
   }
 });
