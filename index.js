@@ -214,8 +214,9 @@ app.get("/sendkbmReminder", async (req, res) => {
       {
         $set: {
           lastTextMessageReceivedAt: new Date(e.lastTextMessageReceivedAt),
-          lastMessageRecievedAt: new Date(e.lastMessageRecievedAt)
-        }
+          lastMessageReceivedAt: new Date(e.lastMessageReceivedAt)
+        },
+        $unset: { lastMessageRecievedAt: 1 }
       }
     );
   }
