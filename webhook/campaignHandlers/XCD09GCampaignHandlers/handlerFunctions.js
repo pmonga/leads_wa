@@ -75,11 +75,15 @@ async function sendReminderNewDay(
   const action = {
     buttons: [playButton]
   };
-  console.log("handlerFunction.js 78 registered: ", registered);
   if (registered) {
     const { lastAttemptedAt, lastDayAttempts, name } = registered;
     const attemptsLeft =
       MAX_ATTEMPTS - (isSameDate(lastAttemptedAt) ? lastDayAttempts.length : 0);
+    console.log(
+      "handlerFunctions.js 82 samedate attemptsLeft",
+      isSameDate(lastAttemptedAt),
+      attemptsLeft
+    );
     if (attemptsLeft > 0) {
       const body = {
         text: ` Dear ${name}, You have ${attemptsLeft} for today. Don't forget to play and win credits.`
