@@ -245,6 +245,7 @@ app.get("/sendkbmReminder", async (req, res) => {
     .aggregate(pipeline)
     .toArray();
   let promises = [];
+  console.log("contacts: ", contacts);
   contacts.forEach;
   (e) =>
     promises.push(
