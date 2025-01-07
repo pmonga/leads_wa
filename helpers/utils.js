@@ -262,7 +262,7 @@ function timeout(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function isOfficeOpen(startTime, endTime) {
+function isInTimeRange(startTime, endTime) {
   const now = new Date();
 
   // Set the current time to IST explicitly
@@ -298,6 +298,6 @@ export {
   isObject,
   createReminderManager,
   timeout,
-  isOfficeOpen
+  isInTimeRange
 };
 /* global console, Intl, setTimeout Promise Map clearTimeout */

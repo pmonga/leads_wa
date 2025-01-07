@@ -406,5 +406,6 @@ export {
   sendRegistrationMessage,
   sendPostGameMessage,
   sendSignUpFlow,
+  sendReminderNewDay,
   sendKBMFlow
 };

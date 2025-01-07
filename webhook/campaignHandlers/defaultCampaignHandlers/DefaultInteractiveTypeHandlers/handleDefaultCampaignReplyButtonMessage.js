@@ -2,7 +2,7 @@ import { COURSES, JOIN_NOW } from "../../../../assets/signup_assets.js";
 import { FLOW_SIGNUP } from "../../../../helpers/config.js";
 import { set } from "../../../../helpers/storage.js";
 import generateToken from "../../../../helpers/tokenizer.js";
-import { isOfficeOpen } from "../../../../helpers/utils.js";
+import { isInTimeRange } from "../../../../helpers/utils.js";
 import { getRegistration } from "../../XCD09GCampaignHandlers/handlerFunctions.js";
 import { playButton, tryMBAGameButton } from "../common.js";
 
@@ -14,7 +14,7 @@ const handleDefaultCampaignReplyButtonMessage = async function (req, res) {
   switch (ac) {
     case "vc": {
       if (name) {
-        if (isOfficeOpen("10:30", "18:30")) {
+        if (isInTimeRange("10:30", "18:30")) {
           body.text =
             "We have received your request and we will soon contact you with zoom meeting details.";
         } else {
@@ -44,7 +44,7 @@ Meanwhile why don't you try our MBA game`;
     }
     case "callback":
       if (name) {
-        if (isOfficeOpen("10:30", "18:30")) {
+        if (isInTimeRange("10:30", "18:30")) {
           body.text =
             "We have received your request and we will soon call you.";
         } else {

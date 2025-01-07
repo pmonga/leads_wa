@@ -1,6 +1,6 @@
 import { signUp } from "../../../../flows/flowSignUpFunctions.js";
 import { FLOW_SIGNUP } from "../../../../helpers/config.js";
-import { isOfficeOpen } from "../../../../helpers/utils.js";
+import { isInTimeRange } from "../../../../helpers/utils.js";
 import { getRegistration } from "../../XCD09GCampaignHandlers/handlerFunctions.js";
 import {
   playButton,
@@ -19,7 +19,7 @@ const handleDefaultCampaignFlowMessage = async function (req, res) {
     const { phone, name } = contact;
     switch (code) {
       case "VIDCON": {
-        if (isOfficeOpen("10:30", "18:30")) {
+        if (isInTimeRange("10:30", "18:30")) {
           body.text =
             "We have received your request and we will soon contact you with zoom meeting details.";
         } else {
@@ -45,7 +45,7 @@ const handleDefaultCampaignFlowMessage = async function (req, res) {
       }
       case "RQCALL":
         {
-          if (isOfficeOpen("10:30", "18:30")) {
+          if (isInTimeRange("10:30", "18:30")) {
             body.text =
               "We have received your request and we will soon call you.";
           } else {

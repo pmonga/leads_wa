@@ -1,4 +1,4 @@
-/*global console, process, Buffer, APP_SECRET*/
+/*global console, process, Buffer, APP_SECRET, Promise*/
 import crypto from "crypto";
 import express from "express";
 import axios from "axios";
@@ -18,7 +18,9 @@ import {
 import { getNextScreen } from "./flow.js";
 import { get, set, del } from "./helpers/storage.js";
 import { FLOW_KBM } from "./helpers/config.js";
-import { createReminderManager } from "./helpers/utils.js";
+import { createReminderManager, isInTimeRange } from "./helpers/utils.js";
+import { pipeline } from "stream";
+import { sendReminderNewDay } from "./webhook/campaignHandlers/XCD09GCampaignHandlers/handlerFunctions.js";
 
 const {
   WEBHOOK_VERIFY_TOKEN,
@@ -192,6 +194,75 @@ app.get("/kbm", (req, res) => {
   res.redirect(
     `https://wa.me/919811233305?text=%5BXCD09G%5D%7BeyJ1dG1fbWVkaXVtIjoiaW4gYXBwIHJlZmVycmFsIn0%3D.qvcreREMQFlQlBD6J8fY1uVF6mBJWmyzZTQZZQ%2BfXI4%3D%7D%20Play%20now`
   );
+});
+
+app.get("/sendkbmReminder", async (req, res) => {
+  if (!isInTimeRange("10:00", "10:01")) {
+    return res.status(403).send("Not in allowed time range");
+  }
+  const code = "XCD09G";
+  const { collections, waClient, KBMreminder } = res.locals;
+  const { contactsCollection, campaignContactsCollection: coll } = collections;
+  const pipeline = [
+    {
+      $match: {
+        lastRecievedMessageAt: {
+          $gt: new Date(Date.now() - 24 * 60 * 60 * 1000)
+        } // Apply filters on indexed fields here
+      }
+    },
+    {
+      $lookup: {
+        from: "campaignContactsCollection",
+        let: { phone: "$phone" }, // Define a variable for `_id` in the source
+        pipeline: [
+          {
+            $match: {
+              $and: [
+                { $expr: { $eq: ["$code", code] } },
+                { $expr: { $eq: ["$phone", "$$phone"] } }
+              ] // Match `reference_id` with `_id` from the source
+            }
+          }
+        ],
+        as: "registered"
+      }
+    },
+    {
+      $match: {
+        registered: { $ne: [] } // Include only products with discounts
+      }
+    },
+    {
+      $project: {
+        phone: 1
+      }
+    }
+  ];
+  const contacts = await contactsCollection.collection
+    .aggregrate(pipeline)
+    .toArray();
+  let promises = [];
+  contacts.forEach;
+  (e) =>
+    promises.push(
+      sendReminderNewDay(code, e.phone, {
+        coll,
+        contactsCollection,
+        waClient,
+        KBMreminder
+      })
+    );
+  try {
+    await Promise.all(promises);
+    res
+      .status(200)
+      .send(
+        `Sent ${promises.lemgth} reminders at ${new Date().toLocaleDateString}`
+      );
+  } catch (err) {
+    res.status(500).send(err);
+  }
 });
 
 app.get("/encrypt", (req, res) => {
