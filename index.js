@@ -204,10 +204,24 @@ app.get("/sendkbmReminder", async (req, res) => {
   const code = "XCD09G";
   const { collections, waClient, KBMreminder } = res.locals;
   const { contactsCollection, campaignContactsCollection: coll } = collections;
+  const c = await contactsCollection.read({
+    lastTextMessageReceivedAt: { $exists: 1 }
+  });
+  for (const e of c) {
+    await contactsCollection.update(
+      { _id: e._id },
+      {
+        $set: {
+          lastTextMessageReceivedAt: new Date(e.lastTextMessageReceivedAt),
+          lastMessageRecievedAt: new Date(e.lastMessageRecievedAt)
+        }
+      }
+    );
+  }
   const pipeline = [
     {
       $match: {
-        lastRecievedMessageAt: {
+        lastMessageRecievedAt: {
           $gt: new Date(Date.now() - 24 * 60 * 60 * 1000)
         } // Apply filters on indexed fields here
       }
