@@ -229,11 +229,11 @@ app.get("/sendkbmReminder", async (req, res) => {
         as: "registered"
       }
     },
-    {
-      $match: {
-        registered: { $ne: [] } // Include only products with discounts
-      }
-    },
+    // {
+    //   $match: {
+    //     registered: { $ne: [] }
+    //   }
+    // },
     {
       $project: {
         phone: 1
@@ -245,22 +245,23 @@ app.get("/sendkbmReminder", async (req, res) => {
     .aggregate(pipeline)
     .toArray();
   let promises = [];
-  contacts.forEach;
-  (e) =>
-    promises.push(
-      sendReminderNewDay(code, e.phone, {
-        coll,
-        contactsCollection,
-        waClient,
-        KBMreminder
-      })
-    );
+  console.log("contacts: ", contacts);
+  // contacts.forEach;
+  // (e) =>
+  //   promises.push(
+  //     sendReminderNewDay(code, e.phone, {
+  //       coll,
+  //       contactsCollection,
+  //       waClient,
+  //       KBMreminder
+  //     })
+  //   );
   try {
     await Promise.all(promises);
     res
       .status(200)
       .send(
-        `Sent ${promises.length} reminders at ${new Date().toLocaleDateString}`
+        `Sent ${promises.length} reminders at ${new Date().toLocaleDateString()}`
       );
   } catch (err) {
     console.log(err);
