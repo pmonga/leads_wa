@@ -80,9 +80,10 @@ async function sendReminderNewDay(
     const attemptsLeft =
       MAX_ATTEMPTS - (isSameDate(lastAttemptedAt) ? lastDayAttempts.length : 0);
     console.log(
-      "handlerFunctions.js 82 samedate attemptsLeft",
+      "handlerFunctions.js 82 samedate attemptsLeft registered",
       isSameDate(lastAttemptedAt),
-      attemptsLeft
+      attemptsLeft,
+      registered
     );
     if (attemptsLeft > 0) {
       const body = {

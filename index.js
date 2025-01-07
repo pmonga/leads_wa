@@ -28,7 +28,8 @@ const {
   PORT,
   ENV,
   PRIVATE_KEY,
-  PASSPHRASE
+  PASSPHRASE,
+  PHONE_NUMBER_ID
 } = process.env;
 
 const app = express();
@@ -97,11 +98,7 @@ async function logger(req, res, next) {
 }
 async function setCredentials(req, res, next) {
   // setup whatsapp api client
-  if (req.body.entry?.[0].changes?.[0].value?.metadata?.phone_number_id) {
-    res.locals.waClient = createWhatsAppClient(
-      req.body.entry?.[0].changes?.[0].value?.metadata?.phone_number_id
-    );
-  }
+  res.locals.waClient = createWhatsAppClient(PHONE_NUMBER_ID);
 
   // type of payload
   if (
