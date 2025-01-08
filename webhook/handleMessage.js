@@ -24,7 +24,7 @@ const handleMessage = async function (req, res) {
     (await contactsCollection.read({ phone }))?.[0] ||
     (await createContact(req, res));
   contact.tagsToAdd = [];
-  contact.lastMessageReceivedAt = new Date(Number(message.timestamp));
+  contact.lastMessageReceivedAt = new Date(message.timestamp * 1000);
   contact.fieldsToUpdate = {
     lastMessageReceivedAt: contact.lastMessageReceivedAt
   };
