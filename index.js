@@ -193,7 +193,7 @@ app.get("/kbm", (req, res) => {
 });
 
 app.get("/sendkbmReminder", async (req, res) => {
-  if (!isInTimeRange("23:00", "23:15")) {
+  if (!isInTimeRange("23:00", "23:30")) {
     console.log("out of range");
     return res.status(403).send("Not in allowed time range");
   }
