@@ -256,6 +256,23 @@ function createReminderManager({
     entries // Exposes the entries of the reminders map
   };
 }
+/**
+ * Replaces placeholders in the format ${var_name} within a string with corresponding variable values.
+ *
+ * @param {string} template - The string containing placeholders in the format ${var_name}.
+ * @param {Object} variables - An object where keys are variable names and values are the replacements.
+ * @returns {string} - The string with all placeholders replaced by their corresponding values.
+ *
+ * Example:
+ * const template = "Hello, ${name}! You have ${messages} new messages.";
+ * const variables = { name: "Alice", messages: 5 };
+ * interpolateString(template, variables); // "Hello, Alice! You have 5 new messages."
+ */
+function interpolateString(template, variables) {
+  return template.replace(/\$\{(\w+)\}/g, (match, varName) => {
+    return varName in variables ? variables[varName] : match;
+  });
+}
 
 function timeout(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -297,6 +314,7 @@ export {
   isObject,
   createReminderManager,
   timeout,
-  isInTimeRange
+  isInTimeRange,
+  interpolateString
 };
 /* global console, Intl, setTimeout Promise Map clearTimeout */

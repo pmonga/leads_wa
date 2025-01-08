@@ -18,7 +18,11 @@ import {
 import { getNextScreen } from "./flow.js";
 import { get, set, del } from "./helpers/storage.js";
 import { FLOW_KBM } from "./helpers/config.js";
-import { createReminderManager, isInTimeRange } from "./helpers/utils.js";
+import {
+  createReminderManager,
+  interpolateString,
+  isInTimeRange
+} from "./helpers/utils.js";
 import { pipeline } from "stream";
 import { sendReminderNewDay } from "./webhook/campaignHandlers/XCD09GCampaignHandlers/handlerFunctions.js";
 
@@ -256,6 +260,40 @@ app.get("/sendkbmReminder", async (req, res) => {
     res
       .status(200)
       .send(`Sent ${promises.length} reminders at ${new Date().toISOString()}`);
+  } catch (err) {
+    console.warn("error in reminder: ", err);
+    res.status(500).send(err);
+  }
+});
+
+app.get("/broadcast", async (req, res) => {
+  const message = decodeURIComponent(req.query.message); // Get 'message' from query parameters
+  if (!message) {
+    return res.status(400).json({ error: "Message parameter is missing" });
+  }
+  const { collections, waClient } = res.locals;
+  const { contactsCollection } = collections;
+  const contacts = contactsCollection.read(
+    {
+      lastMessageReceivedAt: {
+        $gt: new Date(Date.now() - 24 * 60 * 60 * 1000)
+      }
+    },
+    { projection: { phone: 1, name: 1 } }
+  );
+  let promises = [];
+  contacts.forEach((e) => {
+    promises = promises.concat(
+      waClient.sendTexTmessage(e.phone, { body: interpolateString(message, e) })
+    );
+  });
+  try {
+    await Promise.all(promises);
+    res
+      .status(200)
+      .send(
+        `Sent broadcast to ${promises.length} numbers at ${new Date().toISOString()}`
+      );
   } catch (err) {
     console.warn("error in reminder: ", err);
     res.status(500).send(err);
