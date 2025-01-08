@@ -193,7 +193,7 @@ app.get("/kbm", (req, res) => {
 });
 
 app.get("/sendkbmReminder", async (req, res) => {
-  if (!isInTimeRange("00:00", "00:55")) {
+  if (!isInTimeRange("10:00", "10:01")) {
     console.log("out of range");
     return res.status(403).send("Not in allowed time range");
   }
@@ -241,7 +241,6 @@ app.get("/sendkbmReminder", async (req, res) => {
     .aggregate(pipeline)
     .toArray();
   let promises = [];
-  console.log("contacts: ", contacts);
   contacts.forEach((e) => {
     promises = promises.concat(
       sendReminderNewDay(code, e.phone, {
@@ -251,7 +250,6 @@ app.get("/sendkbmReminder", async (req, res) => {
         KBMreminder
       })
     );
-    console.log("promises: ", promises);
   });
   try {
     await Promise.all(promises);
