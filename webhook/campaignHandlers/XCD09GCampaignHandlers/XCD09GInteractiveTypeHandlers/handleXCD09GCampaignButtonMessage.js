@@ -15,9 +15,9 @@ export default async (req, res) => {
       ]);
       await waClient.sendTextMessage(contact.phone, {
         preview_url: false,
-        body: `I enjoy playing this game. You can join the fun too. Just click on the link and send the pre-filled message.
+        body: `${link}
         
-        ${link}`
+Hey! I enjoyed playing this WhatsApp-based Quiz game. You can join the fun too. Just click on the link and send the pre-filled message. 🎯🎰`
       });
       break;
     case "play":

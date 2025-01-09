@@ -109,9 +109,13 @@ Meanwhile why don't you try our MBA game`;
               title: "CAT 25"
             },
             {
-              id: "omet25",
-              title: "OMETs (XAT, NMAT etc)"
+              id: "cat26",
+              title: "CAT 26"
             },
+            // {
+            //   id: "omet25",
+            //   title: "OMETs (XAT, NMAT etc)"
+            // },
             {
               id: "gmat25",
               title: "GMAT"

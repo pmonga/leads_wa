@@ -160,7 +160,7 @@ async function sendPostGameMessage(
     body.text += ` You have ${attemptsLeft} attempt(s) left for today. You can win more credits if you win more than ${won > lastDayWins ? won : lastDayWins} credit(s) in your next attempt.`;
     action.buttons.push(playButton);
   } else {
-    body.text += ` You have played all your ${MAX_ATTEMPTS} attempts for today and have won ${won > lastDayWins ? won : lastDayWins} credits. You can win more credits tomorrow`;
+    body.text += ` You have played all your ${MAX_ATTEMPTS} attempts for today and have won ${won > lastDayWins ? won : lastDayWins} credit(s). You can win more credits tomorrow`;
     const contact = (
       await contactsCollection.read(
         { phone },
@@ -183,11 +183,12 @@ async function sendPostGameMessage(
   }
   if (balance) {
     body.text += `
-    Your balance is ${balance} credits. To know more / collect rewards mail to ${email} from your registered email.`;
+Your balance is ${balance} credits.
+To know more & collect reward mail to ${email}.`;
   }
 
   body.text += `
-  If you want your friends to _play and learn_ too, click on *_Refer friends_* below and we will send you a message with a link. Just forward it to them.`;
+If you want your friends to _Play & Learn_ too, click *_Refer friends_* below and we will send you a link. Just forward it to them.`;
   action.buttons.push(referButton);
   await waClient.sendReplyButtonMessage(phone, { body, action });
 }
@@ -243,7 +244,7 @@ async function sendSignUpFlow(res) {
     },
     body: {
       text: `Please register with your full name and email.
-      These details will be verified at the time of reward collection.`
+These details will be verified at the time of reward collection.`
     }
   };
   const params = {
@@ -264,9 +265,13 @@ async function sendSignUpFlow(res) {
             title: "CAT 25"
           },
           {
-            id: "omet25",
-            title: "OMETs (XAT, NMAT etc)"
+            id: "cat26",
+            title: "CAT 26"
           },
+          // {
+          //   id: "omet25",
+          //   title: "OMETs (XAT, NMAT etc)"
+          // },
           {
             id: "gmat25",
             title: "GMAT"
