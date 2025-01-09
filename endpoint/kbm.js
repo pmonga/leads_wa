@@ -1,4 +1,5 @@
 /* global console, setTimeout, Promise, clearTimeout */
+import { ObjectId } from "mongodb";
 import { get, set, del } from "../helpers/storage.js";
 import {
   decryptRequest,
@@ -256,15 +257,19 @@ export const getNextScreen = async (req, res, decryptedBody) => {
             flow_obj.questions?.[flow_obj.cur - 1]?.ans.toUpperCase() ===
             data?.ans?.toUpperCase();
           contactKbmQs.create({
-            kbm_question_id: flow_obj.questions[[flow_obj.cur - 1]]._id,
-            campaign_contact_id,
+            kbm_question_id: new ObjectId(
+              flow_obj.questions[[flow_obj.cur - 1]]._id
+            ),
+            campaign_contact_id: new ObjectId(campaign_contact_id),
             flow_token,
-            contact_id,
+            contact_id: new ObjectId(contact_id),
             phone,
             ans: flow_obj.questions[[flow_obj.cur - 1]].ans,
             response: flow_obj.questions[[flow_obj.cur - 1]].response,
             is_correct: flow_obj.questions[[flow_obj.cur - 1]].is_correct,
-            createdAt: flow_obj.questions[[flow_obj.cur - 1]].createdAt
+            createdAt: new Date(
+              flow_obj.questions[[flow_obj.cur - 1]].createdAt
+            )
           });
           if (data.has_quit) {
             flow_obj.finishedAt = new Date();
