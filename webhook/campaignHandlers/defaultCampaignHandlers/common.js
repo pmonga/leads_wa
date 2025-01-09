@@ -16,7 +16,7 @@ const registerButton = {
   type: "reply",
   reply: {
     id: `COMMON-register`,
-    title: "Tell about yourself"
+    title: "Register Now"
   }
 };
 const playButton = {

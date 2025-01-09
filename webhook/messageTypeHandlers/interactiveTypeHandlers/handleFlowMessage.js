@@ -2,6 +2,7 @@
 import handleTEST01Campaign from "../../campaignHandlers/handleTEST01Campaign.js";
 import handleXCD09GCampaign from "../../campaignHandlers/handleXCD09GCampaign.js";
 import { del, get } from "../../../helpers/storage.js";
+import handleDefaultCampaignFlowMessage from "../../campaignHandlers/defaultCampaignHandlers/DefaultInteractiveTypeHandlers/handleDefaultCampaignFlowMessage.js";
 
 const handleFlowMessage = async function (req, res) {
   const { message, campaigns, contact } = res.locals;
@@ -50,10 +51,16 @@ const handleFlowMessage = async function (req, res) {
       break;
     }
     case "COMMON":
+      res.locals.crm.message += `COMMON:Registered`;
+      await handleDefaultCampaignFlowMessage(req, res);
       break;
     case "VIDCON":
+      res.locals.crm.message += `VIDCON:VC counselling Registered`;
+      await handleDefaultCampaignFlowMessage(req, res);
       break;
     case "RQCALL":
+      res.locals.crm.message += `RQCALL: Request callback Registered`;
+      await handleDefaultCampaignFlowMessage(req, res);
       break;
     default:
       res.locals.crm.message += "SYS MSG:Invalid flow token or campaign code";
