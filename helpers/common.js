@@ -15,7 +15,7 @@ const broadcast = async function (message, waClient, contactsCollection) {
   let promises = [];
   contacts.forEach((e) => {
     promises = promises.concat(
-      waClient.sendTexTmessage(e.phone, { body: interpolateString(message, e) })
+      waClient.sendTextMessage(e.phone, { body: interpolateString(message, e) })
     );
   });
   try {
