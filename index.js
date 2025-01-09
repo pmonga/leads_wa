@@ -91,15 +91,15 @@ async function main() {
   });
 }
 async function logger(req, res, next) {
-  if (ENV === "PROD")
-    // log incoming messages
-    log.create({ ...req.body });
-  else if (ENV === "DEV")
-    // console.log(
-    //   "Logger: Incoming webhook message:",
-    //   JSON.stringify(req.body, null, 2)
-    // );
-    next();
+  // if (ENV === "PROD")
+  //   // log incoming messages
+  //   log.create({ ...req.body });
+  // else if (ENV === "DEV")
+  //   // console.log(
+  //   //   "Logger: Incoming webhook message:",
+  //   //   JSON.stringify(req.body, null, 2)
+  //   // );
+  next();
 }
 async function setCredentials(req, res, next) {
   // type of payload
