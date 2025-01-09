@@ -25,6 +25,7 @@ import {
 } from "./helpers/utils.js";
 import { pipeline } from "stream";
 import { sendReminderNewDay } from "./webhook/campaignHandlers/XCD09GCampaignHandlers/handlerFunctions.js";
+import { broadcast } from "./helpers/common.js";
 
 const {
   WEBHOOK_VERIFY_TOKEN,
@@ -273,30 +274,12 @@ app.get("/broadcast", async (req, res) => {
   }
   const { collections, waClient } = res.locals;
   const { contactsCollection } = collections;
-  const contacts = contactsCollection.read(
-    {
-      lastMessageReceivedAt: {
-        $gt: new Date(Date.now() - 24 * 60 * 60 * 1000)
-      }
-    },
-    { projection: { phone: 1, name: 1 } }
-  );
-  let promises = [];
-  contacts.forEach((e) => {
-    promises = promises.concat(
-      waClient.sendTexTmessage(e.phone, { body: interpolateString(message, e) })
-    );
-  });
-  try {
-    await Promise.all(promises);
-    res
-      .status(200)
-      .send(
-        `Sent broadcast to ${promises.length} numbers at ${new Date().toISOString()}`
-      );
-  } catch (err) {
-    console.warn("error in reminder: ", err);
-    res.status(500).send(err);
+  const result = await broadcast(message, waClient, contactsCollection);
+  if (result.success) {
+    res.status(200).send(result.message);
+  } else {
+    console.warn("error in broadcast: ", result.error);
+    res.status(500).send(result.error);
   }
 });
 
