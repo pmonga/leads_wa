@@ -23,7 +23,7 @@ const GAME_PRIZE = [
 ];
 const TERMS = `## 1. Eligibility
 1.1. Everybody can participate in this game for fun.
-1.2. Participants must be residents of India, eligible to apply for CAT 25/26 and between 18 to 23 years of age as of the date of participation to claim reward.
+1.2. Participants must be residents of India, between 18 to 23 years of age and must fulfil the eligibity criteria for CAT 2025/26 as of the date of participation to claim reward.
 1.3. The name registered for the game must match the name of the reward recipient. No exceptions will be entertained.
 1.4. Participation for rewards is restricted to students preparing for CAT 2025 or CAT 2026. Proof of preparation may be requested.
 1.5. Participants' details, including name, email ID, and phone number, must match the information provided during registration.

@@ -93,7 +93,9 @@ async function createContact(req, res) {
 async function addToCRM(res) {
   // Update CRM with the UTM for the campaign
   const { message, utm } = res.locals.crm;
-  const contact = res.locals.contact;
+  const { contact, waClient } = res.locals.contact;
+  const log = res.locals.collections.log;
+
   const crmData = {
     source: "whatsApp",
     name: contact.name,
@@ -104,7 +106,14 @@ async function addToCRM(res) {
     ...utm
   };
   if (process.env.ENV === "PROD") {
-    await createCommInCRM(crmData);
+    try {
+      await createCommInCRM(crmData);
+    } catch (e) {
+      await log.create({ type: "error", name: "CRM error", data: e });
+      await waClient.sendTextMessage("+919136465050", {
+        body: "CRM Error logged"
+      });
+    }
   } else {
     console.log("CRM Entry :", JSON.stringify(crmData));
   }

@@ -101,6 +101,9 @@ async function logger(req, res, next) {
   //   // );
   next();
 }
+async function logError(name, data) {
+  await log.create({ type: "error", name, data });
+}
 async function setCredentials(req, res, next) {
   // type of payload
   if (
@@ -135,6 +138,7 @@ app.use((req, res, next) => {
     campaignContactsCollection,
     gameStatsCollection,
     ledgerCollection,
+    log,
     kbmQs,
     contactKbmQs
   };
