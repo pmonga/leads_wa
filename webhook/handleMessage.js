@@ -93,7 +93,7 @@ async function createContact(req, res) {
 async function addToCRM(res) {
   // Update CRM with the UTM for the campaign
   const { message, utm } = res.locals.crm;
-  const { contact, waClient } = res.locals.contact;
+  const { contact, waClient } = res.locals;
   const log = res.locals.collections.log;
 
   const crmData = {
