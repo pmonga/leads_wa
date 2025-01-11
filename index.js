@@ -226,8 +226,8 @@ app.get("/kbm-mktg", async (req, res) => {
     components
   };
   try {
-    await waClient.sendTemplateMessage(to, message);
-    res.send("Message sent");
+    const result = await waClient.sendTemplateMessage(to, message);
+    res.send("Message sent: " + result);
   } catch (error) {
     res.send("Error in sending message: " + error);
   }
