@@ -221,6 +221,17 @@ app.get("/kbm-mktg", async (req, res) => {
           text: name
         }
       ]
+    },
+    {
+      type: "button",
+      sub_type: "quick_reply",
+      index: "0",
+      parameters: [
+        {
+          type: "payload",
+          payload: "XCD09G-play"
+        }
+      ]
     }
   ];
   const message = {
