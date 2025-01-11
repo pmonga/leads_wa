@@ -193,8 +193,9 @@ app.get("/refresh-campaigns", async (req, res) => {
   res.status(200).send("Campaigns refreshed");
 });
 app.get("/kbm-mktg", async (req, res) => {
-  const name = decodeURIComponent(req.query.name);
-  const to = decodeURIComponent(req.query.to);
+  let name = decodeURIComponent(req.query?.name);
+  name = name ? name : "there";
+  const to = decodeURIComponent(req.query?.to);
   if (!to) {
     res.send("missing phone number");
     return;
