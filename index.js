@@ -207,7 +207,7 @@ app.get("/kbm-mktg", async (req, res) => {
         {
           type: "image",
           image: {
-            link: "https://drive.google.com/file/d/1x5gxRIZiEeuHFBgir9XtSAUrDGwzuO_w/view"
+            link: "https://lh3.googleusercontent.com/d/1x5gxRIZiEeuHFBgir9XtSAUrDGwzuO_w"
           }
         }
       ]
