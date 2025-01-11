@@ -5,6 +5,7 @@ import dotnenv from "dotenv";
 import handleInteractiveMessage from "./messageTypeHandlers/handleInteractiveMessage.js";
 import handleTextMessage from "./messageTypeHandlers/handleTextMessage.js";
 import createCommInCRM from "../helpers/crm.js";
+import handleButtonMessage from "./messageTypeHandlers/handleButtonMessage.js";
 
 dotnenv.config();
 const handleMessage = async function (req, res) {
@@ -43,6 +44,9 @@ const handleMessage = async function (req, res) {
       break;
     case "interactive":
       await handleInteractiveMessage(req, res);
+      break;
+    case "button":
+      await handleButtonMessage(req, res);
       break;
     default:
       console.log("Not supported message type: ", type);

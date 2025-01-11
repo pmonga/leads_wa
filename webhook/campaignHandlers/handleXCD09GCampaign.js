@@ -19,6 +19,9 @@ export default async (req, res, next) => {
         case "interactive":
           await handleXCD09GCampaignInteractiveMessage(req, res);
           break;
+        case "button":
+          await handleXCD09GCampaignTextMessage(req, res);
+          break;
         default:
           console.log(
             "unsupported message type for XCD09G campaign: ",

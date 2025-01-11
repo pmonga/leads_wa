@@ -187,9 +187,51 @@ app.get("/webhook", (req, res) => {
 });
 app.get("/refresh-campaigns", async (req, res) => {
   await refreshCampaign();
-  res.status(200).send("Camapigns refreshed");
+  res.status(200).send("Campaigns refreshed");
 });
-
+app.get("/kbm-mktg", async (req, res) => {
+  const name = decodeURIComponent(req.query.name);
+  const to = decodeURIComponent(req.query.to);
+  if (!to) {
+    res.send("missing phone number");
+    return;
+  }
+  const waClient = res.locals.waClient;
+  const components = [
+    {
+      type: "header",
+      parameters: [
+        {
+          type: "image",
+          image: {
+            link: "https://drive.google.com/file/d/1x5gxRIZiEeuHFBgir9XtSAUrDGwzuO_w/view"
+          }
+        }
+      ]
+    },
+    {
+      type: "body",
+      parameters: [
+        {
+          type: "text",
+          parameter_name: "name",
+          text: name
+        }
+      ]
+    }
+  ];
+  const message = {
+    name: "kbmba_invite",
+    language: { code: "en" },
+    components
+  };
+  try {
+    await waClient.sendTemplateMessage(to, message);
+    res.send("Message sent");
+  } catch (error) {
+    res.send("Error in sending message: " + error);
+  }
+});
 app.get("/", (req, res) => {
   res.send(`<pre>Nothing to see here.
 Checkout README.md to start.</pre>`);

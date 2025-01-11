@@ -32,15 +32,16 @@ export default async (req, res, next) => {
       collections.campaignContactsCollection
     );
     body.text = `Welcome back, ${name}, what will you like to do?
-1. Request a call back (10:30-6:30)
-2. Take a counselling on Zoom (10:30-6:30)`;
+1. Request a call back 🙂
+2. Join a counseling session on Zoom 💻
+(Office Hours: 10:30 am - 6:30 pm)`;
     if (registered) {
       body.text += `
-3. Play the game`;
+3. Play the game! 🎲`;
       action.buttons = [callBackButton, vcButton, playButton];
     } else {
       body.text += `
-3. Try our game for MBA`;
+3. Try our game for CAT 🎲`;
       action.buttons = [callBackButton, vcButton, tryMBAGameButton];
     }
   }
