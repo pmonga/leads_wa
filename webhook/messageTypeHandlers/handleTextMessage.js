@@ -24,7 +24,7 @@ export default async (req, res, next) => {
   const payload = verifyMessage(signedMessage)
     ? verifyMessage(signedMessage)
     : {};
-  console.log("signedmessage payload: ", signedMessage, payload.utm_medium);
+  console.log("signedmessage payload: ", signedMessage, payload);
   const { tags, ...rest } = payload;
   contact.lastTextMessageReceivedAt = new Date(message.timestamp * 1000);
   let fieldsToUpdate = {

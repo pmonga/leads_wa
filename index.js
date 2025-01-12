@@ -354,16 +354,16 @@ app.get("/encrypt", (req, res) => {
   res.send(payload);
 });
 
-// app.get("/decrypt", (req, res) => {
-//   const { message } = req.query; // Get 'message' from query parameters
-//   if (!message) {
-//     return res.status(400).json({ error: "Message parameter is missing" });
-//   }
-//   const msg = decodeURIComponent(message);
-//   const payload = verifyMessage(msg);
-//   console.log(payload);
-//   res.send(payload);
-// });
+app.get("/decrypt", (req, res) => {
+  const { message } = req.query; // Get 'message' from query parameters
+  if (!message) {
+    return res.status(400).json({ error: "Message parameter is missing" });
+  }
+  const msg = decodeURIComponent(message);
+  const payload = verifyMessage(msg);
+  console.log(payload);
+  res.send(payload);
+});
 
 app.post("/endpoint", async (req, res) => {
   if (!PRIVATE_KEY) {
