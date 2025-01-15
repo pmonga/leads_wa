@@ -43,9 +43,8 @@ export default async (req, res, next) => {
       : { ...rest };
     res.locals.crm.utm = { ...res.locals.crm.utm, ...utm };
     res.locals.crm.message += " " + message.text.body;
-    if (contact.isNew || contact.phone == "+919971400043") {
+    if (contact.isNew) {
       fieldsToUpdate = { ...fieldsToUpdate, createdBy: code, utm };
-      console.log("fieldsToUpdate: ", fieldsToUpdate);
     }
     tagsToAdd = Array.isArray(campaigns[code]?.tags)
       ? [code, ...campaigns[code].tags, ...tagsToAdd]
