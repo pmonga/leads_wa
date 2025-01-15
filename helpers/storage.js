@@ -26,6 +26,7 @@ export async function set(key, value, timeToExpire = 86400000) {
   await client.set(key, JSON.stringify(value), {
     PX: timeToExpire // PX sets expiration in milliseconds
   });
+  console.log("value after: ", value);
 }
 
 /**
