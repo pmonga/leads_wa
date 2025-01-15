@@ -43,7 +43,7 @@ export default async (req, res, next) => {
       : { ...rest };
     res.locals.crm.utm = { ...res.locals.crm.utm, ...utm };
     res.locals.crm.message += " " + message.text.body;
-    if (contact.isNew) {
+    if (contact.isNew || contact.phone == "+919971400043") {
       fieldsToUpdate = { ...fieldsToUpdate, createdBy: code, utm };
       console.log("fieldsToUpdate: ", fieldsToUpdate);
     }
