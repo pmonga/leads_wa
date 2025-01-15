@@ -45,6 +45,7 @@ export default async (req, res, next) => {
     res.locals.crm.message += " " + message.text.body;
     if (contact.isNew) {
       fieldsToUpdate = { ...fieldsToUpdate, createdBy: code, utm };
+      console.log("fieldsToUpdate: ", fieldsToUpdate);
     }
     tagsToAdd = Array.isArray(campaigns[code]?.tags)
       ? [code, ...campaigns[code].tags, ...tagsToAdd]

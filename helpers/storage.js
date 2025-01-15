@@ -22,11 +22,9 @@ client.connect();
  * @returns {Promise<void>}
  */
 export async function set(key, value, timeToExpire = 86400000) {
-  console.log("value: ", value);
   await client.set(key, JSON.stringify(value), {
     PX: timeToExpire // PX sets expiration in milliseconds
   });
-  console.log("value after: ", value);
 }
 
 /**
