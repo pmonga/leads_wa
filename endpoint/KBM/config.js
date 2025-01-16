@@ -49,7 +49,7 @@ const TERMS = `## 1. Eligibility
 
 ## 5. Conduct and Compliance
 5.1. Players must strictly adhere to all rules and regulations of the game.
-5.2. Any attempts to manipulate game outcomes, including but not limited to using AI, bots, using multiple accounts, third-party tools, or unauthorized methods, will result in immediate disqualification and possible legal action.
+5.2. Any attempts to manipulate game outcomes, including but not limited to using Artificial Intelligence (AI), bots, using multiple accounts, third-party tools, or unauthorized methods, will result in immediate disqualification and possible legal action.
 5.3. The institute is not obligated to provide evidence or explanations for disqualification or forfeiture decisions.
 
 ## 6. Technical Issues
