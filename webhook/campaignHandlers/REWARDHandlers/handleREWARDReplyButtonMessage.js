@@ -54,7 +54,7 @@ const handleREWARDReplyButtonMessage = async function (req, res) {
   }
   async function claim() {
     const { _id, phone, name, wallet } = contact;
-    let upi = contact.upi;
+    const upi = contact.upi ? contact.upi : "false";
     const { total, used, converted } = wallet.convertible;
     const ledger = (
       await ledgerCollection.read({ contact_id: _id, status: "pending" })
@@ -133,6 +133,7 @@ You may need to provide KYC and other details if required.`
         }
       }
     };
+    console.log("flow params: ", params.flow_action_payload);
     let r = await res.locals.waClient.sendFlowMessage(phone, layout, params);
     console.log("claim form: ", r);
     await set(flow_token, flow_obj, 60 * 60 * 1000);

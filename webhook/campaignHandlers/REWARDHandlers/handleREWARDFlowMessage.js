@@ -26,7 +26,7 @@ const handleREWARDFlowMessage = async function (req, res) {
       console.warn("PAYER Error: No active payer found");
     }
     const type = "convertible";
-    const changes = { converted: amount };
+    const changes = { converted: 1 * amount };
     const description = `${upi}-${amount}-reward claimed`;
     const entry = { type, changes, description, flow_obj };
     for (const k in changes) {
