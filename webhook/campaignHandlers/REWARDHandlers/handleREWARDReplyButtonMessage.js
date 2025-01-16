@@ -53,6 +53,7 @@ const handleREWARDReplyButtonMessage = async function (req, res) {
   }
   async function claim() {
     const { _id, phone, name, wallet, upi } = contact;
+    const { total, used, converted } = wallet.convertible;
     const ledger = (
       await ledgerCollection.read({ contact_id: _id, status: "pending" })
     )?.[0];
@@ -101,7 +102,6 @@ const handleREWARDReplyButtonMessage = async function (req, res) {
       return;
     }
     const flow_id = FLOW_CLAIM;
-    const { total, used, converted } = wallet.convertible;
     const claimed = used + converted;
     const flow_obj = { name, phone, code, flow_id, createdAt: new Date() };
     const flow_token = generateToken(JSON.stringify(flow_obj));

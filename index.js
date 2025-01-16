@@ -161,7 +161,7 @@ app.post("/webhook", [logger, setCredentials], async (req, res) => {
         await handleMessage(req, res);
         break;
       case "status":
-        //console.log("status: ", res.locals.status);
+        console.log("status: ", res.locals.status);
         break;
       default:
         console.log("unsupported webhook type: ", res.locals.type);
