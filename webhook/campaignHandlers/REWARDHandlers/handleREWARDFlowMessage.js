@@ -1,5 +1,3 @@
-import { playButton } from "../defaultCampaignHandlers/common";
-
 const handleREWARDFlowMessage = async function (req, res) {
   const upiIdRegex = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/;
   const { contact, flow_data, flow_obj, collections, waClient } = res.locals;
@@ -75,4 +73,5 @@ const handleREWARDFlowMessage = async function (req, res) {
     });
   }
 };
+export default handleREWARDFlowMessage;
 /* globals console */

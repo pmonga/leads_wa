@@ -1,6 +1,6 @@
-import { FLOW_CLAIM } from "../../../helpers/config";
-import { set } from "../../../helpers/storage";
-import generateToken from "../../../helpers/tokenizer";
+import { FLOW_CLAIM } from "../../../helpers/config.js";
+import { set } from "../../../helpers/storage.js";
+import generateToken from "../../../helpers/tokenizer.js";
 
 const handleREWARDReplyButtonMessage = async function (req, res) {
   const { code, action, payload: ledger_id, contact, waClient } = res.locals;

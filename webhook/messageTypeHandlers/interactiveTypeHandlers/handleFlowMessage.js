@@ -3,6 +3,7 @@ import handleTEST01Campaign from "../../campaignHandlers/handleTEST01Campaign.js
 import handleXCD09GCampaign from "../../campaignHandlers/handleXCD09GCampaign.js";
 import { del, get } from "../../../helpers/storage.js";
 import handleDefaultCampaignFlowMessage from "../../campaignHandlers/defaultCampaignHandlers/DefaultInteractiveTypeHandlers/handleDefaultCampaignFlowMessage.js";
+import handleREWARDFlowMessage from "../../campaignHandlers/REWARDHandlers/handleREWARDFlowMessage.js";
 
 const handleFlowMessage = async function (req, res) {
   const { message, campaigns, contact } = res.locals;
@@ -63,6 +64,8 @@ const handleFlowMessage = async function (req, res) {
       await handleDefaultCampaignFlowMessage(req, res);
       break;
     case "REWARD":
+      res.locals.crm.message += `REWARD: Claim form filled`;
+      await handleREWARDFlowMessage(req, res);
       break;
     default:
       res.locals.crm.message += "SYS MSG:Invalid flow token or campaign code";
