@@ -58,12 +58,11 @@ const handleREWARDReplyButtonMessage = async function (req, res) {
     )?.[0];
     if (ledger) {
       const payer = (await payers.read({ is_active: true }))?.[0];
-      if (payer.phone != "+" + message.from) {
-        await waClient.sendTextMessage(message.from, {
-          body: `You are not allowed to do this transaction`
+      if (!payer) {
+        await waClient.sendTextMessage(phone, {
+          body: `Something went wrong, please try again later.`
         });
-        console.warn("PAYER Error: Unauthorised person tried transaction");
-        return;
+        console.warn("PAYER Error: No active payer found");
       }
       const [, amount] = ledger.entry.description.split("-");
       const payButton = {
