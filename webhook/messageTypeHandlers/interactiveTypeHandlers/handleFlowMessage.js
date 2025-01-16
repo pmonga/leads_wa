@@ -62,6 +62,8 @@ const handleFlowMessage = async function (req, res) {
       res.locals.crm.message += `RQCALL: Request callback Registered`;
       await handleDefaultCampaignFlowMessage(req, res);
       break;
+    case "REWARD":
+      break;
     default:
       res.locals.crm.message += "SYS MSG:Invalid flow token or campaign code";
       console.log("Flow: Invalid campaign code:  ", code);

@@ -47,6 +47,7 @@ let contactsCollection,
   log,
   kbmQs,
   contactKbmQs,
+  payers,
   gameStatsCollection;
 let campaigns;
 const KBMreminder = createReminderManager();
@@ -59,6 +60,7 @@ async function initdb() {
     campaignsCollection = crud("wa_campaigns", db);
     campaignContactsCollection = crud("wa_campaign_contacts", db);
     kbmQs = crud("wa_kbm_questions", db);
+    payers = crud("wa_payers", db);
     contactKbmQs = crud("wa_contact_kbm_questions", db);
     ledgerCollection = crud("wa_ledger", db);
     gameStatsCollection = crud("wa_game_stats", db);
@@ -139,6 +141,7 @@ app.use((req, res, next) => {
     gameStatsCollection,
     ledgerCollection,
     log,
+    payers,
     kbmQs,
     contactKbmQs
   };

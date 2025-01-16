@@ -100,7 +100,7 @@ export default async (req, res) => {
           if (registered.lastDayWins) {
             entries.push({
               type: "convertible",
-              changes: { used: registered.lastDayWins },
+              changes: { total: -1 * registered.lastDayWins },
               description: "reverse previous highest winning",
               flow_token: registered?.lastDayWinToken
             });
@@ -115,7 +115,8 @@ export default async (req, res) => {
               contact_id: contact._id,
               phone: contact.phone,
               name: contact.name,
-              entry: flow_obj?.entry
+              entry,
+              status: "completed"
             });
           }
         }

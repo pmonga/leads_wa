@@ -99,7 +99,10 @@ async function addToCRM(res) {
   const { message, utm } = res.locals.crm;
   const { contact, waClient } = res.locals;
   const log = res.locals.collections.log;
-
+  if (!message.trim() && !Object.keys(utm).length) {
+    console.log("handlemessage js: no data for crm");
+    return;
+  }
   const crmData = {
     source: "whatsApp",
     name: contact.name,

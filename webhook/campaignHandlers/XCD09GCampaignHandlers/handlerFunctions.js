@@ -133,6 +133,13 @@ async function sendPostGameMessage(
       title: "Play Again"
     }
   };
+  const claimButton = {
+    type: "reply",
+    reply: {
+      id: `REWARD-claim`,
+      title: "Claim Reward"
+    }
+  };
 
   const email = "game.master@alchemistindia.com";
   const attemptsLeft = lastDayAttempts
@@ -185,6 +192,7 @@ async function sendPostGameMessage(
     body.text += `
 Your balance is ${balance} credits.
 To know more & collect reward mail to ${email}.`;
+    action.buttons.push(claimButton);
   }
 
   body.text += `
