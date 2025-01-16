@@ -3,7 +3,14 @@ import { set } from "../../../helpers/storage.js";
 import generateToken from "../../../helpers/tokenizer.js";
 
 const handleREWARDReplyButtonMessage = async function (req, res) {
-  const { code, action, payload: ledger_id, contact, waClient } = res.locals;
+  const {
+    message,
+    code,
+    action,
+    payload: ledger_id,
+    contact,
+    waClient
+  } = res.locals;
   const { contactsCollection, ledgerCollection, payers } =
     res.locals.collections;
   const claimButton = {
@@ -46,13 +53,52 @@ const handleREWARDReplyButtonMessage = async function (req, res) {
   }
   async function claim() {
     const { _id, phone, name, wallet, upi } = contact;
-    const pending = (
+    const ledger = (
       await ledgerCollection.read({ contact_id: _id, status: "pending" })
     )?.[0];
-    if (pending) {
-      await waClient.sendTextMessage(phone, {
-        body: `You already have a pending transaction with ref id : ${JSON.stringify(pending._id)}. Please wait for it to be processed.`
+    if (ledger) {
+      const payer = (await payers.read({ is_active: true }))?.[0];
+      if (payer.phone != "+" + message.from) {
+        await waClient.sendTextMessage(message.from, {
+          body: `You are not allowed to do this transaction`
+        });
+        console.warn("PAYER Error: Unauthorised person tried transaction");
+        return;
+      }
+      const [, amount] = ledger.entry.description.split("-");
+      const payButton = {
+        type: "reply",
+        reply: {
+          id: `REWARD-pay-${ledger._id}`,
+          title: "Pay Now"
+        }
+      };
+      const denyButton = {
+        type: "reply",
+        reply: {
+          id: `REWARD-deny-${ledger._id}`,
+          title: "Deny Reward"
+        }
+      };
+      const action = { buttons: [payButton, denyButton] };
+      const body = {
+        text: `Payout Requested Reminder
+1. **Name:** ${ledger.name}
+2. **Phone:** ${ledger.phone}
+3. **Total:** ${total}
+4. **Converted:** ${converted}
+5. **Used:** ${used}
+6. **Balance:** ${total - converted - used}
+7. **Amount Requested: ${amount}`
+      };
+      await waClient.sendReplyButtonMessage(payer.phone, {
+        body,
+        action
       });
+      await waClient.sendTextMessage(phone, {
+        body: `You already have a pending transaction with ref id : ${JSON.stringify(ledger._id)}. Please wait for it to be processed.`
+      });
+
       return;
     }
     const flow_id = FLOW_CLAIM;

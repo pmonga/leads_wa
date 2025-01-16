@@ -71,6 +71,9 @@ const handleREWARDFlowMessage = async function (req, res) {
       body,
       action
     });
+    await waClient.sendTextMessage(phone, {
+      body: `Your request has been submitted`
+    });
   }
 };
 export default handleREWARDFlowMessage;
