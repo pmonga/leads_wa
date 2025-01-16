@@ -59,13 +59,13 @@ const handleREWARDFlowMessage = async function (req, res) {
     const action = { buttons: [payButton, denyButton] };
     const body = {
       text: `Payout Requested
-1. **Name:** ${name}
-2. **Phone:** ${phone}
-3. **Total:** ${total}
-4. **Converted:** ${converted}
-5. **Used:** ${used}
-6. **Balance:** ${total - converted - used}
-7. **Amount Requested: ${amount}`
+1. *Name:* ${name}
+2. *Phone:* ${phone}
+3. *Total:* ${total}
+4. *Converted:* ${converted}
+5. *Used:* ${used}
+6. *Balance:* ${total - converted - used}
+7. *Amount Requested:* ${amount}`
     };
     await waClient.sendReplyButtonMessage(payer.phone, {
       body,

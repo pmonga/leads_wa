@@ -49,6 +49,7 @@ const handleREWARDReplyButtonMessage = async function (req, res) {
       await pay();
       break;
     case "deny":
+      await deny();
       break;
   }
   async function claim() {
@@ -82,14 +83,14 @@ const handleREWARDReplyButtonMessage = async function (req, res) {
       };
       const action = { buttons: [payButton, denyButton] };
       const body = {
-        text: `Payout Requested Reminder
-1. **Name:** ${ledger.name}
-2. **Phone:** ${ledger.phone}
-3. **Total:** ${total}
-4. **Converted:** ${converted}
-5. **Used:** ${used}
-6. **Balance:** ${total - converted - used}
-7. **Amount Requested: ${amount}`
+        text: `Payout Request Reminder
+1. *Name:* ${ledger.name}
+2. *Phone:* ${ledger.phone}
+3. *Total:* ${total}
+4. *Converted:* ${converted - amount}
+5. *Used:* ${used}
+6. *Balance:* ${total - converted - used}
+7. *Amount Requested:* ${amount}`
       };
       await waClient.sendReplyButtonMessage(payer.phone, {
         body,
@@ -127,7 +128,7 @@ You may need to provide KYC and other details if required.`
           name,
           total,
           claimed,
-          upi: upi ? upi : "false"
+          upi: upi ? upi.replace(/@/g, "(at)") : "false"
         }
       }
     };
