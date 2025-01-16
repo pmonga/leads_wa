@@ -129,14 +129,14 @@ You may need to provide KYC and other details if required.`
           name,
           total,
           claimed,
-          upi: "false" //upi ? upi.replace(/@/g, "(at)").replace(/./g, "(dot)") : "false"
+          upi
         }
       }
     };
     console.log("flow params: ", params.flow_action_payload);
     let r = await res.locals.waClient.sendFlowMessage(phone, layout, params);
     console.log("claim form: ", r);
-    await set(flow_token, flow_obj, 60 * 60 * 1000);
+    await set(flow_token, flow_obj, 2 * 60 * 1000);
     return;
   }
   async function pay() {
