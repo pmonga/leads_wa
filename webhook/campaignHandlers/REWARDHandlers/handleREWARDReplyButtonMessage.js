@@ -133,8 +133,9 @@ You may need to provide KYC and other details if required.`
         }
       }
     };
-    await res.locals.waClient.sendFlowMessage(phone, layout, params);
-    await set(flow_token, flow_obj, 2 * 60 * 1000);
+    let r = await res.locals.waClient.sendFlowMessage(phone, layout, params);
+    console.log("claim form: ", r);
+    await set(flow_token, flow_obj, 60 * 60 * 1000);
     return;
   }
   async function pay() {
