@@ -36,7 +36,7 @@ const TERMS = `## 1. Eligibility
 2.5. The decision to leave the game must be explicitly confirmed by the player within the game interface.
 
 ## 3. Rewards
-3.1. Rewards are non-negotiable and non-transferable. The participant’s details, including the registered name, email ID, and phone number, must exactly match the name and details provided in the recipient’s bank account or payment method. Students not registered at Alchemist for comprehensive coaching for CAT 25 or CAT 26 may not claim cash rewards more than rupees hundred.
+3.1. Rewards are non-negotiable and non-transferable. The participant’s details, including the registered name, email ID, and phone number, must exactly match the name and details provided in the recipient’s bank account or payment method. Students not registered at Alchemist for comprehensive coaching for CAT 25 or CAT 26 may not claim cash rewards more than rupees fifty.
 3.2. Players must claim rewards by sending an email to the designated address from their registered email ID.
 3.3. Any failure to follow the claim process, including mismatched details, incomplete information, or delayed submissions, will result in forfeiture of the reward.
 3.4. Rewards will be processed within 7 working days, but Alchemist and its associates also referred to as the institute in this document reserves the right to delay or cancel payment due to suspected fraud or non-compliance with these terms.
@@ -49,7 +49,7 @@ const TERMS = `## 1. Eligibility
 
 ## 5. Conduct and Compliance
 5.1. Players must strictly adhere to all rules and regulations of the game.
-5.2. Any attempts to manipulate game outcomes, including but not limited to using bots, using multiple accounts, third-party tools, or unauthorized methods, will result in immediate disqualification and possible legal action.
+5.2. Any attempts to manipulate game outcomes, including but not limited to using AI, bots, using multiple accounts, third-party tools, or unauthorized methods, will result in immediate disqualification and possible legal action.
 5.3. The institute is not obligated to provide evidence or explanations for disqualification or forfeiture decisions.
 
 ## 6. Technical Issues
