@@ -129,7 +129,7 @@ You may need to provide KYC and other details if required.`
           name,
           total,
           claimed,
-          upi: upi ? upi.replace(/@/g, "(at)").replace(/./g, "(dot)") : "false"
+          upi: "false" //upi ? upi.replace(/@/g, "(at)").replace(/./g, "(dot)") : "false"
         }
       }
     };
