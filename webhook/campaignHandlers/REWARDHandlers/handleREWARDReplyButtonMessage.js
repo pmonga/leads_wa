@@ -53,7 +53,8 @@ const handleREWARDReplyButtonMessage = async function (req, res) {
       break;
   }
   async function claim() {
-    const { _id, phone, name, wallet, upi } = contact;
+    const { _id, phone, name, wallet } = contact;
+    let upi = contact.upi;
     const { total, used, converted } = wallet.convertible;
     const ledger = (
       await ledgerCollection.read({ contact_id: _id, status: "pending" })
@@ -128,7 +129,7 @@ You may need to provide KYC and other details if required.`
           name,
           total,
           claimed,
-          upi: upi ? upi.replace(/@/g, "(at)") : "false"
+          upi: upi ? upi.replace(/@/g, "(at)").replace(/./g, "(dot)") : "false"
         }
       }
     };
