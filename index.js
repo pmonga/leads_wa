@@ -256,9 +256,9 @@ Checkout README.md to start.</pre>`);
 });
 
 app.get("/kbm", (req, res) => {
-  res.redirect(
-    `https://wa.me/919811233305?text=%5BXCD09G%5D%7BeyJ1dG1fbWVkaXVtIjoiaW4gYXBwIHJlZmVycmFsIn0%3D.qvcreREMQFlQlBD6J8fY1uVF6mBJWmyzZTQZZQ%2BfXI4%3D%7D%20%0A%0AHi%2C%20I%20want%20to%20play%20the%20Quiz%20Game.%20%F0%9F%91%8B%0A%0AStart%20Now%21`
-  );
+  const text =
+    "%5BXCD09G%5D%7BeyJ1dG1fbWVkaXVtIjoiYXBwX3JlZmVycmFsIiwidGFncyI6WyJhcHBfcmVmZXJyYWwiXX0%3D.e%2B9jHJsglukBNnMMGPUwYcHiIyBnKx6neHTPOYy7bZI%3D%7D%0A%0A_token_ends_%0A%0A%0AI%20want%20to%20clear%20CAT.%0AStart%20Now";
+  res.redirect(`https://wa.me/919811233305?text=${text}`);
 });
 
 app.get("/sendkbmReminder", async (req, res) => {
