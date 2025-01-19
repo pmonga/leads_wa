@@ -193,7 +193,9 @@ app.get("/webhook", (req, res) => {
 });
 app.get("/refresh-campaigns", async (req, res) => {
   await refreshCampaign();
-  res.status(200).send("Campaigns refreshed");
+  res
+    .status(200)
+    .send(`Campaigns refreshed total: ${Object.keys(campaigns).length} `);
 });
 app.get("/kbm-mktg", async (req, res) => {
   let name = decodeURIComponent(req.query?.name);
