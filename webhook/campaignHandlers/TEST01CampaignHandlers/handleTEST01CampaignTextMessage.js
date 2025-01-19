@@ -18,12 +18,15 @@ export default async (req, res, next) => {
 
   // send message to contact
   if (contact.name) {
-    const registrations = (
+    let registrations = (
       await campaignsCollection.read(
         { _id: campaign._id },
         { projection: { registrations: 1 } }
       )
     )?.[0].registrations;
+    if (!registrations) {
+      registrations = [];
+    }
     let registered = registrations.find((e) => e.phone === contact.phone);
     if (!registered) {
       const { _id, name, mobile, phone, email } = contact;
