@@ -70,7 +70,7 @@ export default async (req, res, next) => {
     ? [...contact.tagsToAdd, ...tagsToAdd]
     : [...tagsToAdd];
   const switch_code = res.locals.campaign?.parent_campaign_code
-    ? res.locals.coampign?.parent_campaign_code
+    ? res.locals.campaign?.parent_campaign_code
     : code;
   switch (switch_code) {
     case "TEST01":
