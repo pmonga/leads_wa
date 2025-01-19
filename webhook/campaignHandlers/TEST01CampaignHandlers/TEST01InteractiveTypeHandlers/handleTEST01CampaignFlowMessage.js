@@ -1,7 +1,8 @@
-import dotnenv from 'dotenv';
-import createCommInCRM from '../../../../helpers/crm.js';
-import generateToken from '../../../../helpers/tokenizer.js';
-import { set, get, del } from '../../../../helpers/storage.js';
+import dotnenv from "dotenv";
+import createCommInCRM from "../../../../helpers/crm.js";
+import generateToken from "../../../../helpers/tokenizer.js";
+import { set, get, del } from "../../../../helpers/storage.js";
+import { FLOW_SIGNUP } from "../../../../helpers/config.js";
 
 dotnenv.config();
 export default async (req, res) => {
@@ -14,12 +15,9 @@ export default async (req, res) => {
 
   const flowData = res.locals.flow_data;
   const flowObject = await get(res.locals.flow_token);
-  if (
-    flowObject.flow_id != '1760272798116365' ||
-    flowObject.phone != contact.phone
-  ) {
+  if (flowObject.flow_id != FLOW_SIGNUP || flowObject.phone != contact.phone) {
     let reply = {
-      body: 'Sorry, Incorrect parameters. Please try again later.',
+      body: "Sorry, Incorrect parameters. Please try again later."
     };
     del(res.locals.flow_token);
     await res.locals.waClient.sendTextMessage(contact.phone, reply);
@@ -30,7 +28,7 @@ export default async (req, res) => {
     ...contact.tagsToAdd,
     code,
     ...flowData.courses,
-    ...campaign.tags,
+    ...campaign.tags
   ];
   if (!contact.name) {
     // update contact info
@@ -39,7 +37,7 @@ export default async (req, res) => {
     await contactsCollection.update(
       { phone: flowObject.phone },
       {
-        $set: { name: flowData.name, email: flowData.email },
+        $set: { name: flowData.name, email: flowData.email }
       }
     );
   }
@@ -63,7 +61,7 @@ export default async (req, res) => {
       mobile,
       phone,
       email,
-      regnum: registrations.length + 1,
+      regnum: registrations.length + 1
     };
     registrations.push(registered);
     await campaignsCollection.update(
@@ -76,7 +74,7 @@ export default async (req, res) => {
       registered.name
     }, you are registered for ${campaign.name.toUpperCase()} with mobile number ${
       registered.mobile
-    } and your registration id is ${registered.regnum}`,
+    } and your registration id is ${registered.regnum}`
   };
   res.locals.waClient.sendTextMessage(contact.phone, reply);
 };

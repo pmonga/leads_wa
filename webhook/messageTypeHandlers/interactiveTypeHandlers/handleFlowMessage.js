@@ -27,10 +27,13 @@ const handleFlowMessage = async function (req, res) {
   res.locals.flow_data = flow_data;
   const utm = res.locals.campaign?.utm ? { ...res.locals.campaign.utm } : {};
   res.locals.crm.utm = { ...utm };
-  switch (code) {
+  const switch_code = campaign?.parent_campaign_code
+    ? campaign.parent_campaign_code
+    : code;
+  switch (switch_code) {
     case "TEST01": {
       res.locals.crm.message +=
-        "[TEST01] Data from Flow: " +
+        `[${code}] Data from Flow: ` +
         JSON.stringify({
           data: { ...flow_data },
           details: { ...flow_obj }
@@ -41,7 +44,7 @@ const handleFlowMessage = async function (req, res) {
     case "XCD09G": {
       const { finishedAt, is_sample, won } = flow_obj;
       res.locals.crm.message +=
-        "[XCD09G] Data from Flow: " +
+        `[${code}] Data from Flow: ` +
         JSON.stringify({
           message: "Played the game",
           finishedAt,

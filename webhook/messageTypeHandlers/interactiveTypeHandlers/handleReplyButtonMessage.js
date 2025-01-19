@@ -19,7 +19,10 @@ const handleReplyButtonMessage = async function (req, res) {
   }
   const utm = campaign?.utm ? { ...campaign.utm } : {};
   res.locals.crm.utm = { ...utm };
-  switch (code) {
+  const switch_code = campaign?.parent_campaign_code
+    ? campaign.parent_campaign_code
+    : code;
+  switch (switch_code) {
     case "XCD09G": {
       res.locals.crm.message += `XCD09G : ${action} requested`;
       await handleXCD09GCampaign(req, res);

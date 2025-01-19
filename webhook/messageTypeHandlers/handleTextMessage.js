@@ -69,8 +69,10 @@ export default async (req, res, next) => {
   contact.tagsToAdd = Array.isArray(contact.tagsToAdd)
     ? [...contact.tagsToAdd, ...tagsToAdd]
     : [...tagsToAdd];
-
-  switch (code) {
+  const switch_code = res.locals.coampign?.parent_campaign_code
+    ? res.locals.coampign?.parent_campaign_code
+    : code;
+  switch (switch_code) {
     case "TEST01":
       await handleTEST01Campaign(req, res);
       break;

@@ -76,15 +76,15 @@ export default async (req, res, next) => {
           courses_img_height: COURSES.height,
           courses: [
             {
-              id: "cat",
-              title: "CAT"
+              id: "cat25",
+              title: "CAT 25"
             },
             {
-              id: "omet",
-              title: "OMETs (XAT, NMAT etc)"
+              id: "cat26",
+              title: "CAT 26"
             },
             {
-              id: "gmat",
+              id: "gmat25",
               title: "GMAT"
             }
           ]
