@@ -6,9 +6,9 @@ const VERSION = "1.0.0";
 const MAX_ATTEMPTS = 3;
 const GAME_QS_DEF = [
   [
-    { level: "very easy", num: 5 },
-    { level: "easy", num: 5 },
-    { level: "medium", num: 0 },
+    { level: "very easy", num: 4 },
+    { level: "easy", num: 4 },
+    { level: "medium", num: 2 },
     { level: "hard", num: 5 }
   ]
 ];

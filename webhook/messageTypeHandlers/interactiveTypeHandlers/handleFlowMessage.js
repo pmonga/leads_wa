@@ -42,12 +42,13 @@ const handleFlowMessage = async function (req, res) {
       break;
     }
     case "XCD09G": {
-      const { finishedAt, is_sample, won } = flow_obj;
+      const { finishedAt, is_sample, won, cur } = flow_obj;
       res.locals.crm.message +=
         `[${code}] Data from Flow: ` +
         JSON.stringify({
           message: "Played the game",
           finishedAt,
+          qs: cur,
           sample_game: is_sample,
           credits_won: won
         });
