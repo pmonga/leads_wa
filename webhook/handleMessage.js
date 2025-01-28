@@ -38,27 +38,36 @@ const handleMessage = async function (req, res) {
   });
 
   console.log("handleMessage switch type:", type);
-  switch (type) {
-    case "text":
-      await handleTextMessage(req, res);
-      break;
-    case "interactive":
-      await handleInteractiveMessage(req, res);
-      break;
-    case "button":
-      await handleButtonMessage(req, res);
-      break;
-    default:
-      console.log("Not supported message type: ", type);
-      break;
+  if (contact.is_blocked) {
+    await res.locals.waClient.sendTextMessage("+919136465050", {
+      body: `Message from blocked number : ${contact.phone}`
+    });
+    await res.locals.waClient.sendTextMessage("+918130568536", {
+      body: `Message from blocked number: ${contact.phone}`
+    });
+  } else {
+    switch (type) {
+      case "text":
+        await handleTextMessage(req, res);
+        break;
+      case "interactive":
+        await handleInteractiveMessage(req, res);
+        break;
+      case "button":
+        await handleButtonMessage(req, res);
+        break;
+      default:
+        console.log("Not supported message type: ", type);
+        break;
+    }
+    // add to CRM without await.. no need to wait for it
+    addToCRM(res);
+    // update contact
+    // All tags in uppercase to avoid search defeciency
+    // const tagsToAdd = contact.tagsToAdd.map(function (x) {
+    //   return x.toUpperCase();
+    // });
   }
-  // add to CRM without await.. no need to wait for it
-  addToCRM(res);
-  // update contact
-  // All tags in uppercase to avoid search defeciency
-  // const tagsToAdd = contact.tagsToAdd.map(function (x) {
-  //   return x.toUpperCase();
-  // });
   if (contact.tagsToAdd.length || Object.keys(contact.fieldsToUpdate).length) {
     await contactsCollection.update(
       { phone: contact.phone },
