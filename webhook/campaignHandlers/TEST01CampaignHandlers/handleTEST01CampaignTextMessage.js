@@ -16,6 +16,17 @@ export default async (req, res, next) => {
   //const contactsCollection = res.locals.collections.contactsCollection;
   const campaignsCollection = res.locals.collections.campaignsCollection;
 
+  const playButton = {
+    type: "reply",
+    reply: {
+      id: `XCD09G-play`,
+      title: "Play Now"
+    }
+  };
+  const action = {
+    buttons: [playButton]
+  };
+
   // send message to contact
   if (contact.name) {
     let registrations = (
@@ -44,14 +55,19 @@ export default async (req, res, next) => {
         { $set: { registrations: registrations } }
       );
     }
-    let reply = {
-      body: `Thank you, ${
+    let body = {
+      text: `Thank you, ${
         registered.name
       }, you are registered for ${campaign.name.toUpperCase()} with mobile number ${
         registered.mobile
-      } and your registration id is ${registered.regnum}`
+      } and your registration id is ${registered.regnum}.
+
+You can also participitate in our scholarship game and win rewards daily.`
     };
-    res.locals.waClient.sendTextMessage(contact.phone, reply);
+    await res.locals.waClient.sendReplyButtonMessage(contact.phone, {
+      body,
+      action
+    });
   } else {
     // send SIGN UP flow message here flow_id: '1760272798116365'
     const flow_id = FLOW_SIGNUP;
