@@ -248,17 +248,17 @@ async function sendSignUpFlow(res) {
   const layout = {
     header: {
       type: "text",
-      text: "SIGN UP"
+      text: `📢 MBA Prep Just Got Exciting!`
     },
     body: {
-      text: `Please register with your full name and email.
-These details will be verified at the time of reward collection.`
+      text: `Join Alchemist’s Kaun Banega MBA and *win daily rewards!* 🎯
+💡 *Play* . *Learn* . *Win* . Up to ₹1000 every day! 💰`
     }
   };
   const params = {
     flow_token: token,
     flow_id: FLOW_SIGNUP, //Lead Sign Up
-    flow_cta: "Register",
+    flow_cta: "Sign up & start winning now!",
     flow_action: "navigate",
     flow_action_payload: {
       screen: "JOIN_NOW",
@@ -371,20 +371,17 @@ async function sendKBMFlow(registered, res) {
     const layout = {
       header: {
         type: "text",
-        text: "Welcome to Play & Learn"
+        text: "🎉 Welcome to Kaun Banega MBA! 🎓"
       },
       body: {
-        text: `Dear ${registered.name},
-        Play daily with us. It will help you learn better for your exam. You get to practice thousands of questions and get a chance to win exciting rewards.
-        Happy Learning.
-        
-        *TEAM ALCHEMIST*`
+        text: `Every day is *Scholarship Day* at Alchemist! 🏆
+Test your knowledge, *LEARN & WIN* up to ₹1000 daily! 🎯`
       }
     };
     const params = {
       flow_token: token,
       flow_id,
-      flow_cta: "Play Now",
+      flow_cta: "Start playing now!",
       flow_action: "navigate",
       flow_action_payload: {
         screen: "WELCOME",
