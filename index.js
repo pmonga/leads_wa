@@ -251,7 +251,7 @@ app.get("/kbm-mktg", async (req, res) => {
     }
   ];
   const message = {
-    name: "kbmba_invite",
+    name: "kbmba_invite_v2",
     language: { code: "en" },
     components
   };
