@@ -223,7 +223,7 @@ app.get("/kbm-mktg", async (req, res) => {
         {
           type: "image",
           image: {
-            link: "https://lh3.googleusercontent.com/d/1x5gxRIZiEeuHFBgir9XtSAUrDGwzuO_w"
+            link: "https://lh3.googleusercontent.com/d/1qYE39zbJ8I3_49UvKq3ztuEGN-H-mabc" //"https://lh3.googleusercontent.com/d/1x5gxRIZiEeuHFBgir9XtSAUrDGwzuO_w"
           }
         }
       ]
