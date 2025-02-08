@@ -262,6 +262,54 @@ app.get("/kbm-mktg", async (req, res) => {
     res.send("Error in sending message: " + JSON.stringify(error));
   }
 });
+
+app.get("/100-mktg", async (req, res) => {
+  const to = decodeURIComponent(req.query?.to);
+  if (!to) {
+    res.send("missing phone number");
+    return;
+  }
+  const waClient = res.locals.waClient;
+  const components = [
+    {
+      type: "header",
+      parameters: [
+        {
+          type: "image",
+          image: {
+            link: "https://lh3.googleusercontent.com/d/1Splpv42kkNFZdptiDsML4szkvzaINaEZ"
+          }
+        }
+      ]
+    },
+    {
+      type: "body"
+    },
+    {
+      type: "button",
+      sub_type: "quick_reply",
+      index: "0",
+      parameters: [
+        {
+          type: "payload",
+          payload: "COMMON-callback"
+        }
+      ]
+    }
+  ];
+  const message = {
+    name: "mktg_100_percentile",
+    language: { code: "en" },
+    components
+  };
+  try {
+    const result = await waClient.sendTemplateMessage(to, message);
+    res.send("Message sent: " + JSON.stringify(result));
+  } catch (error) {
+    res.send("Error in sending message: " + JSON.stringify(error));
+  }
+});
+
 app.get("/", (req, res) => {
   res.send(`<pre>Nothing to see here.
 Checkout README.md to start.</pre>`);

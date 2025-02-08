@@ -1,3 +1,4 @@
+import handleDefaultCampaignReplyButtonMessage from "../campaignHandlers/defaultCampaignHandlers/DefaultInteractiveTypeHandlers/handleDefaultCampaignReplyButtonMessage.js";
 import handleDefaultCampaignTextMessage from "../campaignHandlers/defaultCampaignHandlers/handleDefaultCampaignTextMessage.js";
 import handleXCD09GCampaign from "../campaignHandlers/handleXCD09GCampaign.js";
 
@@ -21,8 +22,13 @@ const handleButtonMessage = async function (req, res) {
     : code;
   switch (switch_code) {
     case "XCD09G": {
-      res.locals.crm.message += `[XCD09G] template button : ${action} requested`;
+      res.locals.crm.message += `[XCD09G] marketing template button : ${action} requested`;
       await handleXCD09GCampaign(req, res);
+      break;
+    }
+    case "COMMON": {
+      res.locals.crm.message += `[COMMON] marketing template button: ${action} requested`;
+      await handleDefaultCampaignReplyButtonMessage(req, res);
       break;
     }
     default: {
