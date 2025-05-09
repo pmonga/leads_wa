@@ -1,4 +1,4 @@
-import { REFERRAL_AMOUNT } from "../helpers/config";
+import { REFERRAL_AMOUNT } from "../helpers/config.js";
 
 async function signUp(res) {
   const { contact, flow_data, waClient } = res.locals;
