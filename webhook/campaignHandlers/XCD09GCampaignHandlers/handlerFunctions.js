@@ -196,12 +196,13 @@ async function sendPostGameMessage(
   if (balance) {
     body.text += `
 Your balance is ${balance} credits.
-To collect reward click on *_Claim Reward _* and the fill the request form.`;
+To collect reward click on *_Claim Reward_* and the fill the request form.`;
     action.buttons.push(claimButton);
   }
 
   body.text += `
-If you want your friends to _Play & Learn_ too, click *_Refer friends_* below and we will send you a link. Just forward it to them.
+  
+If you want your friends to _Play & Learn_ too and also earn ${REFERRAL_AMOUNT} credits per successful referral, click *_Refer friends_* below and we will send you a link. Just forward it to them.
 You may contact us on ${email} to know more.`;
   action.buttons.push(referButton);
   await waClient.sendReplyButtonMessage(phone, { body, action });
@@ -212,7 +213,7 @@ async function sendAlreadyPlayedMessage(registered, waClient) {
     text: `🥳 Hope you have enjoyed playing today's game. We will send you tomorrow's game when it becomes available so that you don't miss out. If you play daily with us you would do thousands of questions till your exam.
     Keep playing, keep learning and keep winning.
 
-    If you want your friends to _play and learn_ too and earn ${REFERRAL_AMOUNT} credits per successful referral, click on *_Refer friends_* below and we will send you a message with a link. Just forward it to them.`
+    If you want your friends to _play and learn_ too and also earn ${REFERRAL_AMOUNT} credits per successful referral, click on *_Refer friends_* below and we will send you a message with a link. Just forward it to them.`
   };
   const action = {
     buttons: [
