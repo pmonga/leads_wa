@@ -18,9 +18,7 @@ async function signUp(res) {
 
   // Referral Credit Add function
   async function creditReferralAmount(phone) {
-    console.log("Test for referral: ", phone);
     const ref = (await contactsCollection.read({ phone }))?.[0];
-    console.log("Test for referral: ", phone, ref);
     if (ref) {
       const { wallet } = ref;
       const entries = [
@@ -79,7 +77,7 @@ async function signUp(res) {
           text: `${contact.name} @ ${contact.phone} has just registered with your reference.
 An amount of ${REFERRAL_AMOUNT} credits have been added to your wallet.
 Your balance is ${balance} credits.
-To collect reward click on *_Claim Reward _* and the fill the request form.
+To collect reward click on *_Claim Reward_* and the fill the request form.
 
 If you want to refer more friends and earn ${REFERRAL_AMOUNT} credit per successful referral, click on *_Refer friends_* below and we will send you a message with a link. Just forward it to them.`
         };
