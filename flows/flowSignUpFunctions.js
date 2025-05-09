@@ -19,7 +19,7 @@ async function signUp(res) {
   // Referral Credit Add function
   async function creditReferralAmount(phone) {
     console.log("Test for referral: ", phone);
-    const ref = await contactsCollection.read({ phone })?.[0];
+    const ref = (await contactsCollection.read({ phone }))?.[0];
     console.log("Test for referral: ", phone, ref);
     if (ref) {
       const { wallet } = ref;
