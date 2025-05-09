@@ -44,7 +44,7 @@ async function signUp(res) {
       await contactsCollection.update(
         { phone },
         {
-          $set: wallet
+          $set: { wallet }
         }
       );
 
