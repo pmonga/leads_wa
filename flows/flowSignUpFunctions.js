@@ -18,6 +18,7 @@ async function signUp(res) {
 
   // Referral Credit Add function
   async function creditReferralAmount(phone) {
+    console.log("Test for referral: ", phone);
     const ref = await contactsCollection.read({ phone })?.[0];
     if (ref) {
       const { wallet } = ref;
@@ -89,3 +90,4 @@ If you want to refer more friends and earn ${REFERRAL_AMOUNT} credit per success
 }
 
 export { signUp };
+/*globals console*/
