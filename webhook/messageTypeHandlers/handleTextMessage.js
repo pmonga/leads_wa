@@ -50,6 +50,10 @@ export default async (req, res, next) => {
     res.locals.crm.utm = { ...res.locals.crm.utm, ...utm };
     res.locals.crm.message += " " + message.text.body;
     if (contact.isNew) {
+      const { utm_source, utm_medium } = utm;
+      if (utm_medium === "app_referral" && utm_source) {
+        fieldsToUpdate["referredBy"] = utm_source;
+      }
       fieldsToUpdate = { ...fieldsToUpdate, createdBy: code, utm };
     }
     tagsToAdd = Array.isArray(campaigns[code]?.tags)

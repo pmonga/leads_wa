@@ -1,7 +1,12 @@
 /*global setTimeout, console, Promise */
 import generateToken from "../../../helpers/tokenizer.js";
 import { set, get, del } from "../../../helpers/storage.js";
-import { BASE_URL, FLOW_KBM, FLOW_SIGNUP } from "../../../helpers/config.js";
+import {
+  BASE_URL,
+  FLOW_KBM,
+  FLOW_SIGNUP,
+  REFERRAL_AMOUNT
+} from "../../../helpers/config.js";
 import { isSameDate } from "../../../helpers/utils.js";
 import { WELCOME } from "../../../assets/kbm_assets.js";
 import { COURSES, JOIN_NOW } from "../../../assets/signup_assets.js";
@@ -191,12 +196,13 @@ async function sendPostGameMessage(
   if (balance) {
     body.text += `
 Your balance is ${balance} credits.
-To know more & collect reward mail to ${email}.`;
+To collect reward click on *_Claim Reward _* and the fill the request form.`;
     action.buttons.push(claimButton);
   }
 
   body.text += `
-If you want your friends to _Play & Learn_ too, click *_Refer friends_* below and we will send you a link. Just forward it to them.`;
+If you want your friends to _Play & Learn_ too, click *_Refer friends_* below and we will send you a link. Just forward it to them.
+You may contact us on ${email} to know more.`;
   action.buttons.push(referButton);
   await waClient.sendReplyButtonMessage(phone, { body, action });
 }
@@ -206,7 +212,7 @@ async function sendAlreadyPlayedMessage(registered, waClient) {
     text: `🥳 Hope you have enjoyed playing today's game. We will send you tomorrow's game when it becomes available so that you don't miss out. If you play daily with us you would do thousands of questions till your exam.
     Keep playing, keep learning and keep winning.
 
-    If you want your friends to _play and learn_ too, click on *_Refer friends_* below and we will send you a message with a link. Just forward it to them.`
+    If you want your friends to _play and learn_ too and earn ${REFERRAL_AMOUNT} credits per successful referral, click on *_Refer friends_* below and we will send you a message with a link. Just forward it to them.`
   };
   const action = {
     buttons: [

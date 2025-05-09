@@ -315,9 +315,31 @@ app.get("/", (req, res) => {
 Checkout README.md to start.</pre>`);
 });
 
-app.get("/kbm", (req, res) => {
-  const text =
-    "%5BXCD09G%5D%7BeyJ1dG1fbWVkaXVtIjoiYXBwX3JlZmVycmFsIiwidGFncyI6WyJhcHBfcmVmZXJyYWwiXX0%3D.e%2B9jHJsglukBNnMMGPUwYcHiIyBnKx6neHTPOYy7bZI%3D%7D%0A%0A_token_ends_%0A%0A%0AI%20want%20to%20clear%20CAT.%0AStart%20Now";
+app.get("/kbm", async (req, res) => {
+  const _id = decodeURIComponent(req.query?._id);
+  const { contactsCollection } = res.locals.collections;
+  const ref = _id
+    ? (await contactsCollection.read({ _id }, { phone: 1 }))?.[0]
+    : false;
+  const payload = ref
+    ? {
+        utm_source: ref.phone,
+        utm_medium: "app_referral",
+        tags: ["app_referral"]
+      }
+    : { utm_medium: "app_referral", tags: ["app_referral"] };
+
+  const signedPayload = signMessage(payload);
+  const message = `[XCD09G]{${signedPayload}}
+
+_token_ends_
+
+
+I want to clear CAT.
+Start Now`;
+
+  const text = encodeURIComponent(message);
+  // "%5BXCD09G%5D%7BeyJ1dG1fbWVkaXVtIjoiYXBwX3JlZmVycmFsIiwidGFncyI6WyJhcHBfcmVmZXJyYWwiXX0%3D.e%2B9jHJsglukBNnMMGPUwYcHiIyBnKx6neHTPOYy7bZI%3D%7D%0A%0A_token_ends_%0A%0A%0AI%20want%20to%20clear%20CAT.%0AStart%20Now";
   res.redirect(`https://wa.me/919811233305?text=${text}`);
 });
 

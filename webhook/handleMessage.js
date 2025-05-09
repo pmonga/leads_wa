@@ -42,9 +42,6 @@ const handleMessage = async function (req, res) {
     await res.locals.waClient.sendTextMessage("+919136465050", {
       body: `Message from blocked number : ${contact.phone}`
     });
-    await res.locals.waClient.sendTextMessage("+918130568536", {
-      body: `Message from blocked number: ${contact.phone}`
-    });
   } else {
     switch (type) {
       case "text":

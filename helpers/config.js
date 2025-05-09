@@ -8,6 +8,7 @@ const FLOW_KBM = "611584554716592";
 const FLOW_SIGNUP = "567250056293445";
 const FLOW_CLAIM = "1407886380184448";
 const BASE_URL = "https://leads-wa-n4wo.onrender.com";
+const REFERRAL_AMOUNT = 5;
 // Export individually
 export {
   APP_NAME,
@@ -16,5 +17,6 @@ export {
   FLOW_KBM,
   FLOW_SIGNUP,
   BASE_URL,
-  FLOW_CLAIM
+  FLOW_CLAIM,
+  REFERRAL_AMOUNT
 };

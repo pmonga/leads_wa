@@ -4,7 +4,7 @@ import handleXCD09GCampaignTextMessage from "../handleXCD09GCampaignTextMessage.
 
 export default async (req, res) => {
   const { contact, action, waClient } = res.locals;
-  const link = BASE_URL + "/kbm";
+  const link = BASE_URL + "/kbm?_id=" + contact._id;
   switch (action) {
     case "refer":
       await Promise.all([
