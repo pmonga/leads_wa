@@ -17,6 +17,7 @@ const crud = (collectionName, db) => {
     // Read documents (excluding soft-deleted)
     read: async (filter = {}, options = {}) => {
       if (typeof filter._id === "string") {
+        console.log("collection and id: ", collectionName, filter._id);
         filter._id = toObjectId(filter._id);
       }
       const collection = db.collection(collectionName);
@@ -73,3 +74,4 @@ const crud = (collectionName, db) => {
 };
 
 export default crud;
+/* globals console */

@@ -317,7 +317,6 @@ Checkout README.md to start.</pre>`);
 
 app.get("/kbm", async (req, res) => {
   const _id = decodeURIComponent(req.query?._id);
-  console.log("_id is: ", _id);
   const { contactsCollection } = res.locals.collections;
   const ref = _id
     ? (await contactsCollection.read({ _id }, { phone: 1 }))?.[0]
