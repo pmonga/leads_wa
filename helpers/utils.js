@@ -305,6 +305,10 @@ function isInTimeRange(startTime, endTime) {
   return istNow >= start && istNow < end;
 }
 
+function isValidMongoId(id) {
+  return typeof id === "string" && /^[a-f0-9]{24}$/i.test(id);
+}
+
 export {
   getTimeWithOffset,
   formatTohhmmDateIST,
@@ -315,6 +319,7 @@ export {
   createReminderManager,
   timeout,
   isInTimeRange,
-  interpolateString
+  interpolateString,
+  isValidMongoId
 };
 /* global console, Intl, setTimeout Promise Map clearTimeout */

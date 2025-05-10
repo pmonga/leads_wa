@@ -21,7 +21,8 @@ import { FLOW_KBM } from "./helpers/config.js";
 import {
   createReminderManager,
   interpolateString,
-  isInTimeRange
+  isInTimeRange,
+  isValidMongoId
 } from "./helpers/utils.js";
 import { pipeline } from "stream";
 import { sendReminderNewDay } from "./webhook/campaignHandlers/XCD09GCampaignHandlers/handlerFunctions.js";
@@ -318,7 +319,7 @@ Checkout README.md to start.</pre>`);
 app.get("/kbm", async (req, res) => {
   const _id = decodeURIComponent(req.query?._id);
   const { contactsCollection } = res.locals.collections;
-  const ref = _id
+  const ref = isValidMongoId(_id)
     ? (await contactsCollection.read({ _id }, { phone: 1 }))?.[0]
     : false;
   const payload = ref
