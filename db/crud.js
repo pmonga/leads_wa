@@ -17,8 +17,12 @@ const crud = (collectionName, db) => {
     // Read documents (excluding soft-deleted)
     read: async (filter = {}, options = {}) => {
       if (typeof filter._id === "string") {
-        console.log("collection and id: ", collectionName, filter._id);
-        filter._id = toObjectId(filter._id);
+        try {
+          filter._id = toObjectId(filter._id);
+        } catch (e) {
+          console.log(e);
+          return [];
+        }
       }
       const collection = db.collection(collectionName);
       filter.deletedAt = { $exists: false }; // Exclude soft-deleted docs
