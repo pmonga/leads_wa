@@ -20,7 +20,12 @@ const crud = (collectionName, db) => {
         try {
           filter._id = toObjectId(filter._id);
         } catch (e) {
-          console.log(e);
+          console.log(
+            "crud.js L24 Read error with _id and collection name: ",
+            filter._id,
+            collectionName,
+            e
+          );
           return [];
         }
       }
