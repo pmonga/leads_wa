@@ -3,14 +3,30 @@ import handleTEST01Campaign from "../campaignHandlers/handleTEST01Campaign.js";
 import handleXCD09GCampaign from "../campaignHandlers/handleXCD09GCampaign.js";
 import handleDefaultCampaign from "../campaignHandlers/handleDefaultCampaign.js";
 import { verifyMessage } from "../../helpers/encryption.js";
-import { isObject } from "../../helpers/utils.js";
+import { isObject, isValidIndianMobile } from "../../helpers/utils.js";
 
 dotnenv.config();
 
 export default async (req, res, next) => {
-  const message = res.locals.message;
-  const contact = res.locals.contact;
-  const campaigns = res.locals.campaigns;
+  async function registrationStartedMessage(phone) {
+    const promoter = (
+      await contactsCollection.read({
+        phone,
+        is_promoter: "true",
+        lastMessageReceivedAt: {
+          $gt: new Date(Date.now() - 24 * 60 * 60 * 1000)
+        }
+      })
+    )?.[0];
+    if (promoter) {
+      await waClient.sendTextMessage(promoter.phone, {
+        body: `A new regisrtaion has been started by ${contact.wa_name}, please ensure its completed to get credit. `
+      });
+    }
+  }
+
+  const { message, contact, campaigns, waClient } = res.locals;
+  const { contactsCollection } = res.locals.collections;
 
   // fields to be updated in contact;
 
@@ -51,8 +67,15 @@ export default async (req, res, next) => {
     res.locals.crm.message += " " + message.text.body;
     if (contact.isNew) {
       const { utm_source, utm_medium } = utm;
-      if (utm_medium === "app_referral" && utm_source) {
+      if (
+        (utm_medium === "app_referral" || utm_medium === "promoter") &&
+        isValidIndianMobile(utm_source)
+      ) {
         fieldsToUpdate["referredBy"] = utm_source;
+        fieldsToUpdate.referralType = utm_medium;
+        if (utm_medium === "promoter") {
+          registrationStartedMessage(utm_source);
+        }
       }
       fieldsToUpdate = { ...fieldsToUpdate, createdBy: code, utm };
     }

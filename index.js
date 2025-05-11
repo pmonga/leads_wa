@@ -22,6 +22,7 @@ import {
   createReminderManager,
   interpolateString,
   isInTimeRange,
+  isValidIndianMobile,
   isValidMongoId
 } from "./helpers/utils.js";
 import { pipeline } from "stream";
@@ -315,12 +316,47 @@ app.get("/", (req, res) => {
   res.send(`<pre>Nothing to see here.
 Checkout README.md to start.</pre>`);
 });
+app.get("/promo-kbm", async (req, res) => {
+  const phone = decodeURIComponent(req.query?.p);
+  const { contactsCollection } = res.locals.collections;
+  const ref = isValidIndianMobile(phone)
+    ? (
+        await contactsCollection.read({
+          phone,
+          is_promoter: "true",
+          lastMessageReceivedAt: {
+            $gt: new Date(Date.now() - 24 * 60 * 60 * 1000)
+          }
+        })
+      )?.[0]
+    : false;
+  const payload = ref
+    ? {
+        utm_source: ref.phone,
+        utm_medium: "promoter",
+        tags: ["promoter"]
+      }
+    : { utm_medium: "promoter", tags: ["promoter"] };
+
+  const signedPayload = signMessage(payload);
+  const message = `[XCD09G]{${signedPayload}}
+
+_token_ends_
+
+
+I want to clear CAT.
+Start Now`;
+
+  const text = encodeURIComponent(message);
+  // "%5BXCD09G%5D%7BeyJ1dG1fbWVkaXVtIjoiYXBwX3JlZmVycmFsIiwidGFncyI6WyJhcHBfcmVmZXJyYWwiXX0%3D.e%2B9jHJsglukBNnMMGPUwYcHiIyBnKx6neHTPOYy7bZI%3D%7D%0A%0A_token_ends_%0A%0A%0AI%20want%20to%20clear%20CAT.%0AStart%20Now";
+  res.redirect(`https://wa.me/919811233305?text=${text}`);
+});
 
 app.get("/kbm", async (req, res) => {
   const _id = decodeURIComponent(req.query?._id);
   const { contactsCollection } = res.locals.collections;
   const ref = isValidMongoId(_id)
-    ? (await contactsCollection.read({ _id }, { phone: 1 }))?.[0]
+    ? (await contactsCollection.read({ _id }))?.[0]
     : false;
   const payload = ref
     ? {

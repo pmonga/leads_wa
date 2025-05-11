@@ -9,6 +9,7 @@ const FLOW_SIGNUP = "567250056293445";
 const FLOW_CLAIM = "1407886380184448";
 const BASE_URL = "https://leads-wa-n4wo.onrender.com";
 const REFERRAL_AMOUNT = 5;
+const PROMOTER_KBM_INCENTIVE = 10;
 // Export individually
 export {
   APP_NAME,
@@ -18,5 +19,6 @@ export {
   FLOW_SIGNUP,
   BASE_URL,
   FLOW_CLAIM,
-  REFERRAL_AMOUNT
+  REFERRAL_AMOUNT,
+  PROMOTER_KBM_INCENTIVE
 };

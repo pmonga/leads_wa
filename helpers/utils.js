@@ -309,6 +309,10 @@ function isValidMongoId(id) {
   return typeof id === "string" && /^[a-f0-9]{24}$/i.test(id);
 }
 
+function isValidIndianMobile(number) {
+  return /^\+91[6-9]\d{9}$/.test(number);
+}
+
 export {
   getTimeWithOffset,
   formatTohhmmDateIST,
@@ -320,6 +324,7 @@ export {
   timeout,
   isInTimeRange,
   interpolateString,
-  isValidMongoId
+  isValidMongoId,
+  isValidIndianMobile
 };
 /* global console, Intl, setTimeout Promise Map clearTimeout */
