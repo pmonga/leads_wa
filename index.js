@@ -323,7 +323,7 @@ app.get("/promo-kbm", async (req, res) => {
     ? (
         await contactsCollection.read({
           phone,
-          is_promoter: "true",
+          is_promoter: true,
           lastMessageReceivedAt: {
             $gt: new Date(Date.now() - 24 * 60 * 60 * 1000)
           }

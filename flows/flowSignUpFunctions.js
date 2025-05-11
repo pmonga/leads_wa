@@ -101,7 +101,7 @@ If you want to refer more friends and earn ${REFERRAL_AMOUNT} credit per success
     const ref = (
       await contactsCollection.read({
         phone,
-        is_promoter: "true",
+        is_promoter: true,
         lastMessageReceivedAt: {
           $gt: new Date(Date.now() - 24 * 60 * 60 * 1000)
         }
