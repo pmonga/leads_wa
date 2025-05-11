@@ -330,6 +330,7 @@ app.get("/promo-kbm", async (req, res) => {
         })
       )?.[0]
     : false;
+  console.log("index.js L333 ref: ", ref);
   const payload = ref
     ? {
         utm_source: ref.phone,
