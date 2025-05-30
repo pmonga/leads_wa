@@ -209,108 +209,108 @@ app.get("/refresh-campaigns", async (req, res) => {
     .status(200)
     .send(`Campaigns refreshed total: ${Object.keys(campaigns).length} `);
 });
-app.get("/kbm-mktg", async (req, res) => {
-  let name = decodeURIComponent(req.query?.name);
-  name = name ? name : "there";
-  const to = decodeURIComponent(req.query?.to);
-  if (!to) {
-    res.send("missing phone number");
-    return;
-  }
-  const waClient = res.locals.waClient;
-  const components = [
-    {
-      type: "header",
-      parameters: [
-        {
-          type: "image",
-          image: {
-            link: "https://lh3.googleusercontent.com/d/1qYE39zbJ8I3_49UvKq3ztuEGN-H-mabc" //"https://lh3.googleusercontent.com/d/1x5gxRIZiEeuHFBgir9XtSAUrDGwzuO_w"
-          }
-        }
-      ]
-    },
-    {
-      type: "body",
-      parameters: [
-        {
-          type: "text",
-          parameter_name: "name",
-          text: name
-        }
-      ]
-    },
-    {
-      type: "button",
-      sub_type: "quick_reply",
-      index: "0",
-      parameters: [
-        {
-          type: "payload",
-          payload: "XCD09G-play"
-        }
-      ]
-    }
-  ];
-  const message = {
-    name: "kbmba_invite_v2",
-    language: { code: "en" },
-    components
-  };
-  try {
-    const result = await waClient.sendTemplateMessage(to, message);
-    res.send("Message sent: " + JSON.stringify(result));
-  } catch (error) {
-    res.send("Error in sending message: " + JSON.stringify(error));
-  }
-});
+// app.get("/kbm-mktg", async (req, res) => {
+//   let name = decodeURIComponent(req.query?.name);
+//   name = name ? name : "there";
+//   const to = decodeURIComponent(req.query?.to);
+//   if (!to) {
+//     res.send("missing phone number");
+//     return;
+//   }
+//   const waClient = res.locals.waClient;
+//   const components = [
+//     {
+//       type: "header",
+//       parameters: [
+//         {
+//           type: "image",
+//           image: {
+//             link: "https://lh3.googleusercontent.com/d/1qYE39zbJ8I3_49UvKq3ztuEGN-H-mabc" //"https://lh3.googleusercontent.com/d/1x5gxRIZiEeuHFBgir9XtSAUrDGwzuO_w"
+//           }
+//         }
+//       ]
+//     },
+//     {
+//       type: "body",
+//       parameters: [
+//         {
+//           type: "text",
+//           parameter_name: "name",
+//           text: name
+//         }
+//       ]
+//     },
+//     {
+//       type: "button",
+//       sub_type: "quick_reply",
+//       index: "0",
+//       parameters: [
+//         {
+//           type: "payload",
+//           payload: "XCD09G-play"
+//         }
+//       ]
+//     }
+//   ];
+//   const message = {
+//     name: "kbmba_invite_v2",
+//     language: { code: "en" },
+//     components
+//   };
+//   try {
+//     const result = await waClient.sendTemplateMessage(to, message);
+//     res.send("Message sent: " + JSON.stringify(result));
+//   } catch (error) {
+//     res.send("Error in sending message: " + JSON.stringify(error));
+//   }
+// });
 
-app.get("/100-mktg", async (req, res) => {
-  const to = decodeURIComponent(req.query?.to);
-  if (!to) {
-    res.send("missing phone number");
-    return;
-  }
-  const waClient = res.locals.waClient;
-  const components = [
-    {
-      type: "header",
-      parameters: [
-        {
-          type: "image",
-          image: {
-            link: "https://lh3.googleusercontent.com/d/1Splpv42kkNFZdptiDsML4szkvzaINaEZ"
-          }
-        }
-      ]
-    },
-    {
-      type: "body"
-    },
-    {
-      type: "button",
-      sub_type: "quick_reply",
-      index: "0",
-      parameters: [
-        {
-          type: "payload",
-          payload: "COMMON-callback"
-        }
-      ]
-    }
-  ];
-  const message = {
-    name: "mktg_100_percentile",
-    language: { code: "en" },
-    components
-  };
-  try {
-    const result = await waClient.sendTemplateMessage(to, message);
-    res.send("Message sent: " + JSON.stringify(result));
-  } catch (error) {
-    res.send("Error in sending message: " + JSON.stringify(error));
-  }
-});
+// app.get("/100-mktg", async (req, res) => {
+//   const to = decodeURIComponent(req.query?.to);
+//   if (!to) {
+//     res.send("missing phone number");
+//     return;
+//   }
+//   const waClient = res.locals.waClient;
+//   const components = [
+//     {
+//       type: "header",
+//       parameters: [
+//         {
+//           type: "image",
+//           image: {
+//             link: "https://lh3.googleusercontent.com/d/1Splpv42kkNFZdptiDsML4szkvzaINaEZ"
+//           }
+//         }
+//       ]
+//     },
+//     {
+//       type: "body"
+//     },
+//     {
+//       type: "button",
+//       sub_type: "quick_reply",
+//       index: "0",
+//       parameters: [
+//         {
+//           type: "payload",
+//           payload: "COMMON-callback"
+//         }
+//       ]
+//     }
+//   ];
+//   const message = {
+//     name: "mktg_100_percentile",
+//     language: { code: "en" },
+//     components
+//   };
+//   try {
+//     const result = await waClient.sendTemplateMessage(to, message);
+//     res.send("Message sent: " + JSON.stringify(result));
+//   } catch (error) {
+//     res.send("Error in sending message: " + JSON.stringify(error));
+//   }
+// });
 
 app.get("/", (req, res) => {
   res.send(`<pre>Nothing to see here.
